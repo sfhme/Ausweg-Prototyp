@@ -1,0 +1,1978 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Ausweg</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IM+Fell+English+SC&family=Alegreya+Sans:wght@400;500;700&family=Courier+Prime&display=swap">
+<style>
+/* Layout: oben Partie-Leiste; links der Raum (Dinge als Karten, Handlungen darunter), rechts das Protokoll der Ereignisse;
+   unten das Inventar. Unter 900px alles untereinander. Eine bewusst dunkle Welt: ein altes Haus bei Lampenlicht. */
+:root{
+  --bg:#15120f; --wand:#211c17; --karte:#2c251e; --karte2:#372e25; --linie:#4a3f33; --text:#e9dfcc; --leise:#a89880;
+  --lampe:#e2b259; --ereignis:#9fc7b5; --warnung:#e07a5f; --erfolg:#b5d98a; --system:#c9b8e8;
+  --f-titel:"IM Fell English SC",Georgia,serif; --f-text:"Alegreya Sans",system-ui,sans-serif; --f-code:"Courier Prime",Consolas,monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{background:var(--bg);color:var(--text)}
+body{margin:0;font-family:var(--f-text);font-size:16px;line-height:1.45;padding-inline:16px;padding-block:14px 32px}
+button,input,select{font:inherit;color:inherit}
+.app{max-width:1200px;margin:0 auto;display:flex;flex-direction:column;gap:12px}
+header{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:flex-end;border-bottom:1px solid var(--linie);padding-bottom:10px}
+h1{font-family:var(--f-titel);font-weight:400;font-size:clamp(30px,5vw,44px);margin:0;line-height:1;letter-spacing:.02em}
+.unter{color:var(--leise);font-size:14px}
+.einstellung{margin-left:auto;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.einstellung label{font-size:13px;color:var(--leise);display:flex;gap:6px;align-items:center}
+.einstellung select,.einstellung input{background:var(--karte);border:1px solid var(--linie);border-radius:4px;padding:5px 8px;width:auto}
+.einstellung input{width:90px}
+.knopf{background:var(--karte2);border:1px solid var(--linie);border-radius:4px;padding:7px 14px;cursor:pointer}
+.knopf:hover:not([disabled]){border-color:var(--lampe)}
+.knopf[disabled]{opacity:.4;cursor:not-allowed}
+.knopf.haupt{background:#5a4320;border-color:var(--lampe)}
+:focus-visible{outline:2px solid var(--lampe);outline-offset:2px}
+.stand{display:flex;gap:16px;font-family:var(--f-code);font-size:15px;color:var(--leise)}
+.stand b{color:var(--lampe);font-weight:400}
+.buehne{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:12px}
+@media (max-width:900px){.buehne{grid-template-columns:minmax(0,1fr)}}
+.raum{background:var(--wand);border:1px solid var(--linie);border-radius:6px;padding:12px;display:flex;flex-direction:column;gap:12px;min-width:0;transition:background .4s}
+.raum.dunkel{background:#0b0a09}
+.raum.dunkel .ding{filter:brightness(.55)}
+.raumkopf{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between}
+.raumkopf h2{font-family:var(--f-titel);font-weight:400;font-size:24px;margin:0}
+.raeume{display:flex;gap:6px}
+.dinge{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.ding{background:var(--karte);border:1px solid var(--linie);border-radius:6px;padding:10px;text-align:left;cursor:pointer;display:flex;flex-direction:column;gap:3px;min-height:64px}
+.ding:hover{border-color:var(--leise)}
+.ding.gewaehlt{border-color:var(--lampe);background:#3a2f20}
+.ding .typ{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--leise)}
+.ding .name{font-weight:500}
+.ding.offen .name::after{content:" \2713";color:var(--erfolg)}
+.handlungen{border-top:1px solid var(--linie);padding-top:10px;display:flex;flex-direction:column;gap:8px}
+.handlungen .ziel{font-size:14px;color:var(--leise)}
+.reihe{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.code{background:var(--bg);border:1px solid var(--linie);border-radius:4px;padding:6px 8px;width:110px;font-family:var(--f-code);letter-spacing:.2em}
+.protokoll{background:#1b1713;border:1px solid var(--linie);border-radius:6px;display:flex;flex-direction:column;min-height:300px;max-height:560px;min-width:0}
+.protokoll h2{font-family:var(--f-titel);font-weight:400;font-size:20px;margin:0;padding:10px 12px;border-bottom:1px solid var(--linie)}
+#log{flex:1;overflow-y:auto;padding:10px 12px;display:flex;flex-direction:column;gap:8px}
+#log p{margin:0;max-width:62ch}
+#log .ereignis{color:var(--ereignis)}
+#log .warnung{color:var(--warnung)}
+#log .erfolg{color:var(--erfolg);font-weight:700}
+#log .system{color:var(--system);font-style:italic}
+#log .ich{color:var(--leise);font-size:14px}
+.inventar{background:var(--wand);border:1px solid var(--linie);border-radius:6px;padding:10px 12px}
+.inventar h2{font-family:var(--f-titel);font-weight:400;font-size:20px;margin:0 0 4px}
+.hinweis{font-size:13px;color:var(--leise);margin:0 0 8px}
+#inv{display:flex;flex-wrap:wrap;gap:8px}
+.gegenstand{background:var(--karte);border:1px solid var(--linie);border-radius:6px;padding:7px 10px;cursor:pointer;text-align:left}
+.gegenstand.gewaehlt{border-color:var(--lampe);background:#3a2f20}
+.gegenstand small{display:block;color:var(--leise);font-size:12px}
+.leer{color:var(--leise);font-style:italic}
+.banner{border-radius:6px;padding:14px 16px;font-size:18px;border:1px solid}
+.banner.gewonnen{background:#24301b;border-color:var(--erfolg)}
+.banner.verloren{background:#3a1d17;border-color:var(--warnung)}
+details{background:var(--wand);border:1px solid var(--linie);border-radius:6px;padding:10px 12px}
+details summary{cursor:pointer;font-weight:500}
+#spoiler{font-size:14px;max-width:80ch}
+#spoiler h3{font-family:var(--f-titel);font-weight:400;font-size:20px;margin:12px 0 4px}
+#spoiler ul,#spoiler ol{padding-left:22px;margin:4px 0}
+@media (prefers-reduced-motion:reduce){.raum{transition:none}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div>
+      <h1>Ausweg</h1>
+      <div class="unter">Prototyp, solo. Jede Partie wird neu erzeugt und vor dem Start gepr&uuml;ft.</div>
+    </div>
+    <div class="einstellung">
+      <label for="stufe">Stufe
+        <select id="stufe"><option value="1">1 leicht</option><option value="2" selected>2 mittel</option><option value="3">3 schwer</option></select>
+      </label>
+      <label for="seed">Partie-Nr.
+        <input id="seed" inputmode="numeric" value="">
+      </label>
+      <button class="knopf haupt" id="neu" type="button">Neue Partie</button>
+    </div>
+  </header>
+
+  <div class="stand"><span>Zeit <b id="zeit">0</b></span><span>Partie <b id="nr">-</b></span><span id="lichtanzeige">Licht an</span></div>
+  <div id="banner" class="banner" hidden></div>
+
+  <div class="buehne">
+    <section class="raum" id="raum">
+      <div class="raumkopf"><h2 id="raumname"></h2><div class="raeume" id="raeume"></div></div>
+      <div class="dinge" id="dinge"></div>
+      <div class="handlungen">
+        <div class="ziel" id="ziel">W&auml;hle etwas im Raum.</div>
+        <div class="reihe">
+          <button class="knopf" type="button" data-b="ansehen" disabled>Ansehen</button>
+          <button class="knopf" type="button" data-b="anfassen" disabled>Anfassen / bedienen</button>
+          <button class="knopf" type="button" data-b="nehmen" disabled>Nehmen</button>
+          <button class="knopf" type="button" data-b="benutzen" disabled>Gew&auml;hlte Gegenst&auml;nde benutzen</button>
+        </div>
+        <div class="reihe" id="codereihe" hidden>
+          <label for="codefeld" class="ziel">Code</label>
+          <input id="codefeld" class="code" inputmode="numeric" maxlength="6">
+          <button class="knopf" type="button" data-b="eingeben">Eingeben</button>
+        </div>
+        <div class="reihe">
+          <button class="knopf" type="button" data-b="warten">Warten</button>
+          <button class="knopf" type="button" data-b="krach" disabled>Mit gew&auml;hltem Gegenstand Krach machen</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="protokoll" aria-label="Geschehen">
+      <h2>Was geschieht</h2>
+      <div id="log" aria-live="polite"></div>
+    </section>
+  </div>
+
+  <section class="inventar">
+    <h2>Bei dir</h2>
+    <p class="hinweis">Antippen w&auml;hlt aus. Mehrere Dinge zusammen gehen nur, wenn etwas Rei&szlig;festes zum Verbinden dabei ist.</p>
+    <div id="inv"></div>
+  </section>
+
+  <details>
+    <summary>F&uuml;r Tester: Aufbau und L&ouml;sung dieser Partie (Spoiler)</summary>
+    <div id="spoiler"></div>
+  </details>
+</div>
+
+<script>
+// Gesaeter Zufall fuer Bodenlos (KONZEPT 15 Schritt 1, 8.2). Streng ES5, wird spaeter in main.js (Rhino) eingebaut.
+// Algorithmus nie aendern: jede Aenderung macht Aufzeichnungen und Karten ungueltig (Festwerte in test_zufall.js).
+var Zufall = (function () {
+    'use strict';
+
+    var ZWEI_HOCH_32 = 4294967296;
+    var SAAT_A = 0x2545f491, SAAT_B = 0x9e3779b9, SAAT_WURF = 0x5bd1e995;
+
+    // Math.imul ist ES2015 und fuer Rhino nicht belegt.
+    function mul32(a, b) {
+        var aHi = (a >>> 16) & 0xffff, aLo = a & 0xffff;
+        var bHi = (b >>> 16) & 0xffff, bLo = b & 0xffff;
+        return ((aLo * bLo) + (((aHi * bLo + aLo * bHi) << 16) >>> 0)) | 0;
+    }
+
+    function fmix32(h) {
+        h ^= h >>> 16;
+        h = mul32(h, 0x85ebca6b);
+        h ^= h >>> 13;
+        h = mul32(h, 0xc2b2ae35);
+        h ^= h >>> 16;
+        return h >>> 0;
+    }
+
+    // MurmurHash3 x86_32 ueber 32-Bit-Woerter
+    function murmur(worte, saat) {
+        var h = saat | 0, k, i;
+        for (i = 0; i < worte.length; i++) {
+            k = mul32(worte[i] | 0, 0xcc9e2d51);
+            k = (k << 15) | (k >>> 17);
+            k = mul32(k, 0x1b873593);
+            h ^= k;
+            h = (h << 13) | (h >>> 19);
+            h = (mul32(h, 5) + 0xe6546b64) | 0;
+        }
+        h ^= worte.length * 4;
+        return fmix32(h);
+    }
+
+    // Laengenpraefix, damit ('ab','c') und ('a','bc') verschiedene Woerter ergeben
+    function textWorte(text, ziel) {
+        var s = String(text), n = s.length, i;
+        ziel.push(n);
+        for (i = 0; i < n; i += 2) {
+            ziel.push(s.charCodeAt(i) | ((i + 1 < n ? s.charCodeAt(i + 1) : 0) << 16));
+        }
+        return ziel;
+    }
+
+    // Zaehlerbasiert: Wurf n = hash(Schluessel, n). Zu speichern ist je Strom nur der Zaehler.
+    // Schluessel und Seed liegen nur in der Closure, JSON.stringify eines Stroms verraet nichts (12).
+    // name nur aus stabilen Server-IDs bilden, nie aus Nick oder Spielertext: Nicks aendern sich (Wiedergabe
+    // bricht), und MurmurHash3 hat gezielt konstruierbare Kollisionen, die k1 und k2 zugleich treffen.
+    function strom(seed, name, zaehler) {
+        var worte = textWorte(name, textWorte(seed, []));
+        var k1 = murmur(worte, SAAT_A), k2 = murmur(worte, SAAT_B);
+        var n = zaehler || 0;
+
+        function u32() {
+            var w = murmur([k1, k2, n >>> 0, Math.floor(n / ZWEI_HOCH_32)], SAAT_WURF);
+            n++;
+            return w;
+        }
+        function zahl() { return u32() / ZWEI_HOCH_32; }
+        function bis(anzahl) { return Math.floor(zahl() * anzahl); }
+
+        return {
+            u32: u32,
+            zahl: zahl,
+            bis: bis,
+            zwischen: function (min, max) { return min + bis(max - min + 1); },
+            chance: function (p) { return zahl() < p; },
+            waehle: function (liste) { return liste[bis(liste.length)]; },
+            mischen: function (liste) {
+                var a = liste.slice(), i, j, t;
+                for (i = a.length - 1; i > 0; i--) {
+                    j = bis(i + 1);
+                    t = a[i]; a[i] = a[j]; a[j] = t;
+                }
+                return a;
+            },
+            zaehler: function () { return n; }
+        };
+    }
+
+    return { version: 1, strom: strom, _mul32: mul32, _murmur: murmur };
+})();
+
+if (typeof module !== 'undefined' && module.exports) { module.exports = Zufall; }
+
+</script>
+<script>
+// Katalog fuer den Partie-Generator von Ausweg (KONZEPT 4). Streng ES5, reine Daten.
+// Die Datei bleibt reines ASCII (Auslieferung unter Rhino, wie im Bodenlos-Kern): Umlaute stehen als ^a ^o ^u ^A ^O ^U ^s
+// und werden beim Laden einmal aufgeloest (Katalog.um).
+//
+// Aufbau:
+//   AUSLOESER    was ein Verhalten anstoesst, mit Text und Bedarf (was die Spieler tun muessen, damit er eintritt)
+//   ELEMENTE     was im Raum steht; jedes Element hat mehrere Faehigkeiten (Art, erlaubte Ausloeser, Text).
+//                Welche Faehigkeit ein Element in einer Partie zeigt, entscheidet erst der Generator (drei Achsen).
+//   GEGENSTAENDE was man aufheben kann, mit Eigenschaften und Staerke (wie im Eigenschaftssystem von Bodenlos)
+//   HINDERNISSE  wo ein Ding verborgen sein kann, mit mehreren Loesungswegen (Idee 12)
+//   SCHLOESSER   was die Tuer verlangt
+//   GEGENMITTEL  wie eine Bedrohung gebannt wird, je Ausloeser
+var Katalog = (function () {
+    'use strict';
+
+    function um(s) {
+        return String(s).replace(/\^a/g, '\u00e4').replace(/\^o/g, '\u00f6').replace(/\^u/g, '\u00fc')
+            .replace(/\^A/g, '\u00c4').replace(/\^O/g, '\u00d6').replace(/\^U/g, '\u00dc').replace(/\^s/g, '\u00df');
+    }
+
+    // Arten (Rollen fuer die Loesung): zahl = zeigt einen Code, richtung = weist auf ein Versteck,
+    // behaelter = gibt etwas frei, traeger = bringt Unerreichbares heran, bedrohung = sperrt einen Bereich,
+    // keine = verhaelt sich, aber folgenlos (Ablenkung).
+    var ARTEN = ['zahl', 'richtung', 'behaelter', 'traeger', 'bedrohung', 'keine'];
+
+    // bedarf: 'nichts' (geschieht beim Hinsehen oder Anfassen), 'licht' (Licht im Raum aus), 'laerm' (irgendwo im Raum
+    // Laerm), 'waerme' (das Element erwaermen), 'wasser' (Hahn im Raum auf), 'zeit' (warten)
+    var AUSLOESER = {
+        hinsehen:   { text: 'bei langem Hinsehen', bedarf: 'nichts', vor: 'Als du eine Weile hinsiehst:' },
+        wegsehen:   { text: 'wenn gerade niemand hinsieht', bedarf: 'nichts', vor: 'Du drehst dich kurz weg. Als du wieder hinsiehst:' },
+        licht_aus:  { text: 'sobald das Licht aus ist', bedarf: 'licht', vor: 'Das Licht flackert und ist einen Moment aus. Dabei:' },
+        laerm:      { text: 'bei L^arm im Raum', bedarf: 'laerm', vor: 'Irgendwo f^allt polternd etwas um. Sofort:' },
+        beruehrung: { text: 'bei Ber^uhrung', bedarf: 'nichts', vor: 'Im Vorbeigehen st^o^st du gegen etwas. Dabei:' },
+        waerme:     { text: 'bei Erw^armung', bedarf: 'waerme', vor: 'Ein Schwall warmer Luft zieht aus dem Heizungsrohr durch den Raum. Dabei:' },
+        wasser:     { text: 'sobald Wasser l^auft', bedarf: 'wasser', vor: 'In der Leitung rauscht kurz Wasser. Dabei:' },
+        zeit:       { text: 'nach einer Weile', bedarf: 'zeit', vor: 'Nach einer Weile:' },
+        naehe:      { text: 'bei Ann^aherung', bedarf: 'nichts', vor: 'Als du n^aher kommst:' }
+    };
+
+    // Jede Faehigkeit: art, aus (erlaubte Ausloeser), text (Satz ohne Ausloeser; {ziel} = Versteck oder Inhalt).
+    var ELEMENTE = {
+        puppe: { name: 'Puppe', nom: 'die Puppe', akk: 'die Puppe', b: 'Eine alte Stoffpuppe mit aufgen^ahten Knopfaugen. Ihr Blick ist unangenehm wach.', f: [
+            { art: 'richtung', aus: ['wegsehen', 'licht_aus', 'laerm'], text: 'Die Puppe r^uckt jedes Mal ein St^uck weiter. Ihr Ziel: {ziel}.' },
+            { art: 'richtung', aus: ['laerm', 'beruehrung'], text: 'Die Puppe dreht den Kopf und starrt auf eine Stelle: {ziel}.' },
+            { art: 'zahl', aus: ['licht_aus'], text: 'Auf dem Kleid der Puppe leuchten Ziffern auf.' },
+            { art: 'behaelter', aus: ['beruehrung', 'waerme'], text: 'Eine Klappe im R^ucken der Puppe springt auf. Darin: {ziel}.' },
+            { art: 'traeger', aus: ['laerm', 'licht_aus'], text: 'Die Puppe ^offnet die Hand und l^asst fallen, was sie hielt: {ziel}.' },
+            { art: 'bedrohung', aus: ['wegsehen', 'licht_aus', 'laerm'], text: 'Die Puppe kommt n^aher.' },
+            { art: 'keine', aus: ['wegsehen', 'laerm', 'hinsehen'], text: 'Die Puppe neigt den Kopf. Sonst nichts.' }
+        ] },
+        becken: { name: 'Wasserbottich', nom: 'der Wasserbottich', akk: 'den Wasserbottich', b: 'Ein gro^ser Holzbottich voll tr^ubem Wasser, daneben ein enger Schacht im Boden.', f: [
+            { art: 'bedrohung', aus: ['zeit'], text: 'Das Wasser steigt und flutet den Boden.' },
+            { art: 'traeger', aus: ['wasser'], text: 'Das Wasser steigt im Schacht und hebt nach oben, was schwimmt: {ziel}.' },
+            { art: 'zahl', aus: ['wasser'], text: 'Auf der Wasseroberfl^ache spiegeln sich Ziffern von der Decke.' },
+            { art: 'behaelter', aus: ['beruehrung'], text: 'Das Wasser l^auft ab. Am Grund liegt: {ziel}.' },
+            { art: 'keine', aus: ['wasser', 'zeit'], text: 'Der Bottich gluckert.' }
+        ] },
+        grammophon: { name: 'Grammophon', nom: 'das Grammophon', akk: 'das Grammophon', b: 'Ein Grammophon mit Messingtrichter. Eine Platte liegt schon auf dem Teller.', f: [
+            { art: 'zahl', aus: ['beruehrung', 'zeit'], text: 'Das Grammophon spielt. Die Zahl der T^one je Takt ergibt die Ziffern.' },
+            { art: 'richtung', aus: ['laerm'], text: 'Der Trichter des Grammophons dreht sich und zeigt auf eine Stelle: {ziel}.' },
+            { art: 'behaelter', aus: ['beruehrung', 'zeit'], text: 'Am Ende der Platte springt ein Fach im Sockel auf. Darin: {ziel}.' },
+            { art: 'keine', aus: ['beruehrung', 'zeit'], text: 'Das Grammophon kratzt eine Melodie ohne Bedeutung.' }
+        ] },
+        standuhr: { name: 'Standuhr', nom: 'die Standuhr', akk: 'die Standuhr', b: 'Eine Standuhr, h^oher als du. Das Pendel schwingt hinter Glas.', f: [
+            { art: 'zahl', aus: ['zeit', 'beruehrung'], text: 'Die Standuhr schl^agt. Die Schl^age, mit Pausen dazwischen, ergeben die Ziffern.' },
+            { art: 'behaelter', aus: ['zeit'], text: 'Zur vollen Stunde ^offnet sich das Geh^ause der Uhr. Darin: {ziel}.' },
+            { art: 'richtung', aus: ['beruehrung'], text: 'Das Pendel bleibt schr^ag stehen und zeigt auf eine Stelle: {ziel}.' },
+            { art: 'bedrohung', aus: ['zeit'], text: 'Bei jedem Schlag senkt sich die Decke ein St^uck.' },
+            { art: 'keine', aus: ['zeit'], text: 'Die Standuhr tickt laut.' }
+        ] },
+        spiegel: { name: 'Wandspiegel', nom: 'der Wandspiegel', akk: 'den Wandspiegel', b: 'Ein hoher Wandspiegel mit fleckigem Glas.', f: [
+            { art: 'zahl', aus: ['waerme', 'wasser'], text: 'Der Spiegel beschl^agt, und im Beschlag erscheinen Ziffern.' },
+            { art: 'richtung', aus: ['hinsehen', 'licht_aus'], text: 'Im Spiegelbild ist eine Stelle markiert, im Raum selbst nicht: {ziel}.' },
+            { art: 'behaelter', aus: ['beruehrung'], text: 'Der Spiegel l^asst sich zur Seite klappen. Dahinter: {ziel}.' },
+            { art: 'bedrohung', aus: ['hinsehen'], text: 'Dein Spiegelbild bewegt sich nicht mehr mit und greift nach dir.' },
+            { art: 'keine', aus: ['hinsehen'], text: 'Das Spiegelbild blinzelt einen Moment zu sp^at.' }
+        ] },
+        kerze: { name: 'Kerzenleuchter', nom: 'der Kerzenleuchter', akk: 'den Kerzenleuchter', b: 'Ein schwerer Kerzenleuchter mit drei dicken Kerzen, nicht angez^undet.', f: [
+            { art: 'richtung', aus: ['waerme'], text: 'Die Flamme neigt sich im Luftzug und verr^at eine Stelle: {ziel}.' },
+            { art: 'behaelter', aus: ['waerme'], text: 'Das Wachs schmilzt und gibt frei, was darin eingegossen war: {ziel}.' },
+            { art: 'zahl', aus: ['waerme', 'zeit'], text: 'Herablaufendes Wachs legt eingeritzte Ziffern frei.' },
+            { art: 'keine', aus: ['waerme'], text: 'Die Kerze brennt und flackert.' }
+        ] },
+        gemaelde: { name: 'Portr^at', nom: 'das Portr^at', akk: 'das Portr^at', b: 'Das Portr^at einer strengen alten Dame in schwarzem Kleid.', f: [
+            { art: 'richtung', aus: ['naehe', 'hinsehen'], text: 'Die Augen im Portr^at wandern zu einer Stelle: {ziel}.' },
+            { art: 'zahl', aus: ['licht_aus'], text: 'Im Hintergrund des Portr^ats leuchten Ziffern.' },
+            { art: 'behaelter', aus: ['beruehrung'], text: 'Hinter dem Rahmen klemmt etwas: {ziel}.' },
+            { art: 'bedrohung', aus: ['hinsehen'], text: 'Wer dem Portr^at in die Augen sieht, kann sich nicht mehr r^uhren.' },
+            { art: 'keine', aus: ['naehe'], text: 'Das Portr^at scheint zu l^acheln.' }
+        ] },
+        katze: { name: 'Katze', nom: 'die Katze', akk: 'die Katze', b: 'Eine graue Katze. Sie beobachtet dich, als w^usste sie mehr als du.', f: [
+            { art: 'richtung', aus: ['laerm'], text: 'Die Katze flitzt zu ihrem Versteck: {ziel}.' },
+            { art: 'traeger', aus: ['beruehrung', 'laerm'], text: 'Die Katze bringt etwas und legt es vor dir ab: {ziel}.' },
+            { art: 'behaelter', aus: ['waerme'], text: 'Die Katze steht von ihrem warmen Platz auf. Darunter lag: {ziel}.' },
+            { art: 'bedrohung', aus: ['naehe'], text: 'Die Katze faucht und kratzt jeden, der n^aher kommt.' },
+            { art: 'keine', aus: ['naehe', 'laerm'], text: 'Die Katze putzt sich und ignoriert dich.' }
+        ] },
+        radio: { name: 'altes Radio', nom: 'das alte Radio', akk: 'das alte Radio', b: 'Ein altes Kofferradio mit Antenne, das leise knistert.', f: [
+            { art: 'zahl', aus: ['beruehrung', 'zeit'], text: 'Das Radio rauscht, dann liest eine Stimme Ziffern vor.' },
+            { art: 'richtung', aus: ['naehe'], text: 'Das Rauschen wird lauter, je n^aher man einer Stelle kommt: {ziel}.' },
+            { art: 'behaelter', aus: ['beruehrung'], text: 'Im Batteriefach des Radios steckt etwas: {ziel}.' },
+            { art: 'keine', aus: ['beruehrung'], text: 'Das Radio spielt leise Tanzmusik.' }
+        ] },
+        schaukelstuhl: { name: 'Schaukelstuhl', nom: 'der Schaukelstuhl', akk: 'den Schaukelstuhl', b: 'Ein Schaukelstuhl aus Korbgeflecht mit fleckigem Sitzpolster.', f: [
+            { art: 'zahl', aus: ['wegsehen', 'zeit'], text: 'Der Schaukelstuhl schaukelt im Takt. Die Schl^age je Pause ergeben die Ziffern.' },
+            { art: 'richtung', aus: ['wegsehen'], text: 'Der Schaukelstuhl hat sich gedreht und zeigt jetzt mit der Lehne auf eine Stelle: {ziel}.' },
+            { art: 'behaelter', aus: ['beruehrung'], text: 'Unter dem Sitzpolster liegt etwas: {ziel}.' },
+            { art: 'bedrohung', aus: ['wegsehen', 'licht_aus'], text: 'Der Schaukelstuhl r^uckt auf dich zu und versperrt den Weg.' },
+            { art: 'keine', aus: ['wegsehen'], text: 'Der Schaukelstuhl schaukelt von allein.' }
+        ] },
+        ventilator: { name: 'Deckenventilator', nom: 'der Deckenventilator', akk: 'den Deckenventilator', b: 'Ein Deckenventilator mit vier Holzfl^ugeln. Eine Kordel h^angt herab.', f: [
+            { art: 'traeger', aus: ['beruehrung'], text: 'Der Ventilator l^auft an und weht vom Schrank, was oben lag: {ziel}.' },
+            { art: 'richtung', aus: ['beruehrung'], text: 'Der Luftzug wirbelt Staub auf, und der Staub zeigt auf eine Stelle: {ziel}.' },
+            { art: 'bedrohung', aus: ['naehe'], text: 'Die Fl^ugel des Ventilators sacken tief und schlagen nach jedem, der darunter geht.' },
+            { art: 'keine', aus: ['beruehrung'], text: 'Der Ventilator quietscht und dreht sich.' }
+        ] }
+    };
+
+    // Eigenschaften und Staerke wie im Eigenschaftssystem. Kein Gegenstand kennt ein Hindernis.
+    var GEGENSTAENDE = {
+        hammer:       { name: 'Hammer', nom: 'der Hammer', akk: 'den Hammer', e: { schwer: 2, stumpf: 2, laut: 1 },
+            b: 'Ein Schlosserhammer mit schwerem Eisenkopf.' },
+        brechstange:  { name: 'Brechstange', nom: 'die Brechstange', akk: 'die Brechstange', e: { schwer: 2, lang: 2, stumpf: 1, laut: 1 },
+            b: 'Eine lange, schwere Brechstange aus Stahl.' },
+        messer:       { name: 'K^uchenmesser', nom: 'das K^uchenmesser', akk: 'das K^uchenmesser', e: { scharf: 2 },
+            b: 'Ein K^uchenmesser mit frisch geschliffener Klinge.' },
+        schere:       { name: 'Schere', nom: 'die Schere', akk: 'die Schere', e: { scharf: 1 },
+            b: 'Eine kleine Bastelschere, nicht besonders scharf.' },
+        saeurehaltig:       { name: 'Flasche Abflussreiniger', nom: 'die Flasche Abflussreiniger', akk: 'die Flasche Abflussreiniger', e: { saeurehaltig: 2 },
+            b: 'Abflussreiniger. Auf dem Etikett steht: stark ^atzend.' },
+        feuerzeug:    { name: 'Feuerzeug', nom: 'das Feuerzeug', akk: 'das Feuerzeug', e: { entzuendend: 1 },
+            b: 'Ein Sturmfeuerzeug. Es z^undet beim ersten Versuch.' },
+        streichhoelzer: { name: 'Streichh^olzer', nom: 'die Streichh^olzer', akk: 'die Streichh^olzer', pl: true, e: { entzuendend: 1 },
+            b: 'Eine Schachtel Streichh^olzer, gut gef^ullt.' },
+        taschenlampe: { name: 'Taschenlampe', nom: 'die Taschenlampe', akk: 'die Taschenlampe', e: { licht: 2 },
+            b: 'Eine Taschenlampe mit kr^aftigem Strahl.' },
+        tuch:         { name: 'Tischtuch', nom: 'das Tischtuch', akk: 'das Tischtuch', e: { deckend: 2, saugfaehig: 1 },
+            b: 'Ein gro^ses Tischtuch aus Leinen. Es nimmt auch etwas Wasser auf.' },
+        decke:        { name: 'Wolldecke', nom: 'die Wolldecke', akk: 'die Wolldecke', e: { deckend: 3 },
+            b: 'Eine dicke, sehr gro^se Wolldecke.' },
+        handspiegel:  { name: 'Handspiegel', nom: 'der Handspiegel', akk: 'den Handspiegel', e: { spiegelnd: 2 },
+            b: 'Ein Handspiegel mit klarem Glas.' },
+        besen:        { name: 'Besenstiel', nom: 'der Besenstiel', akk: 'den Besenstiel', e: { lang: 3 },
+            b: 'Ein langer, leichter Besenstiel.' },
+        kleiderhaken: { name: 'Kleiderb^ugel', nom: 'der Kleiderb^ugel', akk: 'den Kleiderb^ugel', e: { haken: 1 },
+            b: 'Ein Kleiderb^ugel aus Draht, oben ein kleiner Haken.' },
+        angel:        { name: 'Angelrute', nom: 'die Angelrute', akk: 'die Angelrute', e: { lang: 3, haken: 1 },
+            b: 'Eine lange Angelrute, an der Schnur h^angt ein Haken.' },
+        schnur:       { name: 'Rolle Schnur', nom: 'die Rolle Schnur', akk: 'die Rolle Schnur', e: { reissfest: 2 },
+            b: 'Eine Rolle feste Schnur, ein paar Meter lang.' },
+        wecker:       { name: 'Wecker', nom: 'der Wecker', akk: 'den Wecker', e: { laut: 2 },
+            b: 'Ein alter Blechwecker mit sehr lauter Glocke.' },
+        hantel:       { name: 'Hantel', nom: 'die Hantel', akk: 'die Hantel', e: { schwer: 3, stumpf: 2, laut: 1 },
+            b: 'Eine Kurzhantel aus Gusseisen, sehr schwer.' },
+        topf:         { name: 'Kochtopf', nom: 'der Kochtopf', akk: 'den Kochtopf', e: { laut: 1, stumpf: 1 },
+            b: 'Ein leichter Kochtopf aus d^unnem Blech.' },
+        pfanne:       { name: 'Gusseisenpfanne', nom: 'die Gusseisenpfanne', akk: 'die Gusseisenpfanne', e: { schwer: 3, stumpf: 2, laut: 1 },
+            b: 'Eine schwere Pfanne aus Gusseisen.' }
+    };
+
+    // Wenn ein Gegenstand fuer einen Weg nicht reicht: woran es liegt (Satz: "<Ding> ist dafuer <ZU_WENIG>.").
+    // Spieler sehen keine Eigenschaften und Stufen, also muss ein knapper Fehlversuch den Grund nennen.
+    var ZU_WENIG = {
+        schwer: 'zu leicht', stumpf: 'nicht wuchtig genug', lang: 'zu kurz', scharf: 'nicht scharf genug',
+        saeurehaltig: 'nicht ^atzend genug', entzuendend: 'nicht zum Anz^unden geeignet', licht: 'nicht hell genug',
+        deckend: 'zu klein zum Abdecken', saugfaehig: 'nicht saugf^ahig genug', spiegelnd: 'kein brauchbarer Spiegel',
+        haken: 'ohne Haken nicht zu gebrauchen', reissfest: 'nicht rei^sfest genug', laut: 'nicht laut genug'
+    };
+
+    // Text der Eigenschaften fuer das Protokoll
+    var EIGENSCHAFT_TEXT = {
+        schwer: 'schwer', stumpf: 'stumpf', laut: 'laut', lang: 'lang', scharf: 'scharf', saeurehaltig: '^atzend',
+        entzuendend: 'entz^undend', licht: 'Licht', deckend: 'deckend', saugfaehig: 'saugf^ahig', spiegelnd: 'spiegelnd',
+        haken: 'Haken', reissfest: 'rei^sfest', schluessel: 'Schl^ussel'
+    };
+
+    // Verstecke. Jede Alternative ist ein Loesungsweg: b = Bedingung (Eigenschaft: Mindeststaerke), h = Haende,
+    // laerm = macht Laerm (Nebenwirkung). Eine Bedingung darf von zwei Gegenstaenden gemeinsam erfuellt werden, wenn die
+    // Gruppe etwas Reissfestes zum Verbinden hat (Meta-Regel "Befestigen" aus Bodenlos).
+    var HINDERNISSE = {
+        holzkiste: { name: 'Holzkiste mit Vorh^angeschloss', nom: 'die Holzkiste mit Vorh^angeschloss', akk: 'die Holzkiste mit Vorh^angeschloss', alt: [
+            { text: 'aufbrechen', b: { schwer: 2 }, laerm: true },
+            { text: 'Schloss weg^atzen', b: { saeurehaltig: 1 } },
+            { text: 'Deckel aufhebeln', b: { lang: 2, schwer: 2 } }
+        ] },
+        paket: { name: 'mit Draht verschn^urtes Paket', nom: 'das mit Draht verschn^urte Paket', akk: 'das mit Draht verschn^urte Paket', alt: [
+            { text: 'aufschneiden', b: { scharf: 1 } },
+            { text: 'Verschn^urung durchbrennen', b: { entzuendend: 1 } },
+            { text: 'Draht weg^atzen', b: { saeurehaltig: 1 } }
+        ] },
+        vitrine: { name: 'verschlossene Glasvitrine', nom: 'die verschlossene Glasvitrine', akk: 'die verschlossene Glasvitrine', alt: [
+            { text: 'Glas einschlagen', b: { stumpf: 2 }, laerm: true },
+            { text: 'T^ur aufhebeln', b: { lang: 2, schwer: 2 } },
+            { text: 'Schloss weg^atzen', b: { saeurehaltig: 1 } }
+        ] },
+        diele: { name: 'vernagelte Bodendiele', nom: 'die vernagelte Bodendiele', akk: 'die vernagelte Bodendiele', alt: [
+            { text: 'aufhebeln', b: { lang: 2, schwer: 2 } },
+            { text: 'zertr^ummern', b: { stumpf: 2 }, laerm: true },
+            { text: 'Fugen aufschneiden', b: { scharf: 2 } }
+        ] },
+        schrank_oben: { name: 'Ablage oben auf dem hohen Schrank', nom: 'die Ablage oben auf dem hohen Schrank', akk: 'die Ablage oben auf dem hohen Schrank', alt: [
+            { text: 'herunterangeln', b: { lang: 3, haken: 1 } },
+            { text: 'herunterschubsen', b: { lang: 3 }, laerm: true }
+        ] },
+        bodenschacht: { name: 'enger Bodenschacht', nom: 'der enge Bodenschacht', akk: 'den engen Bodenschacht', alt: [
+            { text: 'herausangeln', b: { lang: 2, haken: 1 } },
+            { text: 'mit Schnur und Haken herausfischen', b: { reissfest: 1, haken: 1 } }
+        ] }
+    };
+
+    // Schloesser der Ausgangstuer. art: code (braucht einen Code), schluessel (braucht den Schluessel),
+    // anforderung (braucht ein Mittel aus alt, wie ein Hindernis).
+    var SCHLOESSER = {
+        zahlenschloss: { name: 'Zahlenschloss', nom: 'das Zahlenschloss', akk: 'das Zahlenschloss', art: 'code' },
+        schluesselloch: { name: 'Schl^usselloch', nom: 'das Schl^usselloch', akk: 'das Schl^usselloch', art: 'schluessel' },
+        doppelhebel: { name: 'zwei Hebel, weit auseinander', nom: 'die zwei Hebel', akk: 'die zwei Hebel', art: 'anforderung', alt: [
+            { text: 'zu zweit gleichzeitig ziehen', h: 2 },
+            { text: 'den ersten Hebel mit einer Schnur festbinden und beim Ziehen des zweiten mitziehen', b: { reissfest: 1 } },
+            { text: 'den ersten Hebel mit etwas Langem unten verkeilen und dann den zweiten ziehen', b: { lang: 2 } }
+        ] },
+        druckplatte: { name: 'Druckplatte im Boden', nom: 'die Druckplatte im Boden', akk: 'die Druckplatte im Boden', art: 'anforderung', alt: [
+            { text: 'mit etwas sehr Schwerem beschweren', b: { schwer: 3 } },
+            { text: 'zu zweit draufstellen', h: 2 }
+        ] }
+    };
+
+    // Gegenmittel je Ausloeser einer Bedrohung. beobachter = ein freier Spieler haelt sie in Schach (wegsehen).
+    // null bei laerm: Laerm-Bedrohungen werden nicht gebannt, man muss leise Wege nehmen.
+    var GEGENMITTEL = {
+        wegsehen: { beobachter: true, alt: [{ text: 'Spiegel so aufstellen, dass sie sich selbst ansieht', b: { spiegelnd: 1 } }] },
+        hinsehen: { alt: [{ text: 'abdecken', b: { deckend: 2 } }] },
+        licht_aus: { alt: [{ text: 'mit der Lampe anleuchten', b: { licht: 1 } }] },
+        laerm: null,
+        naehe: { alt: [{ text: 'mit L^arm in eine Ecke weglocken', b: { laut: 1 }, laerm: true },
+                       { text: 'mit einem langen Stiel auf Abstand halten', b: { lang: 2 } }] },
+        zeit: { alt: [{ text: 'aufhalten (Abfluss freistochern, Pendel blockieren)', b: { lang: 2 } },
+                      { text: 'mit Gewalt stoppen', b: { stumpf: 2 }, laerm: true }] }
+    };
+
+    // in: wo man ist, nach: wohin man geht
+    var RAUMNAMEN = [{ name: 'Salon', in: 'im Salon', nach: 'in den Salon' }, { name: 'Bibliothek', in: 'in der Bibliothek', nach: 'in die Bibliothek' },
+        { name: 'Kinderzimmer', in: 'im Kinderzimmer', nach: 'ins Kinderzimmer' }, { name: 'Waschk^uche', in: 'in der Waschk^uche', nach: 'in die Waschk^uche' },
+        { name: 'Dachboden', in: 'auf dem Dachboden', nach: 'auf den Dachboden' }, { name: 'Musikzimmer', in: 'im Musikzimmer', nach: 'ins Musikzimmer' },
+        { name: 'Kellerflur', in: 'im Kellerflur', nach: 'in den Kellerflur' }];
+
+    function ladeUmlaute(o) {
+        var k;
+        if (typeof o === 'string') return um(o);
+        if (o && typeof o === 'object') {
+            for (k in o) if (Object.prototype.hasOwnProperty.call(o, k)) o[k] = ladeUmlaute(o[k]);
+        }
+        return o;
+    }
+    ladeUmlaute(AUSLOESER); ladeUmlaute(ELEMENTE); ladeUmlaute(GEGENSTAENDE); ladeUmlaute(EIGENSCHAFT_TEXT);
+    ladeUmlaute(ZU_WENIG); ladeUmlaute(HINDERNISSE); ladeUmlaute(SCHLOESSER); ladeUmlaute(GEGENMITTEL); ladeUmlaute(RAUMNAMEN);
+
+    return {
+        version: 1, um: um, ARTEN: ARTEN, AUSLOESER: AUSLOESER, ELEMENTE: ELEMENTE, GEGENSTAENDE: GEGENSTAENDE,
+        EIGENSCHAFT_TEXT: EIGENSCHAFT_TEXT, ZU_WENIG: ZU_WENIG, HINDERNISSE: HINDERNISSE, SCHLOESSER: SCHLOESSER, GEGENMITTEL: GEGENMITTEL,
+        RAUMNAMEN: RAUMNAMEN
+    };
+})();
+
+if (typeof module !== 'undefined' && module.exports) { module.exports = Katalog; }
+
+</script>
+<script>
+// Partie-Pruefer fuer Ausweg (KONZEPT 5). Streng ES5, deterministisch, rein: liest die Partie, schreibt nichts.
+//
+// Pruefer.pruefe(partie, spieler) -> { loesbar, schritte, weg: [{aktion, alt, mittel}], noetig: [...], fehlt: [aktionIds] }
+//
+// Belegt zweierlei: die Partie ist mit dieser Spielerzahl loesbar, und keine Aktion wird ausgefuehrt, deren Regel die
+// Spieler noch nicht kennen koennen (jede Aktion nennt ihre Regeln in 'kennt', die Fakten 'kennt:<regel>' entstehen nur
+// durch Spur, Vorfuehrung oder Notiz). Bedrohungen sperren ihren Bereich, solange sie wirken und nicht gebannt sind.
+//
+// Verfahren: Alle Aktionen ausser Schaltern sind monoton (sie fuegen nur Fakten hinzu) und werden gierig ausgefuehrt,
+// bis nichts mehr geht. Verzweigt wird nur ueber Schalter (Licht an/aus), die Fakten auch wegnehmen.
+var Pruefer = (function () {
+    'use strict';
+
+    var GRENZE_ZUSTAENDE = 4000;
+
+    function kopie(z) {
+        var n = { f: {}, schritte: z.schritte, weg: z.weg.slice() }, k;
+        for (k in z.f) if (z.f.hasOwnProperty(k)) n.f[k] = true;
+        return n;
+    }
+
+    function schluessel(z) {
+        return Object.keys(z.f).sort().join('|');
+    }
+
+    function gegenstaendeInHand(partie, z) {
+        var liste = [], k;
+        for (k in z.f) {
+            if (z.f.hasOwnProperty(k) && k.indexOf('hat:') === 0) {
+                var d = partie.dinge[k.slice(4)];
+                if (d && d.e) liste.push(d);
+            }
+        }
+        liste.sort(function (a, b) { return a.id < b.id ? -1 : a.id > b.id ? 1 : 0; });
+        return liste;
+    }
+
+    function deckt(e, b) {
+        var k;
+        for (k in b) if (b.hasOwnProperty(k) && !((e[k] || 0) >= b[k])) return false;
+        return true;
+    }
+
+    // Bedingung b mit dem, was die Gruppe haelt: ein Gegenstand allein, oder zwei verbunden, wenn etwas Reissfestes da ist
+    // (Meta-Regel "Befestigen"). Liefert die benutzten Gegenstaende oder null.
+    function erfuellt(partie, z, b) {
+        var hand = gegenstaendeInHand(partie, z), i, j, k, u, reissfest = null;
+        for (i = 0; i < hand.length; i++) if (deckt(hand[i].e, b)) return [hand[i].id];
+        for (i = 0; i < hand.length; i++) if ((hand[i].e.reissfest || 0) >= 1) { reissfest = hand[i]; break; }
+        if (!reissfest) return null;
+        for (i = 0; i < hand.length; i++) {
+            for (j = i + 1; j < hand.length; j++) {
+                u = {};
+                for (k in hand[i].e) if (hand[i].e.hasOwnProperty(k)) u[k] = hand[i].e[k];
+                for (k in hand[j].e) if (hand[j].e.hasOwnProperty(k)) u[k] = Math.max(u[k] || 0, hand[j].e[k]);
+                if (deckt(u, b)) {
+                    var benutzt = [hand[i].id, hand[j].id];
+                    if (reissfest.id !== hand[i].id && reissfest.id !== hand[j].id) benutzt.push(reissfest.id);
+                    return benutzt;
+                }
+            }
+        }
+        return null;
+    }
+
+    function bedrohungWirkt(b, z) {
+        switch (b.ausloeser) {
+            case 'wegsehen': case 'hinsehen': case 'naehe': return true;
+            case 'licht_aus': return !!z.f['licht_aus:' + b.raum];
+            case 'zeit': return b.frist !== null && b.frist !== undefined && z.schritte >= b.frist;
+            default: return false;
+        }
+    }
+
+    function laermVerboten(partie, raum) {
+        var i;
+        for (i = 0; i < partie.bedrohungen.length; i++) {
+            if (partie.bedrohungen[i].raum === raum && partie.bedrohungen[i].ausloeser === 'laerm') return true;
+        }
+        return false;
+    }
+
+    // Kann die Aktion jetzt ausgefuehrt werden? Liefert {alt, mittel, abh} oder null.
+    function kann(partie, a, z, spieler) {
+        var i, abh = [], extra = 0;
+        for (i = 0; i < a.braucht.length; i++) { if (!z.f[a.braucht[i]]) return null; abh.push(a.braucht[i]); }
+        for (i = 0; i < a.kennt.length; i++) { if (!z.f['kennt:' + a.kennt[i]]) return null; abh.push('kennt:' + a.kennt[i]); }
+        var ding = a.ding ? partie.dinge[a.ding] : null;
+        if (ding && ding.zone && !a.sicher) {
+            for (i = 0; i < partie.bedrohungen.length; i++) {
+                var b = partie.bedrohungen[i];
+                if (b.raum !== a.raum || b.ausloeser === 'laerm') continue;
+                if (!bedrohungWirkt(b, z)) {
+                    if (b.ausloeser === 'licht_aus') abh.push('!licht_aus:' + b.raum);
+                    continue;
+                }
+                if (z.f['gebannt:' + b.id]) { abh.push('gebannt:' + b.id); continue; }
+                if (!z.f['kennt:' + b.regel]) return null;
+                abh.push('kennt:' + b.regel);
+                if (b.beobachter) { extra++; continue; }
+                return null;
+            }
+        }
+        if (!a.mittel) {
+            if (1 + extra > spieler) return null;
+            return { alt: null, mittel: null, abh: abh };
+        }
+        var anf = partie.anforderungen[a.mittel], verboten = laermVerboten(partie, a.raum), wahl = null;
+        for (i = 0; i < anf.alt.length; i++) {
+            var alt = anf.alt[i];
+            if (alt.laerm && verboten) continue;
+            if ((alt.h || 1) + extra > spieler) continue;
+            var benutzt = alt.b ? erfuellt(partie, z, alt.b) : [];
+            if (!benutzt) continue;
+            // leise Wege zuerst, damit kein unnoetiger Laerm Ausloeser setzt
+            if (!wahl || (wahl.alt.laerm && !alt.laerm)) wahl = { alt: alt, index: i, mittel: benutzt };
+            if (!alt.laerm) break;
+        }
+        if (!wahl) return null;
+        for (i = 0; i < wahl.mittel.length; i++) abh.push('hat:' + wahl.mittel[i]);
+        return { alt: wahl.alt, index: wahl.index, mittel: wahl.mittel, abh: abh };
+    }
+
+    function erledigt(a, z) {
+        var i;
+        if (a.schalter) return false;
+        for (i = 0; i < a.gibt.length; i++) if (!z.f[a.gibt[i]]) return false;
+        return true;
+    }
+
+    function fuehreAus(a, k, z) {
+        var i;
+        for (i = 0; i < a.gibt.length; i++) z.f[a.gibt[i]] = true;
+        for (i = 0; i < (a.nimmt || []).length; i++) delete z.f[a.nimmt[i]];
+        if (k.alt && k.alt.laerm) z.f['laerm:' + a.raum] = true;
+        z.schritte += a.kosten || 1;
+        z.weg.push({ aktion: a.id, alt: k.alt ? k.alt.text : null, altIndex: k.alt ? k.index : null, mittel: k.mittel, abh: k.abh, laerm: !!(k.alt && k.alt.laerm), raum: a.raum });
+    }
+
+    function huelle(partie, z, spieler) {
+        var weiter = true, i;
+        while (weiter) {
+            weiter = false;
+            for (i = 0; i < partie.aktionen.length; i++) {
+                var a = partie.aktionen[i];
+                if (a.schalter || erledigt(a, z)) continue;
+                var k = kann(partie, a, z, spieler);
+                if (k) { fuehreAus(a, k, z); weiter = true; }
+            }
+        }
+        return z;
+    }
+
+    // Rueckwaerts vom Ziel: welche der ausgefuehrten Aktionen waren noetig?
+    function noetigerWeg(partie, weg) {
+        var gebraucht = { ausgang: true }, noetig = [], i, j, aktion;
+        var nachId = {};
+        for (i = 0; i < partie.aktionen.length; i++) nachId[partie.aktionen[i].id] = partie.aktionen[i];
+        for (i = weg.length - 1; i >= 0; i--) {
+            aktion = nachId[weg[i].aktion];
+            var liefert = false;
+            for (j = 0; j < aktion.gibt.length; j++) if (gebraucht[aktion.gibt[j]]) liefert = true;
+            if (weg[i].laerm && gebraucht['laerm:' + weg[i].raum]) liefert = true;
+            if (aktion.schalter) {
+                for (j = 0; j < aktion.gibt.length; j++) if (gebraucht[aktion.gibt[j]]) liefert = true;
+                for (j = 0; j < (aktion.nimmt || []).length; j++) if (gebraucht['!' + aktion.nimmt[j]]) liefert = true;
+            }
+            if (!liefert) continue;
+            for (j = 0; j < aktion.gibt.length; j++) delete gebraucht[aktion.gibt[j]];
+            for (j = 0; j < (aktion.nimmt || []).length; j++) delete gebraucht['!' + aktion.nimmt[j]];
+            if (weg[i].laerm) delete gebraucht['laerm:' + weg[i].raum];
+            for (j = 0; j < weg[i].abh.length; j++) gebraucht[weg[i].abh[j]] = true;
+            noetig.unshift(weg[i]);
+        }
+        return noetig;
+    }
+
+    // ab (wahlweise): { f: {fakt: true}, schritte } - pruefen ab einem Spielstand statt ab dem Start
+    function pruefe(partie, spieler, ab) {
+        var start = { f: {}, schritte: ab ? ab.schritte : 0, weg: [] }, i, k;
+        if (ab) { for (k in ab.f) if (ab.f.hasOwnProperty(k)) start.f[k] = true; }
+        else for (i = 0; i < partie.start.length; i++) start.f[partie.start[i]] = true;
+        var schalter = [];
+        for (i = 0; i < partie.aktionen.length; i++) if (partie.aktionen[i].schalter) schalter.push(partie.aktionen[i]);
+        var schlange = [huelle(partie, start, spieler)], gesehen = {}, n = 0, best = null, alleTaten = {};
+        gesehen[schluessel(schlange[0])] = true;
+        while (schlange.length && n < GRENZE_ZUSTAENDE) {
+            var z = schlange.shift(); n++;
+            for (i = 0; i < z.weg.length; i++) alleTaten[z.weg[i].aktion] = true;
+            if (z.f.ausgang) { best = z; break; }
+            for (i = 0; i < schalter.length; i++) {
+                var s = schalter[i], k = kann(partie, s, z, spieler);
+                if (!k) continue;
+                var veraendert = false, j;
+                for (j = 0; j < s.gibt.length; j++) if (!z.f[s.gibt[j]]) veraendert = true;
+                for (j = 0; j < (s.nimmt || []).length; j++) if (z.f[s.nimmt[j]]) veraendert = true;
+                if (!veraendert) continue;
+                var nz = kopie(z);
+                fuehreAus(s, k, nz);
+                huelle(partie, nz, spieler);
+                var sk = schluessel(nz);
+                if (gesehen[sk]) continue;
+                gesehen[sk] = true;
+                schlange.push(nz);
+            }
+        }
+        var fehlt = [];
+        for (i = 0; i < partie.aktionen.length; i++) if (!alleTaten[partie.aktionen[i].id]) fehlt.push(partie.aktionen[i].id);
+        if (!best) return { loesbar: false, schritte: null, weg: [], noetig: [], fehlt: fehlt, zustaende: n };
+        var noetig = noetigerWeg(partie, best.weg), schritteNoetig = 0;
+        var nachId = {};
+        for (i = 0; i < partie.aktionen.length; i++) nachId[partie.aktionen[i].id] = partie.aktionen[i];
+        for (i = 0; i < noetig.length; i++) schritteNoetig += nachId[noetig[i].aktion].kosten || 1;
+        return { loesbar: true, schritte: best.schritte, schritteNoetig: schritteNoetig, weg: best.weg, noetig: noetig, fehlt: fehlt, zustaende: n };
+    }
+
+    return { version: 1, pruefe: pruefe, erfuellt: erfuellt, deckt: deckt };
+})();
+
+if (typeof module !== 'undefined' && module.exports) { module.exports = Pruefer; }
+
+</script>
+<script>
+// Partie-Generator fuer Ausweg (KONZEPT 3 bis 6). Streng ES5, deterministisch: gleicher Seed, gleiche Spielerzahl und
+// Stufe ergeben bitgleich dieselbe Partie. Zufall nur aus kern/zufall.js, nie Math.random; Katalogschluessel werden
+// vor jeder Auswahl sortiert (Rhino ordnet Object.keys anders als Node).
+//
+// Generator.erzeuge(seed, { spieler: 1..4, stufe: 1..3 }) -> Partie mit .pruefung, oder null
+//
+// Rueckwaerts vom Ziel: Die Tuer bekommt Schloesser, jedes Schloss braucht etwas (Code, Schluessel, Mittel), und das
+// wird wieder irgendwo hinterlegt, bis die Tiefe der Stufe erreicht ist. Welche Rolle ein Element spielt (Code,
+// Wegweiser, Behaelter, Traeger, Bedrohung, nichts) und was es ausloest, wird erst hier gewuerfelt.
+// Jede Partie geht durch den Pruefer: loesbar mit der Spielerzahl, loesbar mit einem Spieler weniger, keine Regel
+// wird gebraucht, bevor sie erkennbar war. Sonst wird mit dem naechsten Versuch neu gebaut.
+if (typeof module !== 'undefined' && module.exports) {
+    var Zufall = require('./zufall.js');
+    var Katalog = require('./katalog.js');
+    var Pruefer = require('./pruefer.js');
+}
+
+var Generator = (function () {
+    'use strict';
+
+    var STUFE = {
+        1: { tiefe: 2, schloesser: 1, bedrohung: [0.35, 0], ablenkung: 1, zweiterWeg: 0.55, codeLaenge: 3, frist: 1.8 },
+        2: { tiefe: 3, schloesser: 2, bedrohung: [0.75, 0], ablenkung: 2, zweiterWeg: 0.65, codeLaenge: 3, frist: 1.5 },
+        3: { tiefe: 3, schloesser: 3, bedrohung: [1, 0.45], ablenkung: 2, zweiterWeg: 0.75, codeLaenge: 4, frist: 1.3 }
+    };
+    var MAX_VERSUCHE = 60;
+    var MAX_AKTIONEN = 70;
+    // name, Nominativ und Akkusativ mit Artikel (die Engine beugt keine Namen)
+    var VERSTECKNAMEN = [
+        ['lose Fliese', 'die lose Fliese', 'die lose Fliese'],
+        ['Hohlraum hinter der Tapete', 'der Hohlraum hinter der Tapete', 'den Hohlraum hinter der Tapete'],
+        ['doppelter Boden im Regal', 'der doppelte Boden im Regal', 'den doppelten Boden im Regal'],
+        ['Spalt hinter der Fu\u00dfleiste', 'der Spalt hinter der Fu\u00dfleiste', 'den Spalt hinter der Fu\u00dfleiste'],
+        ['lockerer Ziegel im Kamin', 'der lockere Ziegel im Kamin', 'den lockeren Ziegel im Kamin'],
+        ['loses Brett in der Wandvert\u00e4felung', 'das lose Brett in der Wandvert\u00e4felung', 'das lose Brett in der Wandvert\u00e4felung'],
+        ['Fach unter einer Dielenstufe', 'das Fach unter einer Dielenstufe', 'das Fach unter einer Dielenstufe'],
+        ['hohler Bettpfosten', 'der hohle Bettpfosten', 'den hohlen Bettpfosten']
+    ];
+
+    function Fehlschlag(grund) { this.fehlschlag = true; this.grund = grund; }
+    function sortiert(o) { return Object.keys(o).sort(); }
+
+    // Das Verhalten ohne das Ziel, fuer Vorfuehrung, Spur und Notiz (verraet nicht, wo etwas liegt)
+    function demoText(t) {
+        var teile = t.split('. '), behalten = [], i;
+        for (i = 0; i < teile.length; i++) if (teile[i].indexOf('{ziel}') < 0) behalten.push(teile[i]);
+        if (!behalten.length) return t.replace(': {ziel}', '');
+        var d = behalten.join('. ');
+        return d.charAt(d.length - 1) === '.' ? d : d + '.';
+    }
+    function kopiere(o) { return JSON.parse(JSON.stringify(o)); }
+
+    function Bau(seed, spieler, stufe, versuch) {
+        this.r = Zufall.strom(String(seed), 'partie:' + spieler + ':' + stufe + ':' + versuch);
+        this.cfg = STUFE[stufe];
+        this.spieler = spieler;
+        this.n = 0;
+        this.p = {
+            version: 1, seed: seed, spieler: spieler, stufe: stufe, versuch: versuch,
+            raeume: [], dinge: {}, regeln: [], bedrohungen: [], anforderungen: {}, aktionen: [], tuer: null, start: []
+        };
+        this.elementeFrei = this.r.mischen(sortiert(Katalog.ELEMENTE));
+        this.gegenstaendeFrei = this.r.mischen(sortiert(Katalog.GEGENSTAENDE));
+        this.fixtur = {};
+    }
+
+    Bau.prototype.id = function (vor) { this.n++; return vor + this.n; };
+    // Bei zwei Raeumen bekommt meist der leerere Raum das naechste Ding, damit beide Raeume zaehlen
+    Bau.prototype.raum = function () {
+        if (this.p.raeume.length === 1) return 'r1';
+        var n = { r1: 0, r2: 0 }, k;
+        for (k in this.p.dinge) if (this.p.dinge.hasOwnProperty(k) && n[this.p.dinge[k].raum] !== undefined) n[this.p.dinge[k].raum]++;
+        var leer = n.r1 <= n.r2 ? 'r1' : 'r2';
+        return this.r.chance(0.7) ? leer : (leer === 'r1' ? 'r2' : 'r1');
+    };
+
+    Bau.prototype.zoneFuer = function (raum, opt) {
+        var i;
+        if (opt && opt.zoneFrei) return false;
+        for (i = 0; i < this.p.bedrohungen.length; i++) {
+            if (this.p.bedrohungen[i].raum === raum && this.p.bedrohungen[i].ausloeser !== 'laerm') return this.r.chance(0.6);
+        }
+        return false;
+    };
+
+    Bau.prototype.ding = function (typ, name, raum, extra) {
+        var d = { id: this.id(typ.charAt(0)), typ: typ, name: name, raum: raum, zone: false }, k;
+        for (k in extra) if (extra.hasOwnProperty(k)) d[k] = extra[k];
+        this.p.dinge[d.id] = d;
+        return d;
+    };
+
+    Bau.prototype.aktion = function (o) {
+        var a = { id: this.id('a'), text: o.text, raum: o.raum, ding: o.ding || null, braucht: o.braucht || [],
+            kennt: o.kennt || [], mittel: o.mittel || null, kosten: o.kosten || 1, gibt: o.gibt || [], nimmt: o.nimmt || [],
+            schalter: !!o.schalter, sicher: !!o.sicher, art: o.art || 'bedienen', ausloeser: o.ausloeser || null };
+        this.p.aktionen.push(a);
+        if (this.p.aktionen.length > MAX_AKTIONEN) throw new Fehlschlag('zu gross');
+        return a;
+    };
+
+    Bau.prototype.anforderung = function (name, alt) {
+        var id = this.id('m');
+        this.p.anforderungen[id] = { id: id, name: name, alt: kopiere(alt) };
+        return id;
+    };
+
+    Bau.prototype.nimmElement = function (art) {
+        var i, j, f, passend;
+        for (i = 0; i < this.elementeFrei.length; i++) {
+            f = Katalog.ELEMENTE[this.elementeFrei[i]].f;
+            passend = [];
+            for (j = 0; j < f.length; j++) if (f[j].art === art) passend.push(f[j]);
+            if (passend.length) {
+                var key = this.elementeFrei[i];
+                this.elementeFrei.splice(i, 1);
+                return { key: key, f: this.r.waehle(passend) };
+            }
+        }
+        return null;
+    };
+
+    Bau.prototype.elementDing = function (key, raum, opt) {
+        var d = this.ding('element', Katalog.ELEMENTE[key].name, raum, { vorlage: key, nom: Katalog.ELEMENTE[key].nom, akk: Katalog.ELEMENTE[key].akk });
+        d.zone = this.zoneFuer(raum, opt);
+        return d;
+    };
+
+    Bau.prototype.regel = function (elDing, f, ausloeser, zielDing) {
+        var text = f.text.replace('{ziel}', zielDing ? zielDing.name : '');
+        var rg = { id: this.id('r'), element: elDing.id, art: f.art, ausloeser: ausloeser, text: text,
+            ziel: zielDing ? zielDing.id : null, enthuellung: null, privat: null, demo: demoText(f.text) };
+        if ((f.art === 'zahl' || f.art === 'richtung') && this.spieler > 1 && this.r.chance(0.5)) {
+            rg.privat = 1 + this.r.bis(this.spieler);
+        }
+        this.p.regeln.push(rg);
+        return rg;
+    };
+
+    // Wie die Partie ihre Regel verraet, bevor sie zaehlt (KONZEPT 5)
+    Bau.prototype.enthuelle = function (rg, tiefe, opt) {
+        var x = this.r.zahl(), el = this.p.dinge[rg.element];
+        if (tiefe > 0 && x < 0.22) {
+            var notiz = this.ding('gegenstand', 'Notiz \u00fcber ' + el.akk, el.raum, { e: {}, vorlage: 'notiz', nom: 'die Notiz \u00fcber ' + el.akk, akk: 'die Notiz \u00fcber ' + el.akk });
+            this.platziere(notiz, tiefe - 1, opt);
+            this.aktion({ text: 'Notiz \u00fcber ' + el.akk + ' lesen', art: 'lesen', raum: notiz.raum, braucht: ['hat:' + notiz.id],
+                gibt: ['kennt:' + rg.id], sicher: true });
+            rg.enthuellung = { art: 'notiz', notiz: notiz.id };
+        } else if (x < 0.6) {
+            this.p.start.push('kennt:' + rg.id);
+            rg.enthuellung = { art: 'spur' };
+        } else {
+            this.aktion({ text: el.name + ' beobachten', art: 'vorfuehrung', raum: el.raum, ding: el.id, gibt: ['kennt:' + rg.id], sicher: true });
+            rg.enthuellung = { art: 'vorfuehrung' };
+        }
+    };
+
+    Bau.prototype.licht = function (raum) {
+        if (this.fixtur['licht:' + raum]) return;
+        var s = this.ding('fixtur', 'Lichtschalter', raum, { nom: 'der Lichtschalter', akk: 'den Lichtschalter' });
+        this.aktion({ text: 'Licht ausschalten', art: 'schalter', raum: raum, ding: s.id, gibt: ['licht_aus:' + raum], schalter: true, sicher: true });
+        this.aktion({ text: 'Licht einschalten', art: 'schalter', raum: raum, ding: s.id, nimmt: ['licht_aus:' + raum], schalter: true, sicher: true });
+        this.fixtur['licht:' + raum] = s.id;
+    };
+
+    Bau.prototype.laerm = function (raum, tiefe, opt) {
+        if (this.fixtur['laerm:' + raum]) return;
+        var m = this.anforderung('L\u00e4rm machen', [{ text: 'L\u00e4rm machen', b: { laut: 1 }, laerm: true }]);
+        this.liefere({ laut: 1 }, tiefe, opt);
+        this.aktion({ text: 'L\u00e4rm machen', art: 'krach', raum: raum, mittel: m, gibt: ['laerm:' + raum], sicher: true });
+        this.fixtur['laerm:' + raum] = true;
+    };
+
+    Bau.prototype.hahn = function (raum, tiefe, opt) {
+        if (this.fixtur['hahn:' + raum]) return;
+        var h = this.ding('fixtur', 'Wasserhahn', raum, { nom: 'der Wasserhahn', akk: 'den Wasserhahn' }), m = null;
+        h.zone = this.zoneFuer(raum, opt);
+        if (tiefe > 0 && this.r.chance(0.35)) {
+            h.name = 'festgerosteter Wasserhahn'; h.nom = 'der festgerostete Wasserhahn'; h.akk = 'den festgerosteten Wasserhahn';
+            m = this.anforderung(h.name, [{ text: 'mit Gewalt aufdrehen', b: { stumpf: 1 } }, { text: 'Rost weg\u00e4tzen', b: { saeurehaltig: 1 } }]);
+            var alt = this.p.anforderungen[m].alt;
+            this.liefere(alt[this.r.bis(alt.length)].b, tiefe - 1, opt);
+        }
+        this.aktion({ text: 'Hahn aufdrehen', art: m ? 'benutzen' : 'bedienen', raum: raum, ding: h.id, mittel: m, gibt: ['wasser:' + raum] });
+        this.fixtur['hahn:' + raum] = true;
+    };
+
+    // Was die Spieler tun muessen, damit der Ausloeser eintritt; liefert die noetigen Fakten.
+    Bau.prototype.ausloeserBedarf = function (aus, el, tiefe, opt) {
+        switch (Katalog.AUSLOESER[aus].bedarf) {
+            case 'licht': this.licht(el.raum); return ['licht_aus:' + el.raum];
+            case 'laerm': this.laerm(el.raum, tiefe, opt); return ['laerm:' + el.raum];
+            case 'wasser': this.hahn(el.raum, tiefe, opt); return ['wasser:' + el.raum];
+            case 'waerme':
+                var m = this.anforderung('Feuer', [{ text: 'mit einer Flamme erw\u00e4rmen', b: { entzuendend: 1 } }]);
+                this.liefere({ entzuendend: 1 }, tiefe, opt);
+                this.aktion({ text: el.name + ' erw\u00e4rmen', art: 'benutzen', raum: el.raum, ding: el.id, mittel: m, gibt: ['waerme:' + el.id] });
+                return ['waerme:' + el.id];
+            case 'zeit':
+                this.aktion({ text: 'bei ' + el.name + ' abwarten', art: 'warten', raum: el.raum, ding: el.id, kosten: 3, gibt: ['zeit:' + el.id], sicher: true });
+                return ['zeit:' + el.id];
+            default: return [];
+        }
+    };
+
+    // Sorgt dafuer, dass die Gruppe etwas mit Bedingung b bekommen kann (Idee 12: Eigenschaft, nicht Gegenstand).
+    Bau.prototype.liefere = function (b, tiefe, opt) {
+        var i, k, vorhanden = [];
+        for (k in this.p.dinge) {
+            if (this.p.dinge.hasOwnProperty(k) && this.p.dinge[k].e && Pruefer.deckt(this.p.dinge[k].e, b)) vorhanden.push(k);
+        }
+        if (vorhanden.length && this.r.chance(0.3)) return true;
+        var schluesselB = sortiert(b), einzeln = [];
+        for (i = 0; i < this.gegenstaendeFrei.length; i++) {
+            if (Pruefer.deckt(Katalog.GEGENSTAENDE[this.gegenstaendeFrei[i]].e, b)) einzeln.push(this.gegenstaendeFrei[i]);
+        }
+        var zweiteilig = schluesselB.length >= 2 && this.r.chance(0.3);
+        if (einzeln.length && !zweiteilig) { this.neuerGegenstand(this.r.waehle(einzeln), tiefe, opt); return true; }
+        if (schluesselB.length >= 2 && this.zweiteilig(b, tiefe, opt)) return true;
+        if (einzeln.length) { this.neuerGegenstand(this.r.waehle(einzeln), tiefe, opt); return true; }
+        if (vorhanden.length) return true;
+        throw new Fehlschlag('kein Gegenstand fuer ' + JSON.stringify(b));
+    };
+
+    // Zwei Gegenstaende, die zusammen die Bedingung erfuellen, plus etwas Reissfestes zum Verbinden
+    Bau.prototype.zweiteilig = function (b, tiefe, opt) {
+        var frei = this.gegenstaendeFrei, i, j, k, ea, eb, u, paare = [];
+        for (i = 0; i < frei.length; i++) {
+            for (j = 0; j < frei.length; j++) {
+                if (i === j) continue;
+                ea = Katalog.GEGENSTAENDE[frei[i]].e; eb = Katalog.GEGENSTAENDE[frei[j]].e;
+                if (Pruefer.deckt(ea, b) || Pruefer.deckt(eb, b)) continue;
+                u = {};
+                for (k in ea) if (ea.hasOwnProperty(k)) u[k] = ea[k];
+                for (k in eb) if (eb.hasOwnProperty(k)) u[k] = Math.max(u[k] || 0, eb[k]);
+                if (Pruefer.deckt(u, b) && frei[i] < frei[j]) paare.push([frei[i], frei[j]]);
+            }
+        }
+        if (!paare.length) return false;
+        var paar = this.r.waehle(paare);
+        // beide vorab reservieren, sonst kann die Platzierung des ersten den zweiten schon verbrauchen
+        var g0 = this.reserviere(paar[0]), g1 = this.reserviere(paar[1]);
+        this.platziere(g0, tiefe, opt);
+        this.platziere(g1, tiefe, opt);
+        if (!((Katalog.GEGENSTAENDE[paar[0]].e.reissfest || 0) >= 1 || (Katalog.GEGENSTAENDE[paar[1]].e.reissfest || 0) >= 1)) {
+            this.liefere({ reissfest: 1 }, tiefe, opt);
+        }
+        return true;
+    };
+
+    Bau.prototype.reserviere = function (key) {
+        var i = this.gegenstaendeFrei.indexOf(key);
+        if (i < 0) throw new Fehlschlag('Gegenstand schon vergeben: ' + key);
+        this.gegenstaendeFrei.splice(i, 1);
+        return this.ding('gegenstand', Katalog.GEGENSTAENDE[key].name, null, { vorlage: key, e: kopiere(Katalog.GEGENSTAENDE[key].e),
+            nom: Katalog.GEGENSTAENDE[key].nom, akk: Katalog.GEGENSTAENDE[key].akk });
+    };
+
+    Bau.prototype.neuerGegenstand = function (key, tiefe, opt) {
+        var g = this.reserviere(key);
+        this.platziere(g, tiefe, opt);
+        return g;
+    };
+
+    // Wo ein Ding liegt und was man tun muss, um es zu bekommen
+    Bau.prototype.platziere = function (g, tiefe, opt) {
+        opt = opt || {};
+        g.raum = g.raum || this.raum();
+        g.zone = this.zoneFuer(g.raum, opt);
+        var arten = tiefe <= 0 ? ['frei'] : this.r.mischen(['frei', 'hindernis', 'hindernis', 'hindernis', 'behaelter', 'behaelter',
+            'traeger', 'richtung', 'richtung']);
+        var i;
+        if (tiefe > 0 && arten[0] === 'frei' && this.r.chance(0.6)) arten.push(arten.shift());
+        for (i = 0; i < arten.length; i++) {
+            if (this['lege_' + arten[i]](g, tiefe, opt)) return;
+        }
+        this.lege_frei(g, tiefe, opt);
+    };
+
+    Bau.prototype.lege_frei = function (g) {
+        g.lage = 'liegt offen herum';
+        this.aktion({ text: g.name + ' aufheben', art: 'nehmen', raum: g.raum, ding: g.id, gibt: ['hat:' + g.id] });
+        return true;
+    };
+
+    Bau.prototype.lege_hindernis = function (g, tiefe, opt) {
+        var keys = sortiert(Katalog.HINDERNISSE), unbenutzt = [], k2;
+        for (k2 = 0; k2 < keys.length; k2++) if (!this.fixtur['versteck:' + keys[k2]]) unbenutzt.push(keys[k2]);
+        var hk = this.r.waehle(unbenutzt.length ? unbenutzt : keys), h = Katalog.HINDERNISSE[hk];
+        this.fixtur['versteck:' + hk] = (this.fixtur['versteck:' + hk] || 0) + 1;
+        var zweit = this.fixtur['versteck:' + hk] > 1;
+        var v = this.ding('versteck', (zweit ? 'zweite ' : '') + h.name, g.raum, { vorlage: hk,
+            nom: zweit ? h.nom.replace(' ', ' zweite ') : h.nom, akk: zweit ? h.akk.replace(' ', ' zweite ') : h.akk });
+        v.zone = this.zoneFuer(g.raum, opt);
+        var m = this.anforderung(v.name, h.alt), alt = this.p.anforderungen[m].alt;
+        var reihe = this.r.mischen([0, 1, 2].slice(0, alt.length)), geliefert = 0, i;
+        for (i = 0; i < reihe.length && geliefert < 2; i++) {
+            if (geliefert === 1 && !this.r.chance(this.cfg.zweiterWeg)) break;
+            this.liefere(alt[reihe[i]].b, tiefe - 1, opt);
+            geliefert++;
+        }
+        g.lage = v.name;
+        g.raum = v.raum;
+        this.aktion({ text: v.name + ' \u00f6ffnen', art: 'benutzen', raum: v.raum, ding: v.id, mittel: m, gibt: ['hat:' + g.id] });
+        return true;
+    };
+
+    Bau.prototype.lege_elementregel = function (art, g, tiefe, opt) {
+        var el = this.nimmElement(art);
+        if (!el) return false;
+        var d = this.elementDing(el.key, g.raum, opt), aus = this.r.waehle(el.f.aus);
+        var rg = this.regel(d, el.f, aus, g);
+        var bedarf = this.ausloeserBedarf(aus, d, tiefe - 1, opt);
+        g.lage = (art === 'behaelter' ? 'verborgen in/bei ' : 'unerreichbar, bis ') + d.name;
+        this.aktion({ text: g.name + ' von ' + d.name + ' bekommen', art: 'ereignis', ausloeser: aus, raum: d.raum, ding: d.id, braucht: bedarf, kennt: [rg.id],
+            gibt: ['hat:' + g.id] });
+        this.enthuelle(rg, tiefe - 1, opt);
+        return true;
+    };
+    Bau.prototype.lege_behaelter = function (g, tiefe, opt) { return this.lege_elementregel('behaelter', g, tiefe, opt); };
+    Bau.prototype.lege_traeger = function (g, tiefe, opt) { return this.lege_elementregel('traeger', g, tiefe, opt); };
+
+    Bau.prototype.lege_richtung = function (g, tiefe, opt) {
+        var el = this.nimmElement('richtung');
+        if (!el) return false;
+        var d = this.elementDing(el.key, g.raum, opt), aus = this.r.waehle(el.f.aus);
+        var namen = [], i;
+        for (i = 0; i < VERSTECKNAMEN.length; i++) if (!this.fixtur['name:' + VERSTECKNAMEN[i][0]]) namen.push(VERSTECKNAMEN[i]);
+        if (!namen.length) return false;
+        var vname = this.r.waehle(namen);
+        this.fixtur['name:' + vname[0]] = true;
+        var v = this.ding('versteck', vname[0], g.raum, { verborgen: true, nom: vname[1], akk: vname[2] });
+        v.zone = this.zoneFuer(g.raum, opt);
+        var rg = this.regel(d, el.f, aus, v);
+        var bedarf = this.ausloeserBedarf(aus, d, tiefe - 1, opt);
+        var nah = aus === 'beruehrung' || aus === 'naehe';
+        this.aktion({ text: 'Versteck erkennen (' + d.name + ')', art: 'ereignis', ausloeser: aus, raum: d.raum, ding: d.id, braucht: bedarf, kennt: [rg.id],
+            gibt: ['versteck:' + v.id], sicher: !nah });
+        var m = null;
+        if (tiefe > 1 && this.r.chance(0.4)) {
+            m = this.anforderung(v.name, Katalog.HINDERNISSE.diele.alt);
+            var alt = this.p.anforderungen[m].alt;
+            this.liefere(alt[this.r.bis(alt.length)].b, tiefe - 2, opt);
+        }
+        g.lage = v.name + ' (nur zu finden \u00fcber ' + d.name + ')';
+        this.aktion({ text: v.name + ' \u00f6ffnen', art: m ? 'benutzen' : 'oeffnen', raum: v.raum, ding: v.id, braucht: ['versteck:' + v.id], mittel: m,
+            gibt: ['hat:' + g.id] });
+        this.enthuelle(rg, tiefe - 1, opt);
+        return true;
+    };
+
+    Bau.prototype.code = function (schloss, tiefe) {
+        var el = this.nimmElement('zahl');
+        if (!el) throw new Fehlschlag('kein Element fuer einen Code');
+        var d = this.elementDing(el.key, this.raum(), {}), aus = this.r.waehle(el.f.aus);
+        var rg = this.regel(d, el.f, aus, null), ziffern = '', i;
+        for (i = 0; i < this.cfg.codeLaenge; i++) ziffern += String(this.r.bis(10));
+        schloss.code = ziffern;
+        rg.code = ziffern;
+        var bedarf = this.ausloeserBedarf(aus, d, tiefe - 1, {});
+        this.aktion({ text: 'Code an ' + d.name + ' ablesen', art: 'ereignis', ausloeser: aus, raum: d.raum, ding: d.id, braucht: bedarf, kennt: [rg.id],
+            gibt: ['code:' + schloss.id], sicher: aus !== 'beruehrung' });
+        this.enthuelle(rg, tiefe - 1, {});
+    };
+
+    Bau.prototype.bedrohung = function () {
+        var el = this.nimmElement('bedrohung');
+        if (!el) return;
+        var raum = this.raum(), d = this.elementDing(el.key, raum, { zoneFrei: true }), aus = this.r.waehle(el.f.aus);
+        var rg = this.regel(d, el.f, aus, null), gm = Katalog.GEGENMITTEL[aus];
+        var b = { id: this.id('b'), regel: rg.id, element: d.id, raum: raum, ausloeser: aus, beobachter: !!(gm && gm.beobachter),
+            gegenmittel: null, frist: null };
+        this.p.bedrohungen.push(b);
+        this.enthuelle(rg, 0, { zoneFrei: true });
+        if (!gm) return;
+        b.gegenmittel = this.anforderung('Gegenmittel gegen ' + d.name, gm.alt);
+        this.aktion({ text: d.name + ' bannen', art: 'benutzen', raum: raum, ding: d.id, mittel: b.gegenmittel, kennt: [rg.id], gibt: ['gebannt:' + b.id] });
+        var noetig = aus === 'wegsehen' ? this.spieler <= 2 : aus === 'zeit' ? this.r.chance(0.5) : aus === 'licht_aus' ? this.r.chance(0.6) : true;
+        if (noetig) {
+            var alt = this.p.anforderungen[b.gegenmittel].alt, leise = [], i;
+            for (i = 0; i < alt.length; i++) if (!alt[i].laerm) leise.push(alt[i]);
+            this.liefere(this.r.waehle(leise.length ? leise : alt).b, 1, { zoneFrei: true });
+        }
+    };
+
+    Bau.prototype.schloss = function (art, tuerRaum, tiefe) {
+        var s = Katalog.SCHLOESSER[art];
+        var sd = this.ding('schloss', s.name, tuerRaum, { vorlage: art, nom: s.nom, akk: s.akk });
+        sd.zone = this.zoneFuer(tuerRaum, {});
+        var schlossInfo = { id: sd.id, vorlage: art, name: s.name };
+        if (s.art === 'code') {
+            this.code(schlossInfo, tiefe);
+            this.aktion({ text: 'Code ' + '\u00bb' + schlossInfo.code + '\u00ab am Zahlenschloss eingeben', art: 'eingeben', raum: tuerRaum, ding: sd.id,
+                braucht: ['code:' + sd.id], gibt: ['schloss:' + sd.id] });
+        } else if (s.art === 'schluessel') {
+            var key = this.ding('gegenstand', 'Schl\u00fcssel', null, { vorlage: 'schluessel', e: { schluessel: 1 }, nom: 'der Schl\u00fcssel', akk: 'den Schl\u00fcssel' });
+            this.platziere(key, tiefe, {});
+            this.aktion({ text: 'Schl\u00fcsselloch aufschlie\u00dfen', art: 'schluessel', raum: tuerRaum, ding: sd.id, braucht: ['hat:' + key.id],
+                gibt: ['schloss:' + sd.id] });
+        } else {
+            var m = this.anforderung(s.name, s.alt), alt = this.p.anforderungen[m].alt, i, mitB = [];
+            for (i = 0; i < alt.length; i++) if (alt[i].b) mitB.push(alt[i]);
+            if (this.spieler <= 2 || this.r.chance(this.cfg.zweiterWeg)) this.liefere(this.r.waehle(mitB).b, tiefe - 1, {});
+            this.aktion({ text: s.name.charAt(0).toUpperCase() + s.name.slice(1) + ' bedienen', art: 'benutzen', raum: tuerRaum, ding: sd.id,
+                mittel: m, gibt: ['schloss:' + sd.id] });
+        }
+        return schlossInfo;
+    };
+
+    Bau.prototype.baue = function () {
+        var p = this.p, cfg = this.cfg, i, namen = this.r.mischen(Katalog.RAUMNAMEN.slice());
+        var zwei = this.spieler > 1 ? this.r.chance(0.45) : this.r.chance(0.12);
+        p.raeume.push({ id: 'r1', name: namen[0].name, in: namen[0].in, nach: namen[0].nach });
+        if (zwei) p.raeume.push({ id: 'r2', name: namen[1].name, in: namen[1].in, nach: namen[1].nach });
+
+        // Bedrohungen zuerst, damit die Bereiche (zone) beim Platzieren feststehen
+        if (this.r.chance(cfg.bedrohung[0])) this.bedrohung();
+        if (this.r.chance(cfg.bedrohung[1])) this.bedrohung();
+
+        var tuerRaum = 'r1';
+        var tuer = this.ding('fixtur', 'Ausgangst\u00fcr', tuerRaum, { nom: 'die Ausgangst\u00fcr', akk: 'die Ausgangst\u00fcr' });
+        var anzahl = Math.min(3, cfg.schloesser + (this.spieler >= 3 && cfg.schloesser < 3 ? 1 : 0));
+        var arten = this.r.mischen(['zahlenschloss', 'schluesselloch', 'doppelhebel', 'druckplatte']);
+        // Codes und Schluessel tragen die Raetselketten; Hebel und Platte sind Beigaben
+        // stabil sortiert (Rhino sortiert nicht stabil): Gleichstand entscheidet die gewuerfelte Reihenfolge
+        var rang = function (x) { return (x === 'zahlenschloss' || x === 'schluesselloch' ? 0 : 1) * 10 + arten.indexOf(x); };
+        arten = arten.slice().sort(function (a, b) { return rang(a) - rang(b); });
+        if (this.r.chance(0.35)) { var t = arten[1]; arten[1] = arten[2]; arten[2] = t; }
+        var schloesser = [], braucht = [];
+        for (i = 0; i < anzahl; i++) {
+            var s = this.schloss(arten[i], tuerRaum, cfg.tiefe);
+            schloesser.push(s);
+            braucht.push('schloss:' + s.id);
+        }
+        p.tuer = { id: tuer.id, raum: tuerRaum, schloesser: schloesser };
+        this.aktion({ text: 'Ausgangst\u00fcr \u00f6ffnen', raum: tuerRaum, ding: tuer.id, braucht: braucht, gibt: ['ausgang'], sicher: true });
+
+        // Jeder Raum hat einen Lichtschalter, sonst verraet sein Vorhandensein das Raetsel
+        for (i = 0; i < p.raeume.length; i++) this.licht(p.raeume[i].id);
+
+        // Ablenkungen: Elemente, die sich verhalten, aber nichts bedeuten
+        for (i = 0; i < cfg.ablenkung; i++) {
+            var el = this.nimmElement('keine');
+            if (!el) break;
+            var d = this.elementDing(el.key, this.raum(), {});
+            var rg = this.regel(d, el.f, this.r.waehle(el.f.aus), null);
+            this.aktion({ text: d.name + ' beobachten', art: 'vorfuehrung', raum: d.raum, ding: d.id, gibt: ['kennt:' + rg.id], sicher: true });
+            rg.enthuellung = { art: 'vorfuehrung' };
+        }
+        if (this.gegenstaendeFrei.length && this.r.chance(0.6)) {
+            var g = this.ding('gegenstand', Katalog.GEGENSTAENDE[this.gegenstaendeFrei[0]].name, null,
+                { vorlage: this.gegenstaendeFrei[0], e: kopiere(Katalog.GEGENSTAENDE[this.gegenstaendeFrei[0]].e), ablenkung: true,
+                  nom: Katalog.GEGENSTAENDE[this.gegenstaendeFrei[0]].nom, akk: Katalog.GEGENSTAENDE[this.gegenstaendeFrei[0]].akk });
+            this.gegenstaendeFrei.shift();
+            this.platziere(g, 0, {});
+        }
+        return p;
+    };
+
+    function setzeFristen(p, schritte) {
+        var i;
+        for (i = 0; i < p.bedrohungen.length; i++) {
+            if (p.bedrohungen[i].ausloeser === 'zeit') p.bedrohungen[i].frist = Math.ceil(schritte * STUFE[p.stufe].frist);
+        }
+    }
+
+    function erzeuge(seed, opt) {
+        var spieler = opt.spieler, stufe = opt.stufe, v, gruende = [];
+        if (!(spieler >= 1 && spieler <= 4) || !STUFE[stufe]) throw new Error('Generator.erzeuge: spieler 1..4, stufe 1..3');
+        for (v = 0; v < MAX_VERSUCHE; v++) {
+            var p;
+            try { p = new Bau(seed, spieler, stufe, v).baue(); }
+            catch (e) { if (e && e.fehlschlag) { gruende.push(e.grund); continue; } throw e; }
+            var a = Pruefer.pruefe(p, spieler), b = spieler > 1 ? Pruefer.pruefe(p, spieler - 1) : null;
+            if (!a.loesbar || (b && !b.loesbar)) { gruende.push(!a.loesbar ? 'unloesbar' : 'unloesbar mit einem weniger'); continue; }
+            var hatFrist = false, i;
+            for (i = 0; i < p.bedrohungen.length; i++) if (p.bedrohungen[i].ausloeser === 'zeit') hatFrist = true;
+            if (hatFrist) {
+                setzeFristen(p, Math.max(a.schritte, b ? b.schritte : 0));
+                a = Pruefer.pruefe(p, spieler); b = spieler > 1 ? Pruefer.pruefe(p, spieler - 1) : null;
+                if (!a.loesbar || (b && !b.loesbar)) { gruende.push('Frist zu knapp'); continue; }
+            }
+            p.pruefung = {
+                versuche: v + 1, verworfen: gruende,
+                mit: { spieler: spieler, schritte: a.schritte, schritteNoetig: a.schritteNoetig, weg: a.noetig },
+                weniger: b ? { spieler: spieler - 1, schritte: b.schritte, schritteNoetig: b.schritteNoetig } : null
+            };
+            return p;
+        }
+        return null;
+    }
+
+    return { version: 1, erzeuge: erzeuge, STUFE: STUFE };
+})();
+
+if (typeof module !== 'undefined' && module.exports) { module.exports = Generator; }
+
+</script>
+<script>
+// Lesbares Protokoll einer Partie (Markdown). Streng ES5, rein. Dient dazu, Partien ohne Spiel zu beurteilen.
+if (typeof module !== 'undefined' && module.exports) {
+    var Katalog = require('./katalog.js');
+}
+
+var Protokoll = (function () {
+    'use strict';
+
+    var ROLLE = {
+        zahl: 'zeigt einen Code',
+        richtung: 'weist auf ein Versteck',
+        behaelter: 'gibt etwas frei',
+        traeger: 'bringt Unerreichbares heran',
+        bedrohung: 'BEDROHUNG',
+        keine: 'Ablenkung, ohne Bedeutung'
+    };
+    var ENTHUELLUNG = {
+        spur: 'Spuren im Raum verraten es von Anfang an',
+        vorfuehrung: 'der Raum f\u00fchrt es einmal harmlos vor',
+        notiz: 'eine Notiz beschreibt es'
+    };
+
+    function raumIn(p, id) {
+        var i;
+        for (i = 0; i < p.raeume.length; i++) if (p.raeume[i].id === id) return p.raeume[i].in;
+        return id;
+    }
+
+    function raumName(p, id) {
+        var i;
+        for (i = 0; i < p.raeume.length; i++) if (p.raeume[i].id === id) return p.raeume[i].name;
+        return id;
+    }
+
+    function eigText(e) {
+        var t = [], k, keys = Object.keys(e).sort();
+        for (k = 0; k < keys.length; k++) t.push((Katalog.EIGENSCHAFT_TEXT[keys[k]] || keys[k]) + ' ' + e[keys[k]]);
+        return t.join(', ');
+    }
+
+    function bedingungText(b) {
+        var t = [], keys = Object.keys(b).sort(), k;
+        for (k = 0; k < keys.length; k++) t.push((Katalog.EIGENSCHAFT_TEXT[keys[k]] || keys[k]) + ' ' + b[keys[k]]);
+        return t.join(' + ');
+    }
+
+    function altText(alt) {
+        var t = alt.text;
+        if (alt.b) t += ' (' + bedingungText(alt.b) + ')';
+        if (alt.h) t += ' (' + alt.h + ' Spieler)';
+        if (alt.laerm) t += ', laut';
+        return t;
+    }
+
+    function anzahl(n) { return n === 1 ? '1 Spieler' : n + ' Spielern'; }
+
+    function schreibe(p) {
+        var z = [], i, j, k, d, rg;
+        var nachAktion = {};
+        for (i = 0; i < p.aktionen.length; i++) nachAktion[p.aktionen[i].id] = p.aktionen[i];
+
+        z.push('## Partie ' + p.seed + ' \u00b7 ' + p.spieler + (p.spieler === 1 ? ' Spieler' : ' Spieler') + ' \u00b7 Stufe ' + p.stufe);
+        z.push('');
+        var rn = [];
+        for (i = 0; i < p.raeume.length; i++) rn.push(p.raeume[i].name);
+        z.push('**R\u00e4ume:** ' + rn.join(' und ') + (p.raeume.length > 1 ? ' (Durchgang offen)' : ''));
+        var sch = [];
+        for (i = 0; i < p.tuer.schloesser.length; i++) {
+            var s = p.tuer.schloesser[i];
+            sch.push(s.name + (s.code ? ' (Code ' + s.code + ')' : ''));
+        }
+        z.push('**Ausgang ' + raumIn(p, p.tuer.raum) + ':** ' + sch.join('; '));
+        z.push('');
+
+        z.push('**Was sich diese Partie wie verh\u00e4lt**');
+        z.push('');
+        for (i = 0; i < p.regeln.length; i++) {
+            rg = p.regeln[i];
+            d = p.dinge[rg.element];
+            var zeile = '- **' + d.name + '** (' + raumName(p, d.raum) + '), ' + Katalog.AUSLOESER[rg.ausloeser].text + ': ' + rg.text +
+                ' \u2192 _' + ROLLE[rg.art] + (rg.code ? ' (' + rg.code + ')' : '') + '_';
+            if (rg.enthuellung) zeile += '. Erkennbar: ' + ENTHUELLUNG[rg.enthuellung.art];
+            if (rg.privat) zeile += '. **Nur Spieler ' + rg.privat + ' sieht es.**';
+            z.push(zeile);
+        }
+        for (i = 0; i < p.bedrohungen.length; i++) {
+            var b = p.bedrohungen[i], bz = [];
+            for (k in p.dinge) if (p.dinge.hasOwnProperty(k) && p.dinge[k].zone && p.dinge[k].raum === b.raum) bz.push(p.dinge[k].name);
+            var gt = [];
+            if (b.beobachter) gt.push('ein Spieler h\u00e4lt sie im Blick');
+            if (b.gegenmittel) for (j = 0; j < p.anforderungen[b.gegenmittel].alt.length; j++) gt.push(altText(p.anforderungen[b.gegenmittel].alt[j]));
+            z.push('  - Bedrohung ' + raumIn(p, b.raum) + (b.ausloeser === 'laerm' ? ': Jeder L\u00e4rm dort weckt sie, also nur leise Wege.' :
+                ': sperrt ' + (bz.length ? bz.join(', ') : 'nichts Wichtiges') + '.') +
+                (b.frist ? ' Wird ab Schritt ' + b.frist + ' wirksam.' : '') +
+                (gt.length ? ' Gegenmittel: ' + gt.join(' oder ') + '.' : ''));
+        }
+        z.push('');
+
+        z.push('**Gegenst\u00e4nde**');
+        z.push('');
+        var keys = Object.keys(p.dinge).sort(function (a, b) { return parseInt(a.slice(1), 10) - parseInt(b.slice(1), 10); });
+        for (i = 0; i < keys.length; i++) {
+            d = p.dinge[keys[i]];
+            if (d.typ !== 'gegenstand') continue;
+            z.push('- ' + d.name + (d.e && Object.keys(d.e).length && d.vorlage !== 'schluessel' ? ' (' + eigText(d.e) + ')' : '') + ': ' + (d.lage || '?') +
+                ', ' + raumName(p, d.raum) + (d.ablenkung ? ', _ohne Verwendung_' : ''));
+        }
+        z.push('');
+
+        z.push('**Hindernisse und ihre L\u00f6sungswege**');
+        z.push('');
+        var mids = Object.keys(p.anforderungen).sort(function (a, b) { return parseInt(a.slice(1), 10) - parseInt(b.slice(1), 10); });
+        for (i = 0; i < mids.length; i++) {
+            var m = p.anforderungen[mids[i]], at = [];
+            for (j = 0; j < m.alt.length; j++) at.push(altText(m.alt[j]));
+            z.push('- ' + m.name + ': ' + at.join(' | '));
+        }
+        if (!mids.length) z.push('- keine');
+        z.push('');
+
+        var pr = p.pruefung;
+        z.push('**Gepr\u00fcfter L\u00f6sungsweg** (' + pr.mit.schritteNoetig + ' n\u00f6tige Schritte, mit Umwegen ' + pr.mit.schritte + ')');
+        z.push('');
+        for (i = 0; i < pr.mit.weg.length; i++) {
+            var w = pr.mit.weg[i], a = nachAktion[w.aktion], mittel = [];
+            for (j = 0; j < (w.mittel || []).length; j++) mittel.push(p.dinge[w.mittel[j]].name);
+            z.push((i + 1) + '. ' + a.text + (w.alt && w.alt !== a.text ? ': ' + w.alt : '') + (mittel.length ? ' mit ' + mittel.join(' + ') : '') +
+                (p.raeume.length > 1 ? ' _(' + raumName(p, a.raum) + ')_' : ''));
+        }
+        z.push('');
+        z.push('Gepr\u00fcft: l\u00f6sbar mit ' + anzahl(pr.mit.spieler) + (pr.weniger ? ' und mit ' + anzahl(pr.weniger.spieler) : '') +
+            '; jede Regel war erkennbar, bevor sie gebraucht wurde. Versuche bis zur g\u00fcltigen Partie: ' + pr.versuche + '.');
+        return z.join('\n');
+    }
+
+    return { schreibe: schreibe };
+})();
+
+if (typeof module !== 'undefined' && module.exports) { module.exports = Protokoll; }
+
+</script>
+<script>
+// Spiel-Engine fuer Ausweg. Streng ES5, deterministisch. Laeuft im Browser (Solo-Prototyp) und spaeter unveraendert
+// auf dem Knuddels-Server: Die Oberflaeche schickt Befehle, die Engine antwortet mit Meldungen und einer Sicht.
+//
+// Spiel.neu(partie)                         -> Sitzung
+// Spiel.befehl(sitzung, spielerNr, befehl)  -> [Meldung]   Meldung: { text, art: 'erzaehler'|'ereignis'|'system'|'warnung'|'erfolg', an? }
+// Spiel.sicht(sitzung, spielerNr)           -> was dieser Spieler sieht (Raum, Dinge, Inventar, Zeit, Status)
+//
+// Befehle: { art: 'ansehen', ding }, { art: 'anfassen', ding }, { art: 'nehmen', ding }, { art: 'benutzen', ding, mit: [ids] },
+//          { art: 'krach', mit: [id] }, { art: 'eingeben', ding, code }, { art: 'warten' }, { art: 'gehen', raum }
+//
+// Die Engine kennt dieselben Fakten und Aktionen wie der Pruefer. Anders als der Pruefer verlangt sie kein Wissen
+// ('kennt'): Was Spieler wissen, steht in ihren Koepfen. Bedrohungen und Fristen wirken wie im Pruefer.
+if (typeof module !== 'undefined' && module.exports) {
+    var Katalog = require('./katalog.js');
+    var Pruefer = require('./pruefer.js');
+}
+
+var Spiel = (function () {
+    'use strict';
+
+    var ZEIT = { ansehen: 0, anfassen: 1, nehmen: 1, benutzen: 1, krach: 1, eingeben: 1, warten: 3, gehen: 1 };
+    var LAERM_STRAFE = 5;
+
+    function gross(t) { return t.charAt(0).toUpperCase() + t.slice(1); }
+    function nom(d) { return d.nom || d.name; }
+    function akk(d) { return d.akk || d.name; }
+    function m(text, art, an) { var x = { text: text, art: art || 'erzaehler' }; if (an) x.an = an; return x; }
+
+    function regel(s, id) {
+        var i;
+        for (i = 0; i < s.partie.regeln.length; i++) if (s.partie.regeln[i].id === id) return s.partie.regeln[i];
+        return null;
+    }
+    function regelVonElement(s, dingId) {
+        var i, l = [];
+        for (i = 0; i < s.partie.regeln.length; i++) if (s.partie.regeln[i].element === dingId) l.push(s.partie.regeln[i]);
+        return l;
+    }
+    function raumNach(s, id) {
+        var i;
+        for (i = 0; i < s.partie.raeume.length; i++) if (s.partie.raeume[i].id === id) return s.partie.raeume[i].nach || s.partie.raeume[i].in;
+        return id;
+    }
+
+    function raumIn(s, id) {
+        var i;
+        for (i = 0; i < s.partie.raeume.length; i++) if (s.partie.raeume[i].id === id) return s.partie.raeume[i].in;
+        return id;
+    }
+    function erledigt(s, a) {
+        var i;
+        if (!a.gibt.length) return false;
+        for (i = 0; i < a.gibt.length; i++) if (!s.f[a.gibt[i]]) return false;
+        return true;
+    }
+    function brauchtErfuellt(s, a) {
+        var i;
+        for (i = 0; i < a.braucht.length; i++) if (!s.f[a.braucht[i]]) return false;
+        return true;
+    }
+    function spielerImRaum(s, raum) {
+        var n = 0, k;
+        for (k in s.raum) if (s.raum.hasOwnProperty(k) && s.raum[k] === raum) n++;
+        return n;
+    }
+
+    function bedrohungWirkt(s, b) {
+        switch (b.ausloeser) {
+            case 'wegsehen': case 'hinsehen': case 'naehe': return true;
+            case 'licht_aus': return !!s.f['licht_aus:' + b.raum];
+            case 'zeit': return b.frist !== null && s.zeit >= b.frist;
+            default: return false;
+        }
+    }
+
+    // Sperrt eine Bedrohung diese Aktion? Liefert eine Meldung oder null. extra: zusaetzlich gebundene Spieler.
+    function sperre(s, a, nr, haende) {
+        var ding = a.ding ? s.partie.dinge[a.ding] : null, i;
+        if (!ding || !ding.zone || a.sicher) return null;
+        for (i = 0; i < s.partie.bedrohungen.length; i++) {
+            var b = s.partie.bedrohungen[i];
+            if (b.raum !== a.raum || b.ausloeser === 'laerm' || !bedrohungWirkt(s, b) || s.f['gebannt:' + b.id]) continue;
+            var rg = regel(s, b.regel), el = s.partie.dinge[b.element];
+            if (b.beobachter && spielerImRaum(s, a.raum) >= (haende || 1) + 1) continue;
+            if (b.beobachter) return m('Sobald du dich wegdrehst, r\u00fcckt ' + nom(el) + ' n\u00e4her. Allein kommst du so nicht an ' + akk(ding) + ' heran.', 'warnung');
+            return m(rg.text + ' An ' + akk(ding) + ' kommst du so nicht heran.', 'warnung');
+        }
+        return null;
+    }
+
+    function laermFolgen(s, raum) {
+        var i, aus = [];
+        s.f['laerm:' + raum] = true;
+        for (i = 0; i < s.partie.bedrohungen.length; i++) {
+            var b = s.partie.bedrohungen[i];
+            if (b.raum === raum && b.ausloeser === 'laerm') {
+                s.zeit += LAERM_STRAFE;
+                aus.push(m(regel(s, b.regel).text + ' Du musst warten, bis sich alles beruhigt. Das kostet Zeit.', 'warnung'));
+            }
+        }
+        return aus;
+    }
+
+    // Was man einem Gegenstand ansieht: Worte statt Eigenschaften und Stufen
+    function beschreibung(d) {
+        var g = Katalog.GEGENSTAENDE[d.vorlage];
+        return g && g.b ? g.b : d.name + '.';
+    }
+
+    // Knapp daneben: Die gewaehlten Dinge koennten einen Weg fast gehen. Knapp heisst: Es fehlt genau eine Sache
+    // (Besenstiel zum Hebeln: zu leicht), oder alles Noetige ist da, nur zu schwach (Kochtopf: nicht wuchtig genug).
+    // Sonst null, damit der Grund nie einen Weg andeutet, der mit diesem Ding gar nicht gemeint ist.
+    function knapp(anf, items) {
+        var i, k, u = {}, best = null, bestZahl = 99;
+        for (i = 0; i < items.length; i++) for (k in items[i].e) if (items[i].e.hasOwnProperty(k)) u[k] = Math.max(u[k] || 0, items[i].e[k]);
+        for (i = 0; i < anf.alt.length; i++) {
+            var alt = anf.alt[i], treffer = 0, fehlt = [], schwach = true;
+            if (alt.h || !alt.b) continue;
+            for (k in alt.b) {
+                if (!alt.b.hasOwnProperty(k)) continue;
+                if ((u[k] || 0) >= 1) treffer++;
+                if ((u[k] || 0) < alt.b[k]) { fehlt.push(k); if (!u[k]) schwach = false; }
+            }
+            if (!fehlt.length || !treffer || (fehlt.length > 1 && !schwach)) continue;
+            if (fehlt.length < bestZahl) { bestZahl = fehlt.length; best = fehlt[0]; }
+        }
+        if (!best) return null;
+        var wer = items.length === 1 ? gross(nom(items[0])) + (Katalog.GEGENSTAENDE[items[0].vorlage] && Katalog.GEGENSTAENDE[items[0].vorlage].pl ? ' sind' : ' ist') : 'Zusammen ist das';
+        return wer + ' daf\u00fcr ' + (Katalog.ZU_WENIG[best] || 'nicht geeignet') + '.';
+    }
+
+    function itemsAus(s, ids) {
+        var l = [], i;
+        for (i = 0; i < (ids || []).length; i++) {
+            var d = s.partie.dinge[ids[i]];
+            if (d && d.e && s.f['hat:' + d.id]) l.push(d);
+        }
+        return l;
+    }
+
+    // Erfuellen die gewaehlten Gegenstaende eine Alternative? Mehrere Gegenstaende brauchen etwas Reissfestes darunter.
+    function waehleAlternative(s, anf, items, raum) {
+        var i, k, u = {}, reissfest = false, laermVerboten = false;
+        for (i = 0; i < items.length; i++) {
+            for (k in items[i].e) if (items[i].e.hasOwnProperty(k)) u[k] = Math.max(u[k] || 0, items[i].e[k]);
+            if ((items[i].e.reissfest || 0) >= 1) reissfest = true;
+        }
+        if (items.length > 1 && !reissfest) return { fehlt: 'verbinden' };
+        for (i = 0; i < s.partie.bedrohungen.length; i++) {
+            if (s.partie.bedrohungen[i].raum === raum && s.partie.bedrohungen[i].ausloeser === 'laerm') laermVerboten = true;
+        }
+        var wahl = null;
+        for (i = 0; i < anf.alt.length; i++) {
+            var alt = anf.alt[i];
+            if (alt.h) { if (!items.length && spielerImRaum(s, raum) >= alt.h) return { alt: alt }; continue; }
+            if (!items.length || !Pruefer.deckt(u, alt.b)) continue;
+            if (!wahl || (wahl.laerm && !alt.laerm)) wahl = alt;
+        }
+        if (wahl) return { alt: wahl, laermVerboten: laermVerboten };
+        return { fehlt: 'mittel' };
+    }
+
+    // Was eine Aktion sichtbar bewirkt, als Satz
+    function ergebnis(s, a, alt) {
+        var t = [], i, g = [];
+        if (alt) t.push(gross(alt.text) + '.');
+        for (i = 0; i < a.gibt.length; i++) {
+            if (a.gibt[i].indexOf('hat:') === 0) g.push(s.partie.dinge[a.gibt[i].slice(4)].name);
+            if (a.gibt[i].indexOf('gebannt:') === 0) t.push(gross(nom(s.partie.dinge[a.ding])) + ' kann dir jetzt nichts mehr anhaben.');
+            if (a.gibt[i].indexOf('schloss:') === 0) t.push('Ein Schloss der Ausgangst' + '\u00fc' + 'r ist offen.');
+            if (a.gibt[i].indexOf('wasser:') === 0) t.push('Wasser l' + '\u00e4' + 'uft.');
+            if (a.gibt[i].indexOf('waerme:') === 0) t.push(gross(nom(s.partie.dinge[a.ding])) + ' wird warm.');
+        }
+        if (g.length) t.push('Du findest: ' + g.join(', ') + '.');
+        if (alt && alt.laerm) t.push('Das war laut.');
+        return t.length ? t.join(' ') : 'Erledigt.';
+    }
+
+    function fuehreAus(s, a, alt) {
+        var i, aus = [];
+        for (i = 0; i < a.gibt.length; i++) s.f[a.gibt[i]] = true;
+        for (i = 0; i < a.nimmt.length; i++) delete s.f[a.nimmt[i]];
+        if (alt && alt.laerm) aus = aus.concat(laermFolgen(s, a.raum));
+        return aus;
+    }
+
+    // Ereignisse feuern, wenn ihre Bedingungen erfuellt sind und der Ausloeser passt
+    function ereignisse(s, nr, befehl) {
+        var aus = [], weiter = true, i;
+        while (weiter) {
+            weiter = false;
+            for (i = 0; i < s.partie.aktionen.length; i++) {
+                var a = s.partie.aktionen[i];
+                if ((a.art !== 'ereignis' && a.art !== 'lesen') || erledigt(s, a) || !brauchtErfuellt(s, a)) continue;
+                if (a.art === 'lesen') {
+                    var rgl = regel(s, a.gibt[0].slice(6));
+                    s.f[a.gibt[0]] = true;
+                    aus.push(m('Auf der Notiz steht: \u00bb' + gross(Katalog.AUSLOESER[rgl.ausloeser].text) + ': ' + rgl.demo + '\u00ab', 'ereignis'));
+                    weiter = true;
+                    continue;
+                }
+                if (s.raum[nr] !== a.raum) continue;
+                var gezielt = befehl && befehl.ding === a.ding, passt;
+                switch (a.ausloeser) {
+                    case 'hinsehen': passt = gezielt && befehl.art === 'ansehen'; break;
+                    case 'naehe': passt = gezielt && (befehl.art === 'ansehen' || befehl.art === 'anfassen'); break;
+                    case 'beruehrung': passt = gezielt && befehl.art === 'anfassen'; break;
+                    case 'wegsehen':
+                        if (befehl && !gezielt) s.f['weg:' + a.id] = true;
+                        passt = gezielt && befehl.art === 'ansehen' && !!s.f['weg:' + a.id]; break;
+                    default: passt = true;
+                }
+                if (!passt) continue;
+                var sp = sperre(s, a, nr, 1);
+                if (sp) { if (gezielt) aus.push(sp); continue; }
+                var rg = regel(s, a.kennt[0]), el = s.partie.dinge[a.ding];
+                for (var j = 0; j < a.gibt.length; j++) s.f[a.gibt[j]] = true;
+                var text = (a.ausloeser === 'wegsehen' ? 'Seit du zuletzt hingesehen hast, hat sich etwas ver\u00e4ndert: ' : '') + rg.text;
+                if (rg.art === 'zahl') text += ' Die Ziffern: ' + rg.code.split('').join(' ') + '.';
+                if (rg.art === 'behaelter' || rg.art === 'traeger') text += ' Du nimmst es an dich.';
+                if (rg.art === 'richtung') text += ' Die Stelle ist jetzt sichtbar.';
+                aus.push(m(text, 'ereignis', rg.privat && s.partie.spieler > 1 ? rg.privat : null));
+                weiter = true;
+            }
+        }
+        return aus;
+    }
+
+    function betrete(s, nr, raum) {
+        var aus = [], i;
+        s.raum[nr] = raum;
+        if (s.gesehen[raum]) return aus;
+        s.gesehen[raum] = true;
+        for (i = 0; i < s.partie.aktionen.length; i++) {
+            var a = s.partie.aktionen[i];
+            if (a.art !== 'vorfuehrung' || a.raum !== raum) continue;
+            s.vorfuehrungen.push({ raum: raum, aktion: a });
+        }
+        return aus.concat(naechsteVorfuehrung(s, nr));
+    }
+
+    // Die naechste anstehende Vorfuehrung im Raum; mit ding nur die dieses Elements (wer hinsieht, sieht sie sofort)
+    function naechsteVorfuehrung(s, nr, ding) {
+        var i;
+        for (i = 0; i < s.vorfuehrungen.length; i++) {
+            if (s.vorfuehrungen[i].raum !== s.raum[nr]) continue;
+            if (ding && s.vorfuehrungen[i].aktion.ding !== ding) continue;
+            var a = s.vorfuehrungen.splice(i, 1)[0].aktion, rg = regel(s, a.gibt[0].slice(6));
+            s.f[a.gibt[0]] = true;
+            return [m(Katalog.AUSLOESER[rg.ausloeser].vor + ' ' + rg.demo, 'ereignis')];
+        }
+        return [];
+    }
+
+    function neu(partie) {
+        var s = { partie: partie, f: {}, zeit: 0, raum: {}, gesehen: {}, status: 'laeuft', fristGemeldet: {}, log: [], vorfuehrungen: [] }, i;
+        for (i = 0; i < partie.start.length; i++) s.f[partie.start[i]] = true;
+        var aus = [m('Die T\u00fcr f\u00e4llt hinter dir ins Schloss. Du bist ' + raumIn(s, 'r1') + '. Der einzige Ausgang ist verschlossen.', 'system')];
+        aus = aus.concat(betrete(s, 1, 'r1'));
+        for (i = 2; i <= partie.spieler; i++) s.raum[i] = 'r1';
+        s.log = aus;
+        return s;
+    }
+
+    function ansehenText(s, d) {
+        var t, i, k;
+        if (d.typ === 'element') {
+            t = Katalog.ELEMENTE[d.vorlage].b;
+            var rs = regelVonElement(s, d.id);
+            for (i = 0; i < rs.length; i++) {
+                if (rs[i].enthuellung && rs[i].enthuellung.art === 'spur') {
+                    t += ' Spuren verraten, was geschieht. ' + gross(Katalog.AUSLOESER[rs[i].ausloeser].text) + ': ' + rs[i].demo;
+                }
+            }
+            return t;
+        }
+        if (d.typ === 'gegenstand') return beschreibung(d);
+        if (d.typ === 'schloss') {
+            var zu = s.f['schloss:' + d.id] ? ' Es ist offen.' : '';
+            for (i = 0; i < s.partie.tuer.schloesser.length; i++) {
+                if (s.partie.tuer.schloesser[i].id === d.id && s.partie.tuer.schloesser[i].code) return 'Ein Zahlenschloss mit ' + s.partie.tuer.schloesser[i].code.length + ' Ziffern.' + zu;
+            }
+            return gross(d.name) + '.' + zu;
+        }
+        if (d.name === 'Lichtschalter') return 'Ein alter Drehschalter. Das Licht ist ' + (s.f['licht_aus:' + d.raum] ? 'aus.' : 'an.');
+        if (d.name === 'Ausgangst\u00fcr') {
+            var offen = 0;
+            for (i = 0; i < s.partie.tuer.schloesser.length; i++) if (s.f['schloss:' + s.partie.tuer.schloesser[i].id]) offen++;
+            return 'Die Ausgangst\u00fcr. ' + offen + ' von ' + s.partie.tuer.schloesser.length + ' Schl\u00f6ssern sind offen.';
+        }
+        return gross(d.name) + '.';
+    }
+
+    function zeitPruefen(s) {
+        var aus = [], i, laeuftAb = false;
+        for (i = 0; i < s.partie.bedrohungen.length; i++) {
+            var b = s.partie.bedrohungen[i];
+            if (b.ausloeser !== 'zeit' || b.frist === null || s.f['gebannt:' + b.id]) continue;
+            var rg = regel(s, b.regel), rest = b.frist - s.zeit;
+            if (rest <= 0) {
+                laeuftAb = true;
+                if (!s.fristGemeldet[b.id]) { s.fristGemeldet[b.id] = true; aus.push(m('Jetzt ist es so weit: ' + rg.text, 'warnung')); }
+            } else if (rest <= 4) {
+                aus.push(m(rg.demo + ' Lange geht das nicht mehr gut.', 'warnung'));
+            }
+        }
+        if (laeuftAb && s.status === 'laeuft') {
+            var r = Pruefer.pruefe(s.partie, s.partie.spieler, { f: s.f, schritte: s.zeit });
+            if (!r.loesbar) { s.status = 'verloren'; aus.push(m('Zu sp\u00e4t. Von hier aus gibt es keinen Ausweg mehr.', 'system')); }
+        }
+        return aus;
+    }
+
+    function aktionenAn(s, ding, arten) {
+        var l = [], i;
+        for (i = 0; i < s.partie.aktionen.length; i++) {
+            var a = s.partie.aktionen[i];
+            if (a.ding === ding && arten.indexOf(a.art) >= 0) l.push(a);
+        }
+        return l;
+    }
+
+    function befehl(s, nr, b) {
+        if (s.status !== 'laeuft') return [m('Die Partie ist vorbei.', 'system')];
+        var aus = [], d = b.ding ? s.partie.dinge[b.ding] : null, i, a, sp;
+        if (b.ding && !d) return [m('Das gibt es hier nicht.', 'system')];
+        if (!ZEIT.hasOwnProperty(b.art)) return [m('Das geht nicht.', 'system')];
+        if ((b.art === 'ansehen' || b.art === 'anfassen' || b.art === 'nehmen' || b.art === 'benutzen' || b.art === 'eingeben') && !d) {
+            return [m('W\u00e4hle zuerst etwas aus.', 'system')];
+        }
+        if (b.art === 'gehen') {
+            var gibtRaum = false;
+            for (i = 0; i < s.partie.raeume.length; i++) if (s.partie.raeume[i].id === b.raum) gibtRaum = true;
+            if (!gibtRaum) return [m('Diesen Raum gibt es nicht.', 'system')];
+        }
+        if (d && d.raum !== s.raum[nr] && b.art !== 'gehen') return [m('Das ist nicht hier.', 'system')];
+        s.zeit += ZEIT[b.art] || 0;
+
+        switch (b.art) {
+            case 'ansehen':
+                aus.push(m(ansehenText(s, d)));
+                aus = aus.concat(naechsteVorfuehrung(s, nr, d.id));
+                break;
+
+            case 'anfassen':
+                var getan = false, l = aktionenAn(s, d.id, ['bedienen', 'oeffnen', 'schalter']);
+                for (i = 0; i < l.length; i++) {
+                    a = l[i];
+                    if (a.art === 'schalter') {
+                        var aus_ = s.f['licht_aus:' + a.raum];
+                        if ((a.gibt.length && aus_) || (a.nimmt.length && !aus_)) continue;
+                        fuehreAus(s, a, null);
+                        aus.push(m(aus_ ? 'Du schaltest das Licht wieder ein.' : 'Du schaltest das Licht aus. Es ist dunkel.'));
+                        getan = true; break;
+                    }
+                    if (erledigt(s, a) || !brauchtErfuellt(s, a)) continue;
+                    sp = sperre(s, a, nr, 1);
+                    if (sp) { aus.push(sp); getan = true; break; }
+                    fuehreAus(s, a, null);
+                    aus.push(m(a.gibt.indexOf('ausgang') >= 0 ? 'Die Ausgangst\u00fcr schwingt auf.' : ergebnis(s, a, null), a.gibt.indexOf('ausgang') >= 0 ? 'erfolg' : 'erzaehler'));
+                    getan = true; break;
+                }
+                if (!getan && d.name === 'Ausgangst\u00fcr') aus.push(m(ansehenText(s, d)));
+                else if (!getan) aus.push(m('Du fasst ' + akk(d) + ' an.'));
+                break;
+
+            case 'nehmen':
+                l = aktionenAn(s, d.id, ['nehmen']);
+                if (!l.length || erledigt(s, l[0])) { aus.push(m('Das kannst du nicht mitnehmen.')); break; }
+                sp = sperre(s, l[0], nr, 1);
+                if (sp) { aus.push(sp); break; }
+                fuehreAus(s, l[0], null);
+                aus.push(m('Du nimmst ' + akk(d) + '.'));
+                break;
+
+            case 'benutzen':
+                var items = itemsAus(s, b.mit), versucht = false, erfolg = false, grund = null;
+                l = aktionenAn(s, d.id, ['benutzen', 'schluessel']);
+                for (i = 0; i < l.length && !erfolg; i++) {
+                    a = l[i];
+                    if (erledigt(s, a)) continue;
+                    if (a.art === 'schluessel') {
+                        if (!brauchtErfuellt(s, a)) continue;
+                        var schl = false;
+                        for (var j = 0; j < items.length; j++) if ('hat:' + items[j].id === a.braucht[0]) schl = true;
+                        if (!schl) continue;
+                        fuehreAus(s, a, null); aus.push(m('Der Schl\u00fcssel passt. Klack.')); erfolg = true; continue;
+                    }
+                    if (!brauchtErfuellt(s, a)) continue;
+                    versucht = true;
+                    var w = waehleAlternative(s, s.partie.anforderungen[a.mittel], items, a.raum);
+                    if (!w.alt) {
+                        if (w.fehlt === 'verbinden') { aus.push(m('Mehrere Dinge zusammen halten nur, wenn etwas Rei\u00dffestes zum Verbinden dabei ist.')); erfolg = true; }
+                        else if (!grund) grund = knapp(s.partie.anforderungen[a.mittel], items);
+                        continue;
+                    }
+                    sp = sperre(s, a, nr, w.alt.h || 1);
+                    if (sp) { aus.push(sp); erfolg = true; continue; }
+                    aus.push(m(ergebnis(s, a, w.alt)));
+                    aus = aus.concat(fuehreAus(s, a, w.alt));
+                    erfolg = true;
+                }
+                if (!erfolg) aus.push(m(grund || 'Damit l\u00e4sst sich hier nichts anfangen.'));
+                break;
+
+            case 'krach':
+                items = itemsAus(s, b.mit);
+                var laut = false;
+                for (i = 0; i < items.length; i++) if ((items[i].e.laut || 0) >= 1) laut = true;
+                if (!laut) { aus.push(m('Damit kannst du keinen L\u00e4rm machen.')); break; }
+                aus.push(m('Du machst ordentlich Krach.'));
+                aus = aus.concat(laermFolgen(s, s.raum[nr]));
+                l = s.partie.aktionen;
+                for (i = 0; i < l.length; i++) if (l[i].art === 'krach' && l[i].raum === s.raum[nr]) fuehreAus(s, l[i], null);
+                break;
+
+            case 'eingeben':
+                l = aktionenAn(s, d.id, ['eingeben']);
+                var code = null;
+                for (i = 0; i < s.partie.tuer.schloesser.length; i++) if (s.partie.tuer.schloesser[i].id === d.id) code = s.partie.tuer.schloesser[i].code;
+                if (!l.length || !code) { aus.push(m('Hier gibt es nichts einzugeben.')); break; }
+                sp = sperre(s, l[0], nr, 1);
+                if (sp) { aus.push(sp); break; }
+                if (String(b.code) === code) { s.f['code:' + d.id] = true; fuehreAus(s, l[0], null); aus.push(m('Das Zahlenschloss springt auf.')); }
+                else aus.push(m('Falscher Code. Das Schloss bleibt zu.'));
+                break;
+
+            case 'warten':
+                aus.push(m('Du wartest eine Weile.'));
+                for (i = 0; i < s.partie.aktionen.length; i++) {
+                    a = s.partie.aktionen[i];
+                    if (a.art === 'warten' && a.raum === s.raum[nr]) fuehreAus(s, a, null);
+                }
+                break;
+
+            case 'gehen':
+                if (b.raum === s.raum[nr]) break;
+                aus.push(m('Du gehst ' + raumNach(s, b.raum) + '.'));
+                aus = aus.concat(betrete(s, nr, b.raum));
+                break;
+        }
+
+        aus = aus.concat(ereignisse(s, nr, b));
+        if (b.art !== 'gehen') aus = aus.concat(naechsteVorfuehrung(s, nr));
+        if (s.f.ausgang) {
+            s.status = 'gewonnen';
+            aus.push(m('Du bist drau\u00dfen. Geschafft nach ' + s.zeit + ' Zeiteinheiten.', 'erfolg'));
+        } else {
+            aus = aus.concat(zeitPruefen(s));
+        }
+        s.log = s.log.concat(aus);
+        return aus;
+    }
+
+    function sicht(s, nr) {
+        var raum = s.raum[nr], dinge = [], inventar = [], k, i, nehmbar = {};
+        for (i = 0; i < s.partie.aktionen.length; i++) if (s.partie.aktionen[i].art === 'nehmen') nehmbar[s.partie.aktionen[i].ding] = true;
+        var keys = Object.keys(s.partie.dinge).sort(function (a, b) { return parseInt(a.slice(1), 10) - parseInt(b.slice(1), 10); });
+        for (i = 0; i < keys.length; i++) {
+            var d = s.partie.dinge[keys[i]];
+            // ohne Eigenschaften und Stufen: Spieler sollen ueberlegen, was ein Ding kann, nicht Zahlen vergleichen
+            if (d.typ === 'gegenstand' && s.f['hat:' + d.id]) { inventar.push({ id: d.id, name: d.name, b: beschreibung(d), code: !!(d.e && d.e.schluessel) }); continue; }
+            if (d.raum !== raum) continue;
+            if (d.typ === 'gegenstand' && !nehmbar[d.id]) continue;
+            if (d.typ === 'versteck' && d.verborgen && !s.f['versteck:' + d.id]) continue;
+            var offen = false;
+            if (d.typ === 'schloss') offen = !!s.f['schloss:' + d.id];
+            if (d.typ === 'versteck') {
+                for (k = 0; k < s.partie.aktionen.length; k++) if (s.partie.aktionen[k].ding === d.id && erledigt(s, s.partie.aktionen[k])) offen = true;
+            }
+            var code = false;
+            for (k = 0; k < s.partie.tuer.schloesser.length; k++) if (s.partie.tuer.schloesser[k].id === d.id && s.partie.tuer.schloesser[k].code) code = true;
+            dinge.push({ id: d.id, name: d.name, typ: d.typ, offen: offen, code: code });
+        }
+        var raeume = [];
+        for (i = 0; i < s.partie.raeume.length; i++) raeume.push({ id: s.partie.raeume[i].id, name: s.partie.raeume[i].name, hier: s.partie.raeume[i].id === raum });
+        return { raum: raum, raeume: raeume, dinge: dinge, inventar: inventar, zeit: s.zeit, licht: !s.f['licht_aus:' + raum], status: s.status };
+    }
+
+    return { version: 1, neu: neu, befehl: befehl, sicht: sicht };
+})();
+
+if (typeof module !== 'undefined' && module.exports) { module.exports = Spiel; }
+
+</script>
+<script>
+(function () {
+  "use strict";
+  var $ = function (id) { return document.getElementById(id); };
+  var sitzung = null, gewaehlt = null, auswahl = [];
+
+  function esc(t) { return String(t).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+  var TYP = { element: "Im Raum", gegenstand: "Gegenstand", versteck: "Versteck", schloss: "Schloss", fixtur: "Einrichtung" };
+
+  function markdown(t) {
+    var zeilen = t.split("\n"), h = "", liste = null;
+    function inline(s) { return esc(s).replace(/\*\*(.+?)\*\*/g, "<b>$1</b>").replace(/_(.+?)_/g, "<i>$1</i>"); }
+    function zu() { if (liste) { h += "</" + liste + ">"; liste = null; } }
+    zeilen.forEach(function (z) {
+      var m;
+      if (/^## /.test(z)) { zu(); h += "<h3>" + inline(z.slice(3)) + "</h3>"; }
+      else if ((m = /^\s*- (.*)/.exec(z))) { if (liste !== "ul") { zu(); h += "<ul>"; liste = "ul"; } h += "<li>" + inline(m[1]) + "</li>"; }
+      else if ((m = /^\d+\. (.*)/.exec(z))) { if (liste !== "ol") { zu(); h += "<ol>"; liste = "ol"; } h += "<li>" + inline(m[1]) + "</li>"; }
+      else if (z.trim()) { zu(); h += "<p>" + inline(z) + "</p>"; }
+    });
+    zu();
+    return h;
+  }
+
+  function melde(liste, eigene) {
+    var log = $("log");
+    if (eigene) { var p0 = document.createElement("p"); p0.className = "ich"; p0.textContent = "› " + eigene; log.appendChild(p0); }
+    liste.forEach(function (x) { var p = document.createElement("p"); p.className = x.art; p.textContent = x.text; log.appendChild(p); });
+    log.scrollTop = log.scrollHeight;
+  }
+
+  function zeichne() {
+    var s = Spiel.sicht(sitzung, 1);
+    $("zeit").textContent = s.zeit;
+    $("lichtanzeige").textContent = s.licht ? "Licht an" : "Licht aus";
+    $("raum").classList.toggle("dunkel", !s.licht);
+    var raum = s.raeume.filter(function (r) { return r.hier; })[0];
+    $("raumname").textContent = raum.name;
+    $("raeume").innerHTML = s.raeume.length > 1 ? s.raeume.map(function (r) {
+      return '<button class="knopf" type="button" data-gehen="' + r.id + '"' + (r.hier ? " disabled" : "") + ">" + (r.hier ? "Hier: " : "Gehen: ") + esc(r.name) + "</button>";
+    }).join("") : "";
+    if (gewaehlt && !s.dinge.some(function (d) { return d.id === gewaehlt; })) gewaehlt = null;
+    $("dinge").innerHTML = s.dinge.map(function (d) {
+      return '<button type="button" class="ding' + (d.id === gewaehlt ? " gewaehlt" : "") + (d.offen ? " offen" : "") + '" data-ding="' + d.id + '"><span class="typ">' + TYP[d.typ] + '</span><span class="name">' + esc(d.name) + "</span></button>";
+    }).join("");
+    auswahl = auswahl.filter(function (id) { return s.inventar.some(function (g) { return g.id === id; }); });
+    $("inv").innerHTML = s.inventar.length ? s.inventar.map(function (g) {
+      return '<button type="button" class="gegenstand' + (auswahl.indexOf(g.id) >= 0 ? " gewaehlt" : "") + '" data-g="' + g.id + '" aria-pressed="' + (auswahl.indexOf(g.id) >= 0) + '">' + esc(g.name) + (g.b ? "<small>" + esc(g.b) + "</small>" : "") + "</button>";
+    }).join("") : '<span class="leer">Nichts.</span>';
+    var d = gewaehlt ? s.dinge.filter(function (x) { return x.id === gewaehlt; })[0] : null;
+    $("ziel").textContent = d ? "Gewählt: " + d.name + (auswahl.length ? ", mit " + auswahl.map(function (id) { return sitzung.partie.dinge[id].name; }).join(" + ") : "") : "Wähle etwas im Raum.";
+    var laeuft = s.status === "laeuft";
+    document.querySelectorAll("[data-b]").forEach(function (b) {
+      var art = b.getAttribute("data-b"), an = laeuft;
+      if (["ansehen", "anfassen", "nehmen", "eingeben"].indexOf(art) >= 0) an = an && !!d;
+      if (art === "nehmen") an = an && d && d.typ === "gegenstand";
+      if (art === "benutzen") an = an && !!d && auswahl.length > 0;
+      if (art === "krach") an = an && auswahl.length > 0;
+      b.disabled = !an;
+    });
+    $("codereihe").hidden = !(d && d.code);
+    if (s.status !== "laeuft") {
+      $("banner").hidden = false;
+      $("banner").className = "banner " + s.status;
+      $("banner").textContent = s.status === "gewonnen" ? "Geschafft. Zeit: " + s.zeit + ". Neue Partie oben starten." : "Verloren. Der Raum hat gewonnen. Neue Partie oben starten.";
+    } else $("banner").hidden = true;
+  }
+
+  function starte() {
+    var stufe = parseInt($("stufe").value, 10), seed = parseInt($("seed").value, 10);
+    if (!(seed > 0)) { seed = 1 + Math.floor(Math.random() * 99999); $("seed").value = seed; }
+    var p = Generator.erzeuge(seed, { spieler: 1, stufe: stufe });
+    if (!p) { $("log").innerHTML = ""; melde([{ text: "Für diese Nummer ließ sich keine Partie bauen. Bitte eine andere wählen.", art: "system" }]); return; }
+    sitzung = Spiel.neu(p); gewaehlt = null; auswahl = [];
+    $("nr").textContent = seed + " / Stufe " + stufe;
+    $("log").innerHTML = "";
+    melde(sitzung.log);
+    $("spoiler").innerHTML = markdown(Protokoll.schreibe(p));
+    zeichne();
+  }
+
+  function tue(befehl, text) { melde(Spiel.befehl(sitzung, 1, befehl), text); zeichne(); }
+
+  $("dinge").addEventListener("click", function (e) {
+    var b = e.target.closest("[data-ding]"); if (!b) return;
+    gewaehlt = b.getAttribute("data-ding") === gewaehlt ? null : b.getAttribute("data-ding");
+    zeichne();
+  });
+  $("inv").addEventListener("click", function (e) {
+    var b = e.target.closest("[data-g]"); if (!b) return;
+    var id = b.getAttribute("data-g"), i = auswahl.indexOf(id);
+    if (i >= 0) auswahl.splice(i, 1); else auswahl.push(id);
+    zeichne();
+  });
+  $("raeume").addEventListener("click", function (e) {
+    var b = e.target.closest("[data-gehen]"); if (!b) return;
+    gewaehlt = null;
+    tue({ art: "gehen", raum: b.getAttribute("data-gehen") }, b.textContent);
+  });
+  document.querySelector(".handlungen").addEventListener("click", function (e) {
+    var b = e.target.closest("[data-b]"); if (!b || b.disabled) return;
+    var art = b.getAttribute("data-b"), name = gewaehlt ? sitzung.partie.dinge[gewaehlt].name : "";
+    var mitText = auswahl.map(function (id) { return sitzung.partie.dinge[id].name; }).join(" + ");
+    if (art === "ansehen") tue({ art: "ansehen", ding: gewaehlt }, "Ansehen: " + name);
+    else if (art === "anfassen") tue({ art: "anfassen", ding: gewaehlt }, "Anfassen: " + name);
+    else if (art === "nehmen") tue({ art: "nehmen", ding: gewaehlt }, "Nehmen: " + name);
+    else if (art === "benutzen") tue({ art: "benutzen", ding: gewaehlt, mit: auswahl.slice() }, mitText + " an " + name);
+    else if (art === "krach") tue({ art: "krach", mit: auswahl.slice() }, "Krach mit " + mitText);
+    else if (art === "warten") tue({ art: "warten" }, "Warten");
+    else if (art === "eingeben") { var c = $("codefeld").value.replace(/\D/g, ""); tue({ art: "eingeben", ding: gewaehlt, code: c }, "Code " + c + " an " + name); $("codefeld").value = ""; }
+  });
+  $("codefeld").addEventListener("keydown", function (e) { if (e.key === "Enter") document.querySelector('[data-b="eingeben"]').click(); });
+  $("neu").addEventListener("click", function () { $("seed").value = ""; starte(); });
+  $("seed").addEventListener("change", starte);
+  $("stufe").addEventListener("change", starte);
+  starte();
+})();
+</script>
+
+</body>
+</html>
