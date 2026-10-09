@@ -1168,6 +1168,8 @@ var Generator = (function () {
 
         // Jeder Raum hat einen Lichtschalter, sonst verraet sein Vorhandensein das Raetsel
         for (i = 0; i < p.raeume.length; i++) this.licht(p.raeume[i].id);
+        // Ebenso ein Wasserhahn: Stuende er nur da, wo ein Raetsel Wasser braucht, verriete er es
+        for (i = 0; i < p.raeume.length; i++) this.hahn(p.raeume[i].id, 0, { zoneFrei: true });
 
         // Ablenkungen: Elemente, die sich verhalten, aber nichts bedeuten
         for (i = 0; i < cfg.ablenkung; i++) {
