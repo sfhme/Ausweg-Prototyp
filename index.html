@@ -490,6 +490,9 @@ var Setting = (function () {
         },
         // Ziffer je Kopf (R91): was ein Spieler privat sieht, {teile} z. B. "an zweiter Stelle eine 7"
         zifferJeKopf: 'Nur f\u00fcr deine Augen erscheinen Ziffern: {teile}. Die anderen sehen andere Stellen.',
+        // Was hat sich veraendert? (R24): Im Dunkeln rueckt ein Versteck an eine andere Stelle; welches, sagt der Text nicht
+        verrueckt: { text: 'Etwas scharrt \u00fcber den Boden. Als du wieder siehst, steht ein Ding im Raum nicht mehr dort, wo es stand.',
+            weg: 'es steht nach dem Dunkel an anderer Stelle' },
         // Verwitterte Inschrift, die einen Teil eines Codes traegt; drei Wege, sie lesbar zu machen (Mechanik: INSCHRIFT)
         inschrift: { name: 'verwitterte Inschrift', nom: 'die verwitterte Inschrift', akk: 'die verwitterte Inschrift', verb: 'Entziffern',
             b: 'Eine in einen Mauerstein gehauene Inschrift, verwittert und von Moos \u00fcberzogen. Lesen kann man so nichts.',
@@ -869,6 +872,8 @@ var Katalog = (function () {
 
     // Durchreiche (R83): Was durch ein Loch in der Mauer passt. Nach Vorlage, nicht als Eigenschaft: Kleinsein loest
     // kein Hindernis und soll im Protokoll der Eigenschaften nicht auftauchen. Schriftstuecke passen immer.
+    // Was hat sich veraendert? (R24): freie Verstecke, die sich verruecken lassen (Platz-Schluessel aus dem Setting)
+    var BEWEGLICH = ['fass', 'balken', 'urne', 'schemel'];
     var KLEIN = ['messer', 'schere', 'saeurehaltig', 'feuerzeug', 'streichhoelzer', 'taschenlampe', 'tuch', 'handspiegel', 'kleiderhaken',
         'schnur', 'wecker', 'schluessel', 'notiz', 'plaettchen'];
 
@@ -1020,7 +1025,7 @@ var Katalog = (function () {
         version: 3, SETTING: S.id, ARTEN: ARTEN, AUSLOESER: AUSLOESER, ELEMENTE: ELEMENTE, GEGENSTAENDE: GEGENSTAENDE,
         EIGENSCHAFT_TEXT: EIGENSCHAFT_TEXT, ZU_WENIG: S.zuWenig, HINDERNISSE: HINDERNISSE, SCHLOESSER: SCHLOESSER, GEGENMITTEL: GEGENMITTEL,
         VERSTECKE: S.verstecke, LICHT: S.licht, WASSER: WASSER, SCHLUESSEL: S.schluessel, NOTIZ: S.notiz, STORIES: S.stories,
-        VERWANDLUNGEN: S.verwandlungen, ZAEHL: S.zaehl, LOGIK: S.logik, LUEGNER: S.luegner, HANDBUCH: S.handbuch, ZIFFER_JE_KOPF: S.zifferJeKopf, KLEIN: KLEIN, DURCHREICHE: S.durchreiche, HAUSORDNUNG: S.hausordnung, FALLGITTER: FALLGITTER_K, ZEICHEN: S.zeichen, FETZEN: S.fetzen, UHR: S.uhr, ZWISCHENTUER: S.zwischentuer, TAFEL: S.tafel, INSCHRIFT: INSCHRIFT_K,
+        VERWANDLUNGEN: S.verwandlungen, ZAEHL: S.zaehl, LOGIK: S.logik, LUEGNER: S.luegner, HANDBUCH: S.handbuch, ZIFFER_JE_KOPF: S.zifferJeKopf, KLEIN: KLEIN, BEWEGLICH: BEWEGLICH, VERRUECKT: S.verrueckt, DURCHREICHE: S.durchreiche, HAUSORDNUNG: S.hausordnung, FALLGITTER: FALLGITTER_K, ZEICHEN: S.zeichen, FETZEN: S.fetzen, UHR: S.uhr, ZWISCHENTUER: S.zwischentuer, TAFEL: S.tafel, INSCHRIFT: INSCHRIFT_K,
         SCHLOSSTEXT: S.schlosstext,
         HELL: S.hell, DUNKEL: S.dunkel
     };
@@ -1802,7 +1807,7 @@ var Generator = (function () {
         g.raum = g.raum || this.raum();
         g.zone = this.zoneFuer(g.raum, opt);
         var arten = tiefe <= 0 ? ['frei'] : this.r.mischen(['frei', 'hindernis', 'hindernis', 'hindernis', 'behaelter', 'behaelter',
-            'traeger', 'richtung', 'richtung', 'zweitfach', 'luegner', 'hausordnung']);
+            'traeger', 'richtung', 'richtung', 'zweitfach', 'luegner', 'hausordnung', 'verrueckt']);
         var i;
         if (tiefe > 0 && arten[0] === 'frei' && this.r.chance(0.6)) arten.push(arten.shift());
         for (i = 0; i < arten.length; i++) {
@@ -1893,6 +1898,33 @@ var Generator = (function () {
     };
     Bau.prototype.lege_behaelter = function (g, tiefe, opt) { return this.lege_elementregel('behaelter', g, tiefe, opt); };
     Bau.prototype.lege_traeger = function (g, tiefe, opt) { return this.lege_elementregel('traeger', g, tiefe, opt); };
+
+    // Was hat sich veraendert? (R24): Der Gegenstand steckt in einem freien Versteck, das im Dunkeln an eine andere Stelle
+    // rueckt. Kein Element zeigt darauf: Wer hinsieht, bemerkt selbst, was woanders steht. Schleifspuren am Boden verraten
+    // von Anfang an, dass hier etwas wandert (Enthuellung spur). Hoechstens einmal je Partie, sonst ist es kein Suchbild.
+    Bau.prototype.lege_verrueckt = function (g, tiefe, opt) {
+        var V = this.K.VERRUECKT, VN = this.K.VERSTECKE, namen = [], i;
+        if (!V || this.fixtur.verrueckt || tiefe < 1 || !this.r.chance(0.45)) return false;      // selten genug, dass es auffaellt
+        for (i = 0; i < VN.length; i++) if (!this.fixtur['name:' + VN[i][0]] && this.K.BEWEGLICH.indexOf(VN[i][3]) >= 0) namen.push(VN[i]);
+        if (!namen.length) return false;
+        var vname = this.r.waehle(namen);
+        this.fixtur['name:' + vname[0]] = true;
+        this.fixtur.verrueckt = true;
+        var v = this.ding('versteck', vname[0], g.raum, { verborgen: true, verrueckt: true, nom: vname[1], akk: vname[2], modell: 'v_' + vname[3] });
+        v.zone = this.zoneFuer(g.raum, opt);
+        var rg = { id: this.id('r'), element: v.id, art: 'verrueckt', ausloeser: 'licht_aus', text: V.text, ziel: v.id,
+            enthuellung: { art: 'spur' }, privat: null, demo: V.text };
+        this.p.regeln.push(rg);
+        this.p.start.push('kennt:' + rg.id);
+        var bedarf = this.ausloeserBedarf('licht_aus', v, tiefe - 1, opt);
+        this.aktion({ text: 'bemerken, was woanders steht (' + v.name + ')', art: 'ereignis', ausloeser: 'licht_aus', raum: v.raum, ding: v.id, braucht: bedarf,
+            kennt: [rg.id], gibt: ['versteck:' + v.id, 'verrueckt:' + v.id], sicher: true });
+        // ohne das Dunkel: gruendlich durchsuchen (kostet Zeit)
+        this.aktion({ text: v.name + ' durchsuchen', art: 'durchsuchen', raum: v.raum, ding: v.id, gibt: ['versteck:' + v.id], kosten: SUCHKOSTEN });
+        g.lage = v.name + ' (' + V.weg + ')';
+        this.aktion({ text: v.name + ' \u00f6ffnen', art: 'oeffnen', raum: v.raum, ding: v.id, braucht: ['versteck:' + v.id], gibt: ['hat:' + g.id] });
+        return true;
+    };
 
     Bau.prototype.lege_richtung = function (g, tiefe, opt) {
         var el = this.nimmElement('richtung');
@@ -2737,6 +2769,7 @@ var Protokoll = (function () {
     var ROLLE = {
         zahl: 'zeigt einen Code',
         richtung: 'weist auf ein Versteck',
+        verrueckt: 'steht danach woanders',
         behaelter: 'gibt etwas frei',
         traeger: 'bringt Unerreichbares heran',
         bedrohung: 'BEDROHUNG',
@@ -3813,7 +3846,7 @@ var Spiel = (function () {
             if (d.typ === 'versteck') {
                 for (k = 0; k < s.partie.aktionen.length; k++) {
                     var ak = s.partie.aktionen[k];
-                    if (ak.ding === d.id && (ak.art !== 'durchsuchen' || d.leer) && erledigt(s, ak)) offen = true;
+                    if (ak.ding === d.id && ak.art !== 'ereignis' && (ak.art !== 'durchsuchen' || d.leer) && erledigt(s, ak)) offen = true;   // Ereignis am Versteck (R24: es ist gewandert) oeffnet es nicht
                 }
             }
             if (d.vorlage === 'zwischentuer') offen = !!s.f['offen:' + s.partie.durchgang.nach];
@@ -3821,6 +3854,7 @@ var Spiel = (function () {
             for (k = 0; k < alleS.length; k++) if (alleS[k].id === d.id && alleS[k].code) code = true;
             var eintrag = { id: d.id, name: d.name, typ: d.typ, offen: offen, code: code };
             if (suchen) eintrag.suchen = true;
+            if (d.verrueckt) eintrag.w = wirkungen(s, d, nr);       // R24: art verrueckt, an = steht jetzt an seinem zweiten Platz
             if (d.typ === 'element') { eintrag.w = wirkungen(s, d, nr); if (s.f['waerme:' + d.id]) eintrag.warm = true; }
             // Hausordnung: die drei Plaettchen, wie sie gerade auf der Tafel stehen
             if (d.vorlage === 'hausordnung') eintrag.tafel = ordnungZeile(s, d).split(' \u00b7 ');
