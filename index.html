@@ -239,9 +239,250 @@ if (typeof module !== 'undefined' && module.exports) { module.exports = Zufall; 
 
 </script>
 <script>
+// Settings fuer Ausweg: die Kulisse einer Partie. Streng ES5, reine Daten.
+//
+// Drei Schichten, die der Generator je Partie zusammensetzt:
+//   Mechanik (kern/katalog.js): Rollen, Ausloeser, Eigenschaften, Loesungswege. Ueberall gleich.
+//   Setting  (diese Datei):     was die Dinge in dieser Kulisse SIND: Namen, Beschreibungen, Saetze, die Handlung
+//                               unter dem Fadenkreuz. Die Modelle dazu ordnet werkzeug/modelle/bau.js zu.
+//   Story    (je Setting mehrere): der Anlass, eingeschlossen zu sein: Einstieg, Ausgang, Raumnamen, Ende.
+//
+// Die Schluessel (puppe, becken ...) sind die der Mechanik und bleiben in jedem Setting gleich; sie benennen die Rolle,
+// nicht das Ding. Im Gewoelbe ist "puppe" eine Uebungspuppe aus Stroh, in einem anderen Setting ein Wartungsroboter.
+// f: Saetze je Faehigkeit in der Reihenfolge der Mechanik, davor zur Kontrolle deren Art. {ziel} = Versteck oder Inhalt.
+//
+// Bisher gibt es ein Setting. Geplant (Pakete aus der Low-Poly-Recherche, siehe KONZEPT.md): Raumstation, altes Haus,
+// Friedhof und Gruft, Fabrikhalle, Taverne, Gasthauskueche, Piratenschiff, Hoehle.
+var Setting = (function () {
+    'use strict';
+
+    var gewoelbe = {
+        id: 'gewoelbe',
+        name: 'Burggew\u00f6lbe',
+        hell: 'Fackeln brennen', dunkel: 'Fackeln aus',
+        ausloeser: {
+            hinsehen: 'Als du eine Weile hinsiehst:',
+            wegsehen: 'Du drehst dich kurz weg. Als du wieder hinsiehst:',
+            licht_aus: 'Die Fackeln flackern und sind einen Moment aus. Dabei:',
+            laerm: 'Irgendwo f\u00e4llt polternd etwas um. Sofort:',
+            beruehrung: 'Im Vorbeigehen st\u00f6\u00dft du gegen etwas. Dabei:',
+            waerme: 'Im Kohlebecken flammt die Glut auf, W\u00e4rme zieht durch den Raum. Dabei:',
+            wasser: 'Wasser rinnt durch die Rinne im Boden. Dabei:',
+            zeit: 'Nach einer Weile:',
+            naehe: 'Als du n\u00e4her kommst:'
+        },
+        elemente: {
+            puppe: { name: '\u00dcbungspuppe', nom: 'die \u00dcbungspuppe', akk: 'die \u00dcbungspuppe', verb: 'Ansto\u00dfen',
+                b: 'Eine \u00dcbungspuppe aus Stroh und Sackleinen auf einem Pfahl. Jemand hat ihr ein Gesicht aufgemalt, und es sieht zu wach aus.', f: [
+                ['richtung', 'Die \u00dcbungspuppe steht jedes Mal ein St\u00fcck weiter. Ihr Ziel: {ziel}.'],
+                ['richtung', 'Die \u00dcbungspuppe dreht den Kopf und starrt auf eine Stelle: {ziel}.'],
+                ['zahl', 'Auf dem Sackleinen der \u00dcbungspuppe leuchten Ziffern auf.'],
+                ['behaelter', 'Eine Naht im R\u00fccken der \u00dcbungspuppe platzt auf. Im Stroh steckt: {ziel}.'],
+                ['traeger', 'Die \u00dcbungspuppe l\u00e4sst den Arm sinken und fallen, was daran hing: {ziel}.'],
+                ['bedrohung', 'Die \u00dcbungspuppe kommt n\u00e4her.'],
+                ['keine', 'Die \u00dcbungspuppe neigt den Kopf. Sonst nichts.']] },
+            becken: { name: 'Kessel', nom: 'der Kessel', akk: 'den Kessel', verb: 'Hineingreifen',
+                b: 'Ein gro\u00dfer Kessel voll tr\u00fcbem Wasser, daneben ein enger Schacht im Boden.', f: [
+                ['bedrohung', 'Das Wasser l\u00e4uft \u00fcber den Rand und flutet den Boden.'],
+                ['traeger', 'Das Wasser steigt im Schacht und hebt nach oben, was schwimmt: {ziel}.'],
+                ['zahl', 'Auf der Wasseroberfl\u00e4che spiegeln sich Ziffern von der Decke.'],
+                ['behaelter', 'Das Wasser l\u00e4uft ab. Am Grund liegt: {ziel}.'],
+                ['keine', 'Der Kessel gluckert.']] },
+            grammophon: { name: 'Spieluhr', nom: 'die Spieluhr', akk: 'die Spieluhr', verb: 'Kurbeln',
+                b: 'Ein K\u00e4stchen mit Kurbel und Messingwalze: eine Spieluhr.', f: [
+                ['zahl', 'Die Spieluhr spielt. Die Zahl der T\u00f6ne je Takt ergibt die Ziffern.'],
+                ['richtung', 'Die Walze der Spieluhr bleibt stehen, und ihr Zeiger weist auf eine Stelle: {ziel}.'],
+                ['behaelter', 'Am Ende der Melodie springt ein Fach im Sockel auf. Darin: {ziel}.'],
+                ['keine', 'Die Spieluhr klimpert eine Melodie ohne Bedeutung.']] },
+            standuhr: { name: 'R\u00e4derwerk', nom: 'das R\u00e4derwerk', akk: 'das R\u00e4derwerk', verb: 'Anhalten',
+                b: 'Ein R\u00e4derwerk aus Eisenzahnr\u00e4dern, das ein Gewicht an einer Kette hebt und wieder fallen l\u00e4sst.', f: [
+                ['zahl', 'Das R\u00e4derwerk schl\u00e4gt einen Hammer an. Die Schl\u00e4ge, mit Pausen dazwischen, ergeben die Ziffern.'],
+                ['behaelter', 'Nach einer vollen Umdrehung klappt eine Lade am R\u00e4derwerk auf. Darin: {ziel}.'],
+                ['richtung', 'Das Gewicht bleibt schr\u00e4g h\u00e4ngen und zeigt auf eine Stelle: {ziel}.'],
+                ['bedrohung', 'Bei jedem Schlag senkt sich die Decke ein St\u00fcck.'],
+                ['keine', 'Das R\u00e4derwerk tickt laut.']] },
+            spiegel: { name: 'blanker Schild', nom: 'der blanke Schild', akk: 'den blanken Schild', verb: 'Zur Seite klappen',
+                b: 'Ein blank polierter Schild an der Wand. Man sieht sich darin wie in einem Spiegel.', f: [
+                ['zahl', 'Der blanke Schild beschl\u00e4gt, und im Beschlag erscheinen Ziffern.'],
+                ['richtung', 'Im Spiegelbild des Schildes ist eine Stelle markiert, im Raum selbst nicht: {ziel}.'],
+                ['behaelter', 'Der Schild l\u00e4sst sich zur Seite klappen. Dahinter: {ziel}.'],
+                ['bedrohung', 'Dein Spiegelbild im Schild bewegt sich nicht mehr mit und greift nach dir.'],
+                ['keine', 'Das Spiegelbild im Schild blinzelt einen Moment zu sp\u00e4t.']] },
+            kerze: { name: 'Kerzenleuchter', nom: 'der Kerzenleuchter', akk: 'den Kerzenleuchter', verb: 'Ber\u00fchren',
+                b: 'Ein schwerer Kerzenleuchter mit drei dicken Kerzen, nicht angez\u00fcndet.', f: [
+                ['richtung', 'Die Flamme neigt sich im Luftzug und verr\u00e4t eine Stelle: {ziel}.'],
+                ['behaelter', 'Das Wachs schmilzt und gibt frei, was darin eingegossen war: {ziel}.'],
+                ['zahl', 'Herablaufendes Wachs legt eingeritzte Ziffern frei.'],
+                ['keine', 'Die Kerze brennt und flackert.']] },
+            gemaelde: { name: 'Portr\u00e4t', nom: 'das Portr\u00e4t', akk: 'das Portr\u00e4t', verb: 'Abtasten',
+                b: 'Das Portr\u00e4t eines Burgherrn mit harten Augen.', f: [
+                ['richtung', 'Die Augen im Portr\u00e4t wandern zu einer Stelle: {ziel}.'],
+                ['zahl', 'Im Hintergrund des Portr\u00e4ts leuchten Ziffern.'],
+                ['behaelter', 'Hinter dem Rahmen klemmt etwas: {ziel}.'],
+                ['bedrohung', 'Wer dem Portr\u00e4t in die Augen sieht, kann sich nicht mehr r\u00fchren.'],
+                ['keine', 'Das Portr\u00e4t scheint zu l\u00e4cheln.']] },
+            katze: { name: 'Katze', nom: 'die Katze', akk: 'die Katze', verb: 'Streicheln',
+                b: 'Eine Katze. Sie beobachtet dich, als w\u00fcsste sie mehr als du.', f: [
+                ['richtung', 'Die Katze flitzt zu ihrem Versteck: {ziel}.'],
+                ['traeger', 'Die Katze bringt etwas und legt es vor dir ab: {ziel}.'],
+                ['behaelter', 'Die Katze steht von ihrem warmen Platz auf. Darunter lag: {ziel}.'],
+                ['bedrohung', 'Die Katze faucht und kratzt jeden, der n\u00e4her kommt.'],
+                ['keine', 'Die Katze putzt sich und ignoriert dich.']] },
+            radio: { name: 'fl\u00fcsterndes Buch', nom: 'das fl\u00fcsternde Buch', akk: 'das fl\u00fcsternde Buch', verb: 'Bl\u00e4ttern',
+                b: 'Ein aufgeschlagenes Buch. Die Seiten rascheln, als atme es, und manchmal fl\u00fcstert es.', f: [
+                ['zahl', 'Das Buch fl\u00fcstert, dann z\u00e4hlt eine Stimme Ziffern auf.'],
+                ['richtung', 'Das Fl\u00fcstern wird lauter, je n\u00e4her man einer Stelle kommt: {ziel}.'],
+                ['behaelter', 'Zwischen den Seiten des Buches steckt etwas: {ziel}.'],
+                ['keine', 'Das Buch murmelt Verse ohne Sinn.']] },
+            schaukelstuhl: { name: 'Lehnstuhl', nom: 'der Lehnstuhl', akk: 'den Lehnstuhl', verb: 'Ansto\u00dfen',
+                b: 'Ein Stuhl mit hoher Lehne. Er steht nie ganz still.', f: [
+                ['zahl', 'Der Lehnstuhl kippelt im Takt. Die Schl\u00e4ge je Pause ergeben die Ziffern.'],
+                ['richtung', 'Der Lehnstuhl hat sich gedreht und zeigt jetzt mit der Lehne auf eine Stelle: {ziel}.'],
+                ['behaelter', 'Unter der Sitzfl\u00e4che klemmt etwas: {ziel}.'],
+                ['bedrohung', 'Der Lehnstuhl r\u00fcckt auf dich zu und versperrt den Weg.'],
+                ['keine', 'Der Lehnstuhl kippelt von allein.']] },
+            ventilator: { name: 'Kronleuchter', nom: 'der Kronleuchter', akk: 'den Kronleuchter', verb: 'Am Seil ziehen',
+                b: 'Ein eiserner Kronleuchter an einer langen Kette. Daneben h\u00e4ngt das Seil zum Herablassen.', f: [
+                ['traeger', 'Der Kronleuchter ger\u00e4t ins Schwingen und fegt vom Sims, was oben lag: {ziel}.'],
+                ['richtung', 'Der schwingende Kronleuchter wirft einen Schatten, und der Schatten zeigt auf eine Stelle: {ziel}.'],
+                ['bedrohung', 'Der Kronleuchter sackt tief und schwingt nach jedem, der darunter geht.'],
+                ['keine', 'Der Kronleuchter knarrt und dreht sich.']] }
+        },
+        gegenstaende: {
+            hammer: { name: 'Schmiedehammer', nom: 'der Schmiedehammer', akk: 'den Schmiedehammer', b: 'Ein Schmiedehammer mit schwerem Eisenkopf.' },
+            brechstange: { name: 'Spitzhacke', nom: 'die Spitzhacke', akk: 'die Spitzhacke', b: 'Eine lange, schwere Spitzhacke.' },
+            messer: { name: 'Dolch', nom: 'der Dolch', akk: 'den Dolch', b: 'Ein Dolch mit frisch geschliffener Klinge.' },
+            schere: { name: 'Schere', nom: 'die Schere', akk: 'die Schere', b: 'Eine alte Schneiderschere, stumpf geworden.' },
+            saeurehaltig: { name: 'Phiole Scheidewasser', nom: 'die Phiole Scheidewasser', akk: 'die Phiole Scheidewasser', b: 'Eine Phiole Scheidewasser. Es frisst sich zischend durch Metall.' },
+            feuerzeug: { name: 'Feuerstahl', nom: 'der Feuerstahl', akk: 'den Feuerstahl', b: 'Feuerstein und Stahl. Ein Schlag gibt Funken.' },
+            streichhoelzer: { name: 'Zunderb\u00fcchse', nom: 'die Zunderb\u00fcchse', akk: 'die Zunderb\u00fcchse', b: 'Eine Zunderb\u00fcchse mit glimmendem Schwamm.' },
+            taschenlampe: { name: 'Laterne', nom: 'die Laterne', akk: 'die Laterne', b: 'Eine Blendlaterne mit kr\u00e4ftigem Schein.' },
+            tuch: { name: 'Leintuch', nom: 'das Leintuch', akk: 'das Leintuch', b: 'Ein gro\u00dfes Leintuch. Es nimmt auch etwas Wasser auf.' },
+            decke: { name: 'Pferdedecke', nom: 'die Pferdedecke', akk: 'die Pferdedecke', b: 'Eine dicke, sehr gro\u00dfe Pferdedecke.' },
+            handspiegel: { name: 'Zinnteller', nom: 'der Zinnteller', akk: 'den Zinnteller', b: 'Ein blank polierter Zinnteller, in dem man sich spiegelt.' },
+            besen: { name: 'Wanderstab', nom: 'der Wanderstab', akk: 'den Wanderstab', b: 'Ein langer, leichter Wanderstab.' },
+            kleiderhaken: { name: 'Schmiedezange', nom: 'die Schmiedezange', akk: 'die Schmiedezange', b: 'Eine Schmiedezange, die fest zupackt.' },
+            angel: { name: 'Hellebarde', nom: 'die Hellebarde', akk: 'die Hellebarde', b: 'Eine lange Hellebarde. Hinter der Klinge sitzt ein Haken.' },
+            schnur: { name: 'Seil', nom: 'das Seil', akk: 'das Seil', b: 'Ein festes Hanfseil, ein paar Meter lang.' },
+            wecker: { name: 'Kettenb\u00fcndel', nom: 'das Kettenb\u00fcndel', akk: 'das Kettenb\u00fcndel', b: 'Ein B\u00fcndel Eisenketten. Es rasselt bei jeder Bewegung.' },
+            hantel: { name: 'Steinquader', nom: 'der Steinquader', akk: 'den Steinquader', b: 'Ein behauener Steinquader, sehr schwer.' },
+            topf: { name: 'Zinnkrug', nom: 'der Zinnkrug', akk: 'den Zinnkrug', b: 'Ein leichter Krug aus d\u00fcnnem Zinn.' },
+            pfanne: { name: 'Gusseisenpfanne', nom: 'die Gusseisenpfanne', akk: 'die Gusseisenpfanne', b: 'Eine schwere Pfanne aus Gusseisen.' }
+        },
+        schluessel: { name: 'Schl\u00fcssel', nom: 'der Schl\u00fcssel', akk: 'den Schl\u00fcssel', b: 'Ein schwerer Eisenschl\u00fcssel.' },
+        notiz: { name: 'Pergament \u00fcber ', nom: 'das Pergament \u00fcber ', akk: 'das Pergament \u00fcber ', steht: 'Auf dem Pergament steht:' },
+        zuWenig: {
+            schwer: 'zu leicht', stumpf: 'nicht wuchtig genug', lang: 'zu kurz', scharf: 'nicht scharf genug',
+            saeurehaltig: 'nicht \u00e4tzend genug', entzuendend: 'nicht zum Anz\u00fcnden geeignet', licht: 'nicht hell genug',
+            deckend: 'zu klein zum Abdecken', saugfaehig: 'nicht saugf\u00e4hig genug', spiegelnd: 'kein brauchbarer Spiegel',
+            haken: 'damit l\u00e4sst sich nichts greifen', reissfest: 'nicht rei\u00dffest genug', laut: 'nicht laut genug'
+        },
+        // zweit: Name, Nominativ, Akkusativ, wenn dieselbe Art ein zweites Mal im Raum vorkommt
+        hindernisse: {
+            holzkiste: { name: 'Truhe mit Vorh\u00e4ngeschloss', nom: 'die Truhe mit Vorh\u00e4ngeschloss', akk: 'die Truhe mit Vorh\u00e4ngeschloss',
+                zweit: ['zweite Truhe mit Vorh\u00e4ngeschloss', 'die zweite Truhe mit Vorh\u00e4ngeschloss', 'die zweite Truhe mit Vorh\u00e4ngeschloss'],
+                alt: ['aufbrechen', 'Schloss weg\u00e4tzen', 'Deckel aufhebeln'] },
+            paket: { name: 'mit Draht verschn\u00fcrtes B\u00fcndel', nom: 'das mit Draht verschn\u00fcrte B\u00fcndel', akk: 'das mit Draht verschn\u00fcrte B\u00fcndel',
+                zweit: ['zweites mit Draht verschn\u00fcrtes B\u00fcndel', 'das zweite mit Draht verschn\u00fcrte B\u00fcndel', 'das zweite mit Draht verschn\u00fcrte B\u00fcndel'],
+                alt: ['aufschneiden', 'Verschn\u00fcrung durchbrennen', 'Draht weg\u00e4tzen'] },
+            vitrine: { name: 'verschlossener Wandschrank', nom: 'der verschlossene Wandschrank', akk: 'den verschlossenen Wandschrank',
+                zweit: ['zweiter verschlossener Wandschrank', 'der zweite verschlossene Wandschrank', 'den zweiten verschlossenen Wandschrank'],
+                alt: ['T\u00fcr einschlagen', 'T\u00fcr aufhebeln', 'Schloss weg\u00e4tzen'] },
+            diele: { name: 'verm\u00f6rtelte Bodenplatte', nom: 'die verm\u00f6rtelte Bodenplatte', akk: 'die verm\u00f6rtelte Bodenplatte',
+                zweit: ['zweite verm\u00f6rtelte Bodenplatte', 'die zweite verm\u00f6rtelte Bodenplatte', 'die zweite verm\u00f6rtelte Bodenplatte'],
+                alt: ['aufhebeln', 'zertr\u00fcmmern', 'Fugen auskratzen'] },
+            schrank_oben: { name: 'oberstes Brett des hohen Regals', nom: 'das oberste Brett des hohen Regals', akk: 'das oberste Brett des hohen Regals',
+                zweit: ['oberstes Brett des zweiten Regals', 'das oberste Brett des zweiten Regals', 'das oberste Brett des zweiten Regals'],
+                alt: ['herunterangeln', 'herunterschubsen'] },
+            bodenschacht: { name: 'Gitterschacht im Boden', nom: 'der Gitterschacht im Boden', akk: 'den Gitterschacht im Boden',
+                zweit: ['zweiter Gitterschacht im Boden', 'der zweite Gitterschacht im Boden', 'den zweiten Gitterschacht im Boden'],
+                alt: ['herausangeln', 'mit Seil und etwas Greifendem herausfischen'] }
+        },
+        // freie Verstecke, die erst ein Hinweis verraet: name, Nominativ, Akkusativ
+        // Name, Nominativ, Akkusativ, Platz. Der Platz ist ein Ding, das von Anfang an im Raum steht (Modell v_<platz>);
+        // dass darin ein Fach ist, verraet erst der Hinweis. Wo ein Platz steht, legt kern/raumplan.js fest (FREI).
+        verstecke: [
+            ['lockerer Mauerstein', 'der lockere Mauerstein', 'den lockeren Mauerstein', 'mauerstein'],
+            ['Spalt hinter dem Wandbehang', 'der Spalt hinter dem Wandbehang', 'den Spalt hinter dem Wandbehang', 'wandbehang'],
+            ['doppelter Boden im Fass', 'der doppelte Boden im Fass', 'den doppelten Boden im Fass', 'fass'],
+            ['hohler Baumstamm', 'der hohle Baumstamm', 'den hohlen Baumstamm', 'balken'],
+            ['Nische hinter der Wandlaterne', 'die Nische hinter der Wandlaterne', 'die Nische hinter der Wandlaterne', 'laterne'],
+            ['Urne mit doppeltem Boden', 'die Urne mit doppeltem Boden', 'die Urne mit doppeltem Boden', 'urne'],
+            ['lose Bodenplatte', 'die lose Bodenplatte', 'die lose Bodenplatte', 'bodenplatte'],
+            ['hohles Bein des Schemels', 'das hohle Bein des Schemels', 'das hohle Bein des Schemels', 'schemel']
+        ],
+        schloesser: {
+            zahlenschloss: { name: 'Ziffernschloss', nom: 'das Ziffernschloss', akk: 'das Ziffernschloss', verb: 'Ziffern einstellen', offen: 'Das Ziffernschloss springt auf.' },
+            schluesselloch: { name: 'T\u00fcrschloss', nom: 'das T\u00fcrschloss', akk: 'das T\u00fcrschloss', verb: 'Aufschlie\u00dfen' },
+            doppelhebel: { name: 'zwei Zugketten, weit auseinander', nom: 'die zwei Zugketten', akk: 'die zwei Zugketten', verb: 'Kette ziehen',
+                alt: ['zu zweit gleichzeitig ziehen', 'die erste Kette mit einem Seil festbinden und beim Ziehen der zweiten mitziehen',
+                    'die erste Kette mit etwas Langem unten verkeilen und dann die zweite ziehen'] },
+            druckplatte: { name: 'Trittplatte im Boden', nom: 'die Trittplatte im Boden', akk: 'die Trittplatte im Boden', verb: 'Drauftreten',
+                alt: ['mit etwas sehr Schwerem beschweren', 'zu zweit draufstellen'] }
+        },
+        gegenmittel: {
+            wegsehen: ['etwas Spiegelndes so aufstellen, dass sie sich selbst ansieht'],
+            hinsehen: ['abdecken'],
+            licht_aus: ['mit der Laterne anleuchten'],
+            naehe: ['mit L\u00e4rm in eine Ecke weglocken', 'mit einem langen Stab auf Abstand halten'],
+            zeit: ['aufhalten (Abfluss freistochern, R\u00e4der blockieren)', 'mit Gewalt stoppen']
+        },
+        // feste Einrichtung jedes Raums: womit man es dunkel macht und wo Wasser herkommt
+        licht: { name: 'Luftklappe', nom: 'die Luftklappe', akk: 'die Luftklappe', verb: 'Klappe bewegen',
+            b: 'Eine Eisenklappe am Luftschacht. Ohne Zugluft ersticken die Fackeln.', an: 'Die Klappe ist offen.', aus: 'Die Klappe ist zu.',
+            schliessen: 'Luftklappe schlie\u00dfen', oeffnen: 'Luftklappe \u00f6ffnen',
+            wirdDunkel: 'Du schlie\u00dft die Luftklappe. Die Fackeln ersticken, es ist dunkel.', wirdHell: 'Du \u00f6ffnest die Luftklappe. Die Fackeln flammen wieder auf.' },
+        wasser: { name: 'Wasserfass', nom: 'das Wasserfass', akk: 'das Wasserfass', verb: 'Zapfhahn aufdrehen', tun: 'Zapfhahn aufdrehen',
+            rost: { name: 'Wasserfass mit festgerostetem Zapfhahn', nom: 'das Wasserfass mit festgerostetem Zapfhahn', akk: 'das Wasserfass mit festgerostetem Zapfhahn',
+                alt: ['mit Gewalt aufdrehen', 'Rost weg\u00e4tzen'] } },
+        stories: [
+            { id: 'verlies', titel: 'Das Verlies',
+                intro: 'Die Wache hat dich ins Verlies geworfen. Zur n\u00e4chsten Glocke holen sie dich. Du bist {in}, und die Kerkert\u00fcr ist verriegelt.',
+                ende: 'Du bist drau\u00dfen, bevor die Wache kommt.',
+                ausgang: { name: 'Kerkert\u00fcr', nom: 'die Kerkert\u00fcr', akk: 'die Kerkert\u00fcr', verb: 'T\u00fcr \u00f6ffnen', auf: 'Die Kerkert\u00fcr schwingt auf.' },
+                raeume: [{ name: 'Zelle', in: 'in der Zelle', nach: 'in die Zelle' }, { name: 'Wachstube', in: 'in der Wachstube', nach: 'in die Wachstube' },
+                    { name: 'Kerkergang', in: 'im Kerkergang', nach: 'in den Kerkergang' }, { name: 'Vorratskammer', in: 'in der Vorratskammer', nach: 'in die Vorratskammer' }] },
+            { id: 'schatzkammer', titel: 'Die Schatzkammer',
+                intro: 'Du bist in die Schatzkammer des Burgherrn eingestiegen. Hinter dir ist die Eisent\u00fcr ins Schloss gefallen. Du bist {in}, und bis zum Morgen musst du hier raus sein.',
+                ende: 'Du bist drau\u00dfen, und niemand hat dich gesehen.',
+                ausgang: { name: 'Eisent\u00fcr', nom: 'die Eisent\u00fcr', akk: 'die Eisent\u00fcr', verb: 'T\u00fcr \u00f6ffnen', auf: 'Die Eisent\u00fcr schwingt auf.' },
+                raeume: [{ name: 'Schatzkammer', in: 'in der Schatzkammer', nach: 'in die Schatzkammer' }, { name: 'Vorkammer', in: 'in der Vorkammer', nach: 'in die Vorkammer' },
+                    { name: 'R\u00fcstkammer', in: 'in der R\u00fcstkammer', nach: 'in die R\u00fcstkammer' }, { name: 'Schreibstube', in: 'in der Schreibstube', nach: 'in die Schreibstube' }] },
+            { id: 'labor', titel: 'Das Labor des Alchemisten',
+                intro: 'Der Alchemist ist seit Tagen verschwunden. Du wolltest nur nachsehen, da schlug die T\u00fcr zu. Du bist {in}, und irgendwo brodelt noch sein letzter Versuch.',
+                ende: 'Du bist drau\u00dfen. Hinter dir zischt es noch.',
+                ausgang: { name: 'Labort\u00fcr', nom: 'die Labort\u00fcr', akk: 'die Labort\u00fcr', verb: 'T\u00fcr \u00f6ffnen', auf: 'Die Labort\u00fcr schwingt auf.' },
+                raeume: [{ name: 'Labor', in: 'im Labor', nach: 'ins Labor' }, { name: 'Kr\u00e4uterkammer', in: 'in der Kr\u00e4uterkammer', nach: 'in die Kr\u00e4uterkammer' },
+                    { name: 'Studierstube', in: 'in der Studierstube', nach: 'in die Studierstube' }, { name: 'Destillierkeller', in: 'im Destillierkeller', nach: 'in den Destillierkeller' }] },
+            { id: 'gruft', titel: 'Die Gruft',
+                intro: 'Du solltest nur eine Urkunde aus der Gruft unter der Kapelle holen. Dann fiel hinter dir die Gruftt\u00fcr zu. Du bist {in}.',
+                ende: 'Du bist drau\u00dfen, oben in der Kapelle, und atmest durch.',
+                ausgang: { name: 'Gruftt\u00fcr', nom: 'die Gruftt\u00fcr', akk: 'die Gruftt\u00fcr', verb: 'T\u00fcr \u00f6ffnen', auf: 'Die Gruftt\u00fcr schwingt auf.' },
+                raeume: [{ name: 'Gruft', in: 'in der Gruft', nach: 'in die Gruft' }, { name: 'Beinhaus', in: 'im Beinhaus', nach: 'ins Beinhaus' },
+                    { name: 'Vorraum', in: 'im Vorraum', nach: 'in den Vorraum' }, { name: 'Sakristeikeller', in: 'im Sakristeikeller', nach: 'in den Sakristeikeller' }] },
+            { id: 'weinkeller', titel: 'Der Weinkeller',
+                intro: 'Die Burg wird belagert, oben brennt es. Du hast dich in den Keller gerettet, aber die Kellert\u00fcr hat sich hinter dir verkeilt. Du bist {in}, und der Rauch kommt n\u00e4her.',
+                ende: 'Du bist drau\u00dfen, im Burggraben, an der frischen Luft.',
+                ausgang: { name: 'Kellert\u00fcr', nom: 'die Kellert\u00fcr', akk: 'die Kellert\u00fcr', verb: 'T\u00fcr \u00f6ffnen', auf: 'Die Kellert\u00fcr schwingt auf.' },
+                raeume: [{ name: 'Weinkeller', in: 'im Weinkeller', nach: 'in den Weinkeller' }, { name: 'Vorratskeller', in: 'im Vorratskeller', nach: 'in den Vorratskeller' },
+                    { name: 'Fasslager', in: 'im Fasslager', nach: 'ins Fasslager' }, { name: 'Eiskeller', in: 'im Eiskeller', nach: 'in den Eiskeller' }] }
+        ]
+    };
+
+    return { version: 1, aktiv: 'gewoelbe', gewoelbe: gewoelbe };
+})();
+
+if (typeof module !== 'undefined' && module.exports) { module.exports = Setting; }
+
+</script>
+<script>
 // Katalog fuer den Partie-Generator von Ausweg (KONZEPT 4). Streng ES5, reine Daten.
-// Die Datei bleibt reines ASCII (Auslieferung unter Rhino, wie im Bodenlos-Kern): Umlaute stehen als ^a ^o ^u ^A ^O ^U ^s
-// und werden beim Laden einmal aufgeloest (Katalog.um).
+// Nach werkzeug/ascii.js reines ASCII (Auslieferung unter Rhino, wie im Bodenlos-Kern).
+//
+// Hier steht die MECHANIK: welche Rollen es gibt, was sie ausloest, welche Eigenschaften Gegenstaende haben und
+// welche Wege ein Hindernis oeffnen. Was die Dinge in einer Partie SIND (Namen, Beschreibungen, Saetze), kommt aus dem
+// Setting (kern/setting.js) und wird beim Laden daruebergelegt. Die Schluessel (puppe, becken ...) benennen die
+// Rolle, nicht das Ding; sie sind historisch und bleiben in jedem Setting gleich.
 //
 // Aufbau:
 //   AUSLOESER    was ein Verhalten anstoesst, mit Text und Bedarf (was die Spieler tun muessen, damit er eintritt)
@@ -251,254 +492,233 @@ if (typeof module !== 'undefined' && module.exports) { module.exports = Zufall; 
 //   HINDERNISSE  wo ein Ding verborgen sein kann, mit mehreren Loesungswegen (Idee 12)
 //   SCHLOESSER   was die Tuer verlangt
 //   GEGENMITTEL  wie eine Bedrohung gebannt wird, je Ausloeser
+//   VERSTECKE, LICHT, WASSER, SCHLUESSEL, NOTIZ, STORIES   aus dem Setting
+if (typeof module !== 'undefined' && module.exports) {
+    var Setting = require('./setting.js');
+}
+
 var Katalog = (function () {
     'use strict';
 
-    function um(s) {
-        return String(s).replace(/\^a/g, '\u00e4').replace(/\^o/g, '\u00f6').replace(/\^u/g, '\u00fc')
-            .replace(/\^A/g, '\u00c4').replace(/\^O/g, '\u00d6').replace(/\^U/g, '\u00dc').replace(/\^s/g, '\u00df');
-    }
+    var S = Setting[Setting.aktiv];
 
     // Arten (Rollen fuer die Loesung): zahl = zeigt einen Code, richtung = weist auf ein Versteck,
     // behaelter = gibt etwas frei, traeger = bringt Unerreichbares heran, bedrohung = sperrt einen Bereich,
     // keine = verhaelt sich, aber folgenlos (Ablenkung).
     var ARTEN = ['zahl', 'richtung', 'behaelter', 'traeger', 'bedrohung', 'keine'];
 
-    // bedarf: 'nichts' (geschieht beim Hinsehen oder Anfassen), 'licht' (Licht im Raum aus), 'laerm' (irgendwo im Raum
-    // Laerm), 'waerme' (das Element erwaermen), 'wasser' (Hahn im Raum auf), 'zeit' (warten)
+    // bedarf: 'nichts' (geschieht beim Hinsehen oder Anfassen), 'licht' (es ist dunkel im Raum), 'laerm' (irgendwo im Raum
+    // Laerm), 'waerme' (das Element erwaermen), 'wasser' (Wasser laeuft im Raum), 'zeit' (es vergeht Zeit)
     var AUSLOESER = {
-        hinsehen:   { text: 'bei langem Hinsehen', bedarf: 'nichts', vor: 'Als du eine Weile hinsiehst:' },
-        wegsehen:   { text: 'wenn gerade niemand hinsieht', bedarf: 'nichts', vor: 'Du drehst dich kurz weg. Als du wieder hinsiehst:' },
-        licht_aus:  { text: 'sobald das Licht aus ist', bedarf: 'licht', vor: 'Das Licht flackert und ist einen Moment aus. Dabei:' },
-        laerm:      { text: 'bei L^arm im Raum', bedarf: 'laerm', vor: 'Irgendwo f^allt polternd etwas um. Sofort:' },
-        beruehrung: { text: 'bei Ber^uhrung', bedarf: 'nichts', vor: 'Im Vorbeigehen st^o^st du gegen etwas. Dabei:' },
-        waerme:     { text: 'bei Erw^armung', bedarf: 'waerme', vor: 'Ein Schwall warmer Luft zieht aus dem Heizungsrohr durch den Raum. Dabei:' },
-        wasser:     { text: 'sobald Wasser l^auft', bedarf: 'wasser', vor: 'In der Leitung rauscht kurz Wasser. Dabei:' },
-        zeit:       { text: 'nach einer Weile', bedarf: 'zeit', vor: 'Nach einer Weile:' },
-        naehe:      { text: 'bei Ann^aherung', bedarf: 'nichts', vor: 'Als du n^aher kommst:' }
+        hinsehen:   { text: 'bei langem Hinsehen', bedarf: 'nichts' },
+        wegsehen:   { text: 'wenn gerade niemand hinsieht', bedarf: 'nichts' },
+        licht_aus:  { text: 'sobald es dunkel ist', bedarf: 'licht' },
+        laerm:      { text: 'bei L\u00e4rm im Raum', bedarf: 'laerm' },
+        beruehrung: { text: 'bei Ber\u00fchrung', bedarf: 'nichts' },
+        waerme:     { text: 'bei Erw\u00e4rmung', bedarf: 'waerme' },
+        wasser:     { text: 'sobald Wasser l\u00e4uft', bedarf: 'wasser' },
+        zeit:       { text: 'nach einer Weile', bedarf: 'zeit' },
+        naehe:      { text: 'bei Ann\u00e4herung', bedarf: 'nichts' }
     };
 
-    // Jede Faehigkeit: art, aus (erlaubte Ausloeser), text (Satz ohne Ausloeser; {ziel} = Versteck oder Inhalt).
+    // Jede Faehigkeit: art, aus (erlaubte Ausloeser). Der Satz dazu (mit {ziel} = Versteck oder Inhalt) steht im Setting.
     var ELEMENTE = {
-        puppe: { name: 'Puppe', nom: 'die Puppe', akk: 'die Puppe', b: 'Eine alte Stoffpuppe mit aufgen^ahten Knopfaugen. Ihr Blick ist unangenehm wach.', f: [
-            { art: 'richtung', aus: ['wegsehen', 'licht_aus', 'laerm'], text: 'Die Puppe r^uckt jedes Mal ein St^uck weiter. Ihr Ziel: {ziel}.' },
-            { art: 'richtung', aus: ['laerm', 'beruehrung'], text: 'Die Puppe dreht den Kopf und starrt auf eine Stelle: {ziel}.' },
-            { art: 'zahl', aus: ['licht_aus'], text: 'Auf dem Kleid der Puppe leuchten Ziffern auf.' },
-            { art: 'behaelter', aus: ['beruehrung', 'waerme'], text: 'Eine Klappe im R^ucken der Puppe springt auf. Darin: {ziel}.' },
-            { art: 'traeger', aus: ['laerm', 'licht_aus'], text: 'Die Puppe ^offnet die Hand und l^asst fallen, was sie hielt: {ziel}.' },
-            { art: 'bedrohung', aus: ['wegsehen', 'licht_aus', 'laerm'], text: 'Die Puppe kommt n^aher.' },
-            { art: 'keine', aus: ['wegsehen', 'laerm', 'hinsehen'], text: 'Die Puppe neigt den Kopf. Sonst nichts.' }
+        puppe: { f: [
+            { art: 'richtung', aus: ['wegsehen', 'licht_aus', 'laerm'] },
+            { art: 'richtung', aus: ['laerm', 'beruehrung'] },
+            { art: 'zahl', aus: ['licht_aus'] },
+            { art: 'behaelter', aus: ['beruehrung', 'waerme'] },
+            { art: 'traeger', aus: ['laerm', 'licht_aus'] },
+            { art: 'bedrohung', aus: ['wegsehen', 'licht_aus', 'laerm'] },
+            { art: 'keine', aus: ['wegsehen', 'laerm', 'hinsehen'] }
         ] },
-        becken: { name: 'Wasserbottich', nom: 'der Wasserbottich', akk: 'den Wasserbottich', b: 'Ein gro^ser Holzbottich voll tr^ubem Wasser, daneben ein enger Schacht im Boden.', f: [
-            { art: 'bedrohung', aus: ['zeit'], text: 'Das Wasser steigt und flutet den Boden.' },
-            { art: 'traeger', aus: ['wasser'], text: 'Das Wasser steigt im Schacht und hebt nach oben, was schwimmt: {ziel}.' },
-            { art: 'zahl', aus: ['wasser'], text: 'Auf der Wasseroberfl^ache spiegeln sich Ziffern von der Decke.' },
-            { art: 'behaelter', aus: ['beruehrung'], text: 'Das Wasser l^auft ab. Am Grund liegt: {ziel}.' },
-            { art: 'keine', aus: ['wasser', 'zeit'], text: 'Der Bottich gluckert.' }
+        becken: { f: [
+            { art: 'bedrohung', aus: ['zeit'] },
+            { art: 'traeger', aus: ['wasser'] },
+            { art: 'zahl', aus: ['wasser'] },
+            { art: 'behaelter', aus: ['beruehrung'] },
+            { art: 'keine', aus: ['wasser', 'zeit'] }
         ] },
-        grammophon: { name: 'Grammophon', nom: 'das Grammophon', akk: 'das Grammophon', b: 'Ein Grammophon mit Messingtrichter. Eine Platte liegt schon auf dem Teller.', f: [
-            { art: 'zahl', aus: ['beruehrung', 'zeit'], text: 'Das Grammophon spielt. Die Zahl der T^one je Takt ergibt die Ziffern.' },
-            { art: 'richtung', aus: ['laerm'], text: 'Der Trichter des Grammophons dreht sich und zeigt auf eine Stelle: {ziel}.' },
-            { art: 'behaelter', aus: ['beruehrung', 'zeit'], text: 'Am Ende der Platte springt ein Fach im Sockel auf. Darin: {ziel}.' },
-            { art: 'keine', aus: ['beruehrung', 'zeit'], text: 'Das Grammophon kratzt eine Melodie ohne Bedeutung.' }
+        grammophon: { f: [
+            { art: 'zahl', aus: ['beruehrung', 'zeit'] },
+            { art: 'richtung', aus: ['laerm'] },
+            { art: 'behaelter', aus: ['beruehrung', 'zeit'] },
+            { art: 'keine', aus: ['beruehrung', 'zeit'] }
         ] },
-        standuhr: { name: 'Standuhr', nom: 'die Standuhr', akk: 'die Standuhr', b: 'Eine Standuhr, h^oher als du. Das Pendel schwingt hinter Glas.', f: [
-            { art: 'zahl', aus: ['zeit', 'beruehrung'], text: 'Die Standuhr schl^agt. Die Schl^age, mit Pausen dazwischen, ergeben die Ziffern.' },
-            { art: 'behaelter', aus: ['zeit'], text: 'Zur vollen Stunde ^offnet sich das Geh^ause der Uhr. Darin: {ziel}.' },
-            { art: 'richtung', aus: ['beruehrung'], text: 'Das Pendel bleibt schr^ag stehen und zeigt auf eine Stelle: {ziel}.' },
-            { art: 'bedrohung', aus: ['zeit'], text: 'Bei jedem Schlag senkt sich die Decke ein St^uck.' },
-            { art: 'keine', aus: ['zeit'], text: 'Die Standuhr tickt laut.' }
+        standuhr: { f: [
+            { art: 'zahl', aus: ['zeit', 'beruehrung'] },
+            { art: 'behaelter', aus: ['zeit'] },
+            { art: 'richtung', aus: ['beruehrung'] },
+            { art: 'bedrohung', aus: ['zeit'] },
+            { art: 'keine', aus: ['zeit'] }
         ] },
-        spiegel: { name: 'Wandspiegel', nom: 'der Wandspiegel', akk: 'den Wandspiegel', b: 'Ein hoher Wandspiegel mit fleckigem Glas.', f: [
-            { art: 'zahl', aus: ['waerme', 'wasser'], text: 'Der Spiegel beschl^agt, und im Beschlag erscheinen Ziffern.' },
-            { art: 'richtung', aus: ['hinsehen', 'licht_aus'], text: 'Im Spiegelbild ist eine Stelle markiert, im Raum selbst nicht: {ziel}.' },
-            { art: 'behaelter', aus: ['beruehrung'], text: 'Der Spiegel l^asst sich zur Seite klappen. Dahinter: {ziel}.' },
-            { art: 'bedrohung', aus: ['hinsehen'], text: 'Dein Spiegelbild bewegt sich nicht mehr mit und greift nach dir.' },
-            { art: 'keine', aus: ['hinsehen'], text: 'Das Spiegelbild blinzelt einen Moment zu sp^at.' }
+        spiegel: { f: [
+            { art: 'zahl', aus: ['waerme', 'wasser'] },
+            { art: 'richtung', aus: ['hinsehen', 'licht_aus'] },
+            { art: 'behaelter', aus: ['beruehrung'] },
+            { art: 'bedrohung', aus: ['hinsehen'] },
+            { art: 'keine', aus: ['hinsehen'] }
         ] },
-        kerze: { name: 'Kerzenleuchter', nom: 'der Kerzenleuchter', akk: 'den Kerzenleuchter', b: 'Ein schwerer Kerzenleuchter mit drei dicken Kerzen, nicht angez^undet.', f: [
-            { art: 'richtung', aus: ['waerme'], text: 'Die Flamme neigt sich im Luftzug und verr^at eine Stelle: {ziel}.' },
-            { art: 'behaelter', aus: ['waerme'], text: 'Das Wachs schmilzt und gibt frei, was darin eingegossen war: {ziel}.' },
-            { art: 'zahl', aus: ['waerme', 'zeit'], text: 'Herablaufendes Wachs legt eingeritzte Ziffern frei.' },
-            { art: 'keine', aus: ['waerme'], text: 'Die Kerze brennt und flackert.' }
+        kerze: { f: [
+            { art: 'richtung', aus: ['waerme'] },
+            { art: 'behaelter', aus: ['waerme'] },
+            { art: 'zahl', aus: ['waerme', 'zeit'] },
+            { art: 'keine', aus: ['waerme'] }
         ] },
-        gemaelde: { name: 'Portr^at', nom: 'das Portr^at', akk: 'das Portr^at', b: 'Das Portr^at einer strengen alten Dame in schwarzem Kleid.', f: [
-            { art: 'richtung', aus: ['naehe', 'hinsehen'], text: 'Die Augen im Portr^at wandern zu einer Stelle: {ziel}.' },
-            { art: 'zahl', aus: ['licht_aus'], text: 'Im Hintergrund des Portr^ats leuchten Ziffern.' },
-            { art: 'behaelter', aus: ['beruehrung'], text: 'Hinter dem Rahmen klemmt etwas: {ziel}.' },
-            { art: 'bedrohung', aus: ['hinsehen'], text: 'Wer dem Portr^at in die Augen sieht, kann sich nicht mehr r^uhren.' },
-            { art: 'keine', aus: ['naehe'], text: 'Das Portr^at scheint zu l^acheln.' }
+        gemaelde: { f: [
+            { art: 'richtung', aus: ['naehe', 'hinsehen'] },
+            { art: 'zahl', aus: ['licht_aus'] },
+            { art: 'behaelter', aus: ['beruehrung'] },
+            { art: 'bedrohung', aus: ['hinsehen'] },
+            { art: 'keine', aus: ['naehe'] }
         ] },
-        katze: { name: 'Katze', nom: 'die Katze', akk: 'die Katze', b: 'Eine graue Katze. Sie beobachtet dich, als w^usste sie mehr als du.', f: [
-            { art: 'richtung', aus: ['laerm'], text: 'Die Katze flitzt zu ihrem Versteck: {ziel}.' },
-            { art: 'traeger', aus: ['beruehrung', 'laerm'], text: 'Die Katze bringt etwas und legt es vor dir ab: {ziel}.' },
-            { art: 'behaelter', aus: ['waerme'], text: 'Die Katze steht von ihrem warmen Platz auf. Darunter lag: {ziel}.' },
-            { art: 'bedrohung', aus: ['naehe'], text: 'Die Katze faucht und kratzt jeden, der n^aher kommt.' },
-            { art: 'keine', aus: ['naehe', 'laerm'], text: 'Die Katze putzt sich und ignoriert dich.' }
+        katze: { f: [
+            { art: 'richtung', aus: ['laerm'] },
+            { art: 'traeger', aus: ['beruehrung', 'laerm'] },
+            { art: 'behaelter', aus: ['waerme'] },
+            { art: 'bedrohung', aus: ['naehe'] },
+            { art: 'keine', aus: ['naehe', 'laerm'] }
         ] },
-        radio: { name: 'altes Radio', nom: 'das alte Radio', akk: 'das alte Radio', b: 'Ein altes Kofferradio mit Antenne, das leise knistert.', f: [
-            { art: 'zahl', aus: ['beruehrung', 'zeit'], text: 'Das Radio rauscht, dann liest eine Stimme Ziffern vor.' },
-            { art: 'richtung', aus: ['naehe'], text: 'Das Rauschen wird lauter, je n^aher man einer Stelle kommt: {ziel}.' },
-            { art: 'behaelter', aus: ['beruehrung'], text: 'Im Batteriefach des Radios steckt etwas: {ziel}.' },
-            { art: 'keine', aus: ['beruehrung'], text: 'Das Radio spielt leise Tanzmusik.' }
+        radio: { f: [
+            { art: 'zahl', aus: ['beruehrung', 'zeit'] },
+            { art: 'richtung', aus: ['naehe'] },
+            { art: 'behaelter', aus: ['beruehrung'] },
+            { art: 'keine', aus: ['beruehrung'] }
         ] },
-        schaukelstuhl: { name: 'Schaukelstuhl', nom: 'der Schaukelstuhl', akk: 'den Schaukelstuhl', b: 'Ein Schaukelstuhl aus Korbgeflecht mit fleckigem Sitzpolster.', f: [
-            { art: 'zahl', aus: ['wegsehen', 'zeit'], text: 'Der Schaukelstuhl schaukelt im Takt. Die Schl^age je Pause ergeben die Ziffern.' },
-            { art: 'richtung', aus: ['wegsehen'], text: 'Der Schaukelstuhl hat sich gedreht und zeigt jetzt mit der Lehne auf eine Stelle: {ziel}.' },
-            { art: 'behaelter', aus: ['beruehrung'], text: 'Unter dem Sitzpolster liegt etwas: {ziel}.' },
-            { art: 'bedrohung', aus: ['wegsehen', 'licht_aus'], text: 'Der Schaukelstuhl r^uckt auf dich zu und versperrt den Weg.' },
-            { art: 'keine', aus: ['wegsehen'], text: 'Der Schaukelstuhl schaukelt von allein.' }
+        schaukelstuhl: { f: [
+            { art: 'zahl', aus: ['wegsehen', 'zeit'] },
+            { art: 'richtung', aus: ['wegsehen'] },
+            { art: 'behaelter', aus: ['beruehrung'] },
+            { art: 'bedrohung', aus: ['wegsehen', 'licht_aus'] },
+            { art: 'keine', aus: ['wegsehen'] }
         ] },
-        ventilator: { name: 'Deckenventilator', nom: 'der Deckenventilator', akk: 'den Deckenventilator', b: 'Ein Deckenventilator mit vier Holzfl^ugeln. Eine Kordel h^angt herab.', f: [
-            { art: 'traeger', aus: ['beruehrung'], text: 'Der Ventilator l^auft an und weht vom Schrank, was oben lag: {ziel}.' },
-            { art: 'richtung', aus: ['beruehrung'], text: 'Der Luftzug wirbelt Staub auf, und der Staub zeigt auf eine Stelle: {ziel}.' },
-            { art: 'bedrohung', aus: ['naehe'], text: 'Die Fl^ugel des Ventilators sacken tief und schlagen nach jedem, der darunter geht.' },
-            { art: 'keine', aus: ['beruehrung'], text: 'Der Ventilator quietscht und dreht sich.' }
+        ventilator: { f: [
+            { art: 'traeger', aus: ['beruehrung'] },
+            { art: 'richtung', aus: ['beruehrung'] },
+            { art: 'bedrohung', aus: ['naehe'] },
+            { art: 'keine', aus: ['beruehrung'] }
         ] }
     };
 
     // Eigenschaften und Staerke wie im Eigenschaftssystem. Kein Gegenstand kennt ein Hindernis.
+    // "lang" meint eine steife Stange (ein Seil ist nicht lang), "haken" etwas, das greift oder einhakt.
     var GEGENSTAENDE = {
-        hammer:       { name: 'Hammer', nom: 'der Hammer', akk: 'den Hammer', e: { schwer: 2, stumpf: 2, laut: 1 },
-            b: 'Ein Schlosserhammer mit schwerem Eisenkopf.' },
-        brechstange:  { name: 'Brechstange', nom: 'die Brechstange', akk: 'die Brechstange', e: { schwer: 2, lang: 2, stumpf: 1, laut: 1 },
-            b: 'Eine lange, schwere Brechstange aus Stahl.' },
-        messer:       { name: 'K^uchenmesser', nom: 'das K^uchenmesser', akk: 'das K^uchenmesser', e: { scharf: 2 },
-            b: 'Ein K^uchenmesser mit frisch geschliffener Klinge.' },
-        schere:       { name: 'Schere', nom: 'die Schere', akk: 'die Schere', e: { scharf: 1 },
-            b: 'Eine kleine Bastelschere, nicht besonders scharf.' },
-        saeurehaltig:       { name: 'Flasche Abflussreiniger', nom: 'die Flasche Abflussreiniger', akk: 'die Flasche Abflussreiniger', e: { saeurehaltig: 2 },
-            b: 'Abflussreiniger. Auf dem Etikett steht: stark ^atzend.' },
-        feuerzeug:    { name: 'Feuerzeug', nom: 'das Feuerzeug', akk: 'das Feuerzeug', e: { entzuendend: 1 },
-            b: 'Ein Sturmfeuerzeug. Es z^undet beim ersten Versuch.' },
-        streichhoelzer: { name: 'Streichh^olzer', nom: 'die Streichh^olzer', akk: 'die Streichh^olzer', pl: true, e: { entzuendend: 1 },
-            b: 'Eine Schachtel Streichh^olzer, gut gef^ullt.' },
-        taschenlampe: { name: 'Taschenlampe', nom: 'die Taschenlampe', akk: 'die Taschenlampe', e: { licht: 2 },
-            b: 'Eine Taschenlampe mit kr^aftigem Strahl.' },
-        tuch:         { name: 'Tischtuch', nom: 'das Tischtuch', akk: 'das Tischtuch', e: { deckend: 2, saugfaehig: 1 },
-            b: 'Ein gro^ses Tischtuch aus Leinen. Es nimmt auch etwas Wasser auf.' },
-        decke:        { name: 'Wolldecke', nom: 'die Wolldecke', akk: 'die Wolldecke', e: { deckend: 3 },
-            b: 'Eine dicke, sehr gro^se Wolldecke.' },
-        handspiegel:  { name: 'Handspiegel', nom: 'der Handspiegel', akk: 'den Handspiegel', e: { spiegelnd: 2 },
-            b: 'Ein Handspiegel mit klarem Glas.' },
-        besen:        { name: 'Besenstiel', nom: 'der Besenstiel', akk: 'den Besenstiel', e: { lang: 3 },
-            b: 'Ein langer, leichter Besenstiel.' },
-        kleiderhaken: { name: 'Kleiderb^ugel', nom: 'der Kleiderb^ugel', akk: 'den Kleiderb^ugel', e: { haken: 1 },
-            b: 'Ein Kleiderb^ugel aus Draht, oben ein kleiner Haken.' },
-        angel:        { name: 'Angelrute', nom: 'die Angelrute', akk: 'die Angelrute', e: { lang: 3, haken: 1 },
-            b: 'Eine lange Angelrute, an der Schnur h^angt ein Haken.' },
-        schnur:       { name: 'Rolle Schnur', nom: 'die Rolle Schnur', akk: 'die Rolle Schnur', e: { reissfest: 2 },
-            b: 'Eine Rolle feste Schnur, ein paar Meter lang.' },
-        wecker:       { name: 'Wecker', nom: 'der Wecker', akk: 'den Wecker', e: { laut: 2 },
-            b: 'Ein alter Blechwecker mit sehr lauter Glocke.' },
-        hantel:       { name: 'Hantel', nom: 'die Hantel', akk: 'die Hantel', e: { schwer: 3, stumpf: 2, laut: 1 },
-            b: 'Eine Kurzhantel aus Gusseisen, sehr schwer.' },
-        topf:         { name: 'Kochtopf', nom: 'der Kochtopf', akk: 'den Kochtopf', e: { laut: 1, stumpf: 1 },
-            b: 'Ein leichter Kochtopf aus d^unnem Blech.' },
-        pfanne:       { name: 'Gusseisenpfanne', nom: 'die Gusseisenpfanne', akk: 'die Gusseisenpfanne', e: { schwer: 3, stumpf: 2, laut: 1 },
-            b: 'Eine schwere Pfanne aus Gusseisen.' }
-    };
-
-    // Wenn ein Gegenstand fuer einen Weg nicht reicht: woran es liegt (Satz: "<Ding> ist dafuer <ZU_WENIG>.").
-    // Spieler sehen keine Eigenschaften und Stufen, also muss ein knapper Fehlversuch den Grund nennen.
-    var ZU_WENIG = {
-        schwer: 'zu leicht', stumpf: 'nicht wuchtig genug', lang: 'zu kurz', scharf: 'nicht scharf genug',
-        saeurehaltig: 'nicht ^atzend genug', entzuendend: 'nicht zum Anz^unden geeignet', licht: 'nicht hell genug',
-        deckend: 'zu klein zum Abdecken', saugfaehig: 'nicht saugf^ahig genug', spiegelnd: 'kein brauchbarer Spiegel',
-        haken: 'ohne Haken nicht zu gebrauchen', reissfest: 'nicht rei^sfest genug', laut: 'nicht laut genug'
+        hammer:       { e: { schwer: 2, stumpf: 2, laut: 1 } },
+        brechstange:  { e: { schwer: 2, lang: 2, stumpf: 1, laut: 1 } },
+        messer:       { e: { scharf: 2 } },
+        schere:       { e: { scharf: 1 } },
+        saeurehaltig: { e: { saeurehaltig: 2 } },
+        feuerzeug:    { e: { entzuendend: 1 } },
+        streichhoelzer: { e: { entzuendend: 1 } },
+        taschenlampe: { e: { licht: 2 } },
+        tuch:         { e: { deckend: 2, saugfaehig: 1 } },
+        decke:        { e: { deckend: 3 } },
+        handspiegel:  { e: { spiegelnd: 2 } },
+        besen:        { e: { lang: 3 } },
+        kleiderhaken: { e: { haken: 1 } },
+        angel:        { e: { lang: 3, haken: 1 } },
+        schnur:       { e: { reissfest: 2 } },
+        wecker:       { e: { laut: 2 } },
+        hantel:       { e: { schwer: 3, stumpf: 2, laut: 1 } },
+        topf:         { e: { laut: 1, stumpf: 1 } },
+        pfanne:       { e: { schwer: 3, stumpf: 2, laut: 1 } }
     };
 
     // Text der Eigenschaften fuer das Protokoll
     var EIGENSCHAFT_TEXT = {
-        schwer: 'schwer', stumpf: 'stumpf', laut: 'laut', lang: 'lang', scharf: 'scharf', saeurehaltig: '^atzend',
-        entzuendend: 'entz^undend', licht: 'Licht', deckend: 'deckend', saugfaehig: 'saugf^ahig', spiegelnd: 'spiegelnd',
-        haken: 'Haken', reissfest: 'rei^sfest', schluessel: 'Schl^ussel'
+        schwer: 'schwer', stumpf: 'stumpf', laut: 'laut', lang: 'lang', scharf: 'scharf', saeurehaltig: '\u00e4tzend',
+        entzuendend: 'entz\u00fcndend', licht: 'Licht', deckend: 'deckend', saugfaehig: 'saugf\u00e4hig', spiegelnd: 'spiegelnd',
+        haken: 'Haken', reissfest: 'rei\u00dffest', schluessel: 'Schl\u00fcssel'
     };
 
     // Verstecke. Jede Alternative ist ein Loesungsweg: b = Bedingung (Eigenschaft: Mindeststaerke), h = Haende,
     // laerm = macht Laerm (Nebenwirkung). Eine Bedingung darf von zwei Gegenstaenden gemeinsam erfuellt werden, wenn die
     // Gruppe etwas Reissfestes zum Verbinden hat (Meta-Regel "Befestigen" aus Bodenlos).
     var HINDERNISSE = {
-        holzkiste: { name: 'Holzkiste mit Vorh^angeschloss', nom: 'die Holzkiste mit Vorh^angeschloss', akk: 'die Holzkiste mit Vorh^angeschloss', alt: [
-            { text: 'aufbrechen', b: { schwer: 2 }, laerm: true },
-            { text: 'Schloss weg^atzen', b: { saeurehaltig: 1 } },
-            { text: 'Deckel aufhebeln', b: { lang: 2, schwer: 2 } }
-        ] },
-        paket: { name: 'mit Draht verschn^urtes Paket', nom: 'das mit Draht verschn^urte Paket', akk: 'das mit Draht verschn^urte Paket', alt: [
-            { text: 'aufschneiden', b: { scharf: 1 } },
-            { text: 'Verschn^urung durchbrennen', b: { entzuendend: 1 } },
-            { text: 'Draht weg^atzen', b: { saeurehaltig: 1 } }
-        ] },
-        vitrine: { name: 'verschlossene Glasvitrine', nom: 'die verschlossene Glasvitrine', akk: 'die verschlossene Glasvitrine', alt: [
-            { text: 'Glas einschlagen', b: { stumpf: 2 }, laerm: true },
-            { text: 'T^ur aufhebeln', b: { lang: 2, schwer: 2 } },
-            { text: 'Schloss weg^atzen', b: { saeurehaltig: 1 } }
-        ] },
-        diele: { name: 'vernagelte Bodendiele', nom: 'die vernagelte Bodendiele', akk: 'die vernagelte Bodendiele', alt: [
-            { text: 'aufhebeln', b: { lang: 2, schwer: 2 } },
-            { text: 'zertr^ummern', b: { stumpf: 2 }, laerm: true },
-            { text: 'Fugen aufschneiden', b: { scharf: 2 } }
-        ] },
-        schrank_oben: { name: 'Ablage oben auf dem hohen Schrank', nom: 'die Ablage oben auf dem hohen Schrank', akk: 'die Ablage oben auf dem hohen Schrank', alt: [
-            { text: 'herunterangeln', b: { lang: 3, haken: 1 } },
-            { text: 'herunterschubsen', b: { lang: 3 }, laerm: true }
-        ] },
-        bodenschacht: { name: 'enger Bodenschacht', nom: 'der enge Bodenschacht', akk: 'den engen Bodenschacht', alt: [
-            { text: 'herausangeln', b: { lang: 2, haken: 1 } },
-            { text: 'mit Schnur und Haken herausfischen', b: { reissfest: 1, haken: 1 } }
-        ] }
+        holzkiste: { alt: [{ b: { schwer: 2 }, laerm: true }, { b: { saeurehaltig: 1 } }, { b: { lang: 2, schwer: 2 } }] },
+        paket: { alt: [{ b: { scharf: 1 } }, { b: { entzuendend: 1 } }, { b: { saeurehaltig: 1 } }] },
+        vitrine: { alt: [{ b: { stumpf: 2 }, laerm: true }, { b: { lang: 2, schwer: 2 } }, { b: { saeurehaltig: 1 } }] },
+        diele: { alt: [{ b: { lang: 2, schwer: 2 } }, { b: { stumpf: 2 }, laerm: true }, { b: { scharf: 2 } }] },
+        schrank_oben: { alt: [{ b: { lang: 3, haken: 1 } }, { b: { lang: 3 }, laerm: true }] },
+        bodenschacht: { alt: [{ b: { lang: 2, haken: 1 } }, { b: { reissfest: 1, haken: 1 } }] }
     };
 
-    // Schloesser der Ausgangstuer. art: code (braucht einen Code), schluessel (braucht den Schluessel),
+    // Schloesser am Ausgang. art: code (braucht einen Code), schluessel (braucht den Schluessel),
     // anforderung (braucht ein Mittel aus alt, wie ein Hindernis).
     var SCHLOESSER = {
-        zahlenschloss: { name: 'Zahlenschloss', nom: 'das Zahlenschloss', akk: 'das Zahlenschloss', art: 'code' },
-        schluesselloch: { name: 'Schl^usselloch', nom: 'das Schl^usselloch', akk: 'das Schl^usselloch', art: 'schluessel' },
-        doppelhebel: { name: 'zwei Hebel, weit auseinander', nom: 'die zwei Hebel', akk: 'die zwei Hebel', art: 'anforderung', alt: [
-            { text: 'zu zweit gleichzeitig ziehen', h: 2 },
-            { text: 'den ersten Hebel mit einer Schnur festbinden und beim Ziehen des zweiten mitziehen', b: { reissfest: 1 } },
-            { text: 'den ersten Hebel mit etwas Langem unten verkeilen und dann den zweiten ziehen', b: { lang: 2 } }
-        ] },
-        druckplatte: { name: 'Druckplatte im Boden', nom: 'die Druckplatte im Boden', akk: 'die Druckplatte im Boden', art: 'anforderung', alt: [
-            { text: 'mit etwas sehr Schwerem beschweren', b: { schwer: 3 } },
-            { text: 'zu zweit draufstellen', h: 2 }
-        ] }
+        zahlenschloss: { art: 'code' },
+        schluesselloch: { art: 'schluessel' },
+        doppelhebel: { art: 'anforderung', alt: [{ h: 2 }, { b: { reissfest: 1 } }, { b: { lang: 2 } }] },
+        druckplatte: { art: 'anforderung', alt: [{ b: { schwer: 3 } }, { h: 2 }] }
     };
 
     // Gegenmittel je Ausloeser einer Bedrohung. beobachter = ein freier Spieler haelt sie in Schach (wegsehen).
     // null bei laerm: Laerm-Bedrohungen werden nicht gebannt, man muss leise Wege nehmen.
     var GEGENMITTEL = {
-        wegsehen: { beobachter: true, alt: [{ text: 'Spiegel so aufstellen, dass sie sich selbst ansieht', b: { spiegelnd: 1 } }] },
-        hinsehen: { alt: [{ text: 'abdecken', b: { deckend: 2 } }] },
-        licht_aus: { alt: [{ text: 'mit der Lampe anleuchten', b: { licht: 1 } }] },
+        wegsehen: { beobachter: true, alt: [{ b: { spiegelnd: 1 } }] },
+        hinsehen: { alt: [{ b: { deckend: 2 } }] },
+        licht_aus: { alt: [{ b: { licht: 1 } }] },
         laerm: null,
-        naehe: { alt: [{ text: 'mit L^arm in eine Ecke weglocken', b: { laut: 1 }, laerm: true },
-                       { text: 'mit einem langen Stiel auf Abstand halten', b: { lang: 2 } }] },
-        zeit: { alt: [{ text: 'aufhalten (Abfluss freistochern, Pendel blockieren)', b: { lang: 2 } },
-                      { text: 'mit Gewalt stoppen', b: { stumpf: 2 }, laerm: true }] }
+        naehe: { alt: [{ b: { laut: 1 }, laerm: true }, { b: { lang: 2 } }] },
+        zeit: { alt: [{ b: { lang: 2 } }, { b: { stumpf: 2 }, laerm: true }] }
     };
+    // Rost am Wasserspender: Wege, ihn trotzdem aufzubekommen
+    var ROST = [{ b: { stumpf: 1 } }, { b: { saeurehaltig: 1 } }];
 
-    // in: wo man ist, nach: wohin man geht
-    var RAUMNAMEN = [{ name: 'Salon', in: 'im Salon', nach: 'in den Salon' }, { name: 'Bibliothek', in: 'in der Bibliothek', nach: 'in die Bibliothek' },
-        { name: 'Kinderzimmer', in: 'im Kinderzimmer', nach: 'ins Kinderzimmer' }, { name: 'Waschk^uche', in: 'in der Waschk^uche', nach: 'in die Waschk^uche' },
-        { name: 'Dachboden', in: 'auf dem Dachboden', nach: 'auf den Dachboden' }, { name: 'Musikzimmer', in: 'im Musikzimmer', nach: 'ins Musikzimmer' },
-        { name: 'Kellerflur', in: 'im Kellerflur', nach: 'in den Kellerflur' }];
-
-    function ladeUmlaute(o) {
-        var k;
-        if (typeof o === 'string') return um(o);
-        if (o && typeof o === 'object') {
-            for (k in o) if (Object.prototype.hasOwnProperty.call(o, k)) o[k] = ladeUmlaute(o[k]);
+    // ------------------------------------------------------------ Setting darueberlegen
+    function fehlt(was) { throw new Error('Setting ' + S.id + ': ' + was + ' fehlt oder passt nicht zur Mechanik'); }
+    function uebernimm(ziel, quelle, felder, wo) {
+        var i;
+        if (!quelle) fehlt(wo);
+        for (i = 0; i < felder.length; i++) {
+            if (typeof quelle[felder[i]] !== 'string') fehlt(wo + '.' + felder[i]);
+            ziel[felder[i]] = quelle[felder[i]];
         }
-        return o;
     }
-    ladeUmlaute(AUSLOESER); ladeUmlaute(ELEMENTE); ladeUmlaute(GEGENSTAENDE); ladeUmlaute(EIGENSCHAFT_TEXT);
-    ladeUmlaute(ZU_WENIG); ladeUmlaute(HINDERNISSE); ladeUmlaute(SCHLOESSER); ladeUmlaute(GEGENMITTEL); ladeUmlaute(RAUMNAMEN);
+    function alternativen(alt, texte, wo) {
+        var i;
+        if (!texte || texte.length !== alt.length) fehlt(wo + '.alt');
+        for (i = 0; i < alt.length; i++) alt[i].text = texte[i];
+    }
+    var k, i;
+    for (k in AUSLOESER) if (AUSLOESER.hasOwnProperty(k)) uebernimm(AUSLOESER[k], { vor: S.ausloeser[k] }, ['vor'], 'ausloeser.' + k);
+    for (k in ELEMENTE) {
+        if (!ELEMENTE.hasOwnProperty(k)) continue;
+        var se = S.elemente[k];
+        uebernimm(ELEMENTE[k], se, ['name', 'nom', 'akk', 'b', 'verb'], 'elemente.' + k);
+        if (!se.f || se.f.length !== ELEMENTE[k].f.length) fehlt('elemente.' + k + '.f');
+        for (i = 0; i < se.f.length; i++) {
+            if (se.f[i][0] !== ELEMENTE[k].f[i].art) fehlt('elemente.' + k + '.f[' + i + '] (Art ' + ELEMENTE[k].f[i].art + ')');
+            ELEMENTE[k].f[i].text = se.f[i][1];
+        }
+    }
+    for (k in GEGENSTAENDE) if (GEGENSTAENDE.hasOwnProperty(k)) uebernimm(GEGENSTAENDE[k], S.gegenstaende[k], ['name', 'nom', 'akk', 'b'], 'gegenstaende.' + k);
+    for (var vi = 0; vi < (S.verstecke || []).length; vi++) if (S.verstecke[vi].length !== 4) fehlt('verstecke[' + vi + '] (Name, Nominativ, Akkusativ, Platz)');
+    for (k in HINDERNISSE) {
+        if (!HINDERNISSE.hasOwnProperty(k)) continue;
+        uebernimm(HINDERNISSE[k], S.hindernisse[k], ['name', 'nom', 'akk'], 'hindernisse.' + k);
+        alternativen(HINDERNISSE[k].alt, S.hindernisse[k].alt, 'hindernisse.' + k);
+        if (!S.hindernisse[k].zweit || S.hindernisse[k].zweit.length !== 3) fehlt('hindernisse.' + k + '.zweit');
+        HINDERNISSE[k].zweit = S.hindernisse[k].zweit;
+    }
+    for (k in SCHLOESSER) {
+        if (!SCHLOESSER.hasOwnProperty(k)) continue;
+        uebernimm(SCHLOESSER[k], S.schloesser[k], ['name', 'nom', 'akk', 'verb'], 'schloesser.' + k);
+        if (SCHLOESSER[k].alt) alternativen(SCHLOESSER[k].alt, S.schloesser[k].alt, 'schloesser.' + k);
+        if (S.schloesser[k].offen) SCHLOESSER[k].offen = S.schloesser[k].offen;
+    }
+    for (k in GEGENMITTEL) if (GEGENMITTEL.hasOwnProperty(k) && GEGENMITTEL[k]) alternativen(GEGENMITTEL[k].alt, S.gegenmittel[k], 'gegenmittel.' + k);
+    var WASSER = { name: S.wasser.name, nom: S.wasser.nom, akk: S.wasser.akk, verb: S.wasser.verb, tun: S.wasser.tun,
+        rost: { name: S.wasser.rost.name, nom: S.wasser.rost.nom, akk: S.wasser.rost.akk, alt: ROST } };
+    alternativen(WASSER.rost.alt, S.wasser.rost.alt, 'wasser.rost');
+    if (!S.stories || !S.stories.length) fehlt('stories');
+    for (i = 0; i < S.stories.length; i++) if (!S.stories[i].raeume || S.stories[i].raeume.length < 2) fehlt('stories[' + i + '].raeume (mindestens zwei)');
 
     return {
-        version: 1, um: um, ARTEN: ARTEN, AUSLOESER: AUSLOESER, ELEMENTE: ELEMENTE, GEGENSTAENDE: GEGENSTAENDE,
-        EIGENSCHAFT_TEXT: EIGENSCHAFT_TEXT, ZU_WENIG: ZU_WENIG, HINDERNISSE: HINDERNISSE, SCHLOESSER: SCHLOESSER, GEGENMITTEL: GEGENMITTEL,
-        RAUMNAMEN: RAUMNAMEN
+        version: 2, SETTING: S.id, ARTEN: ARTEN, AUSLOESER: AUSLOESER, ELEMENTE: ELEMENTE, GEGENSTAENDE: GEGENSTAENDE,
+        EIGENSCHAFT_TEXT: EIGENSCHAFT_TEXT, ZU_WENIG: S.zuWenig, HINDERNISSE: HINDERNISSE, SCHLOESSER: SCHLOESSER, GEGENMITTEL: GEGENMITTEL,
+        VERSTECKE: S.verstecke, LICHT: S.licht, WASSER: WASSER, SCHLUESSEL: S.schluessel, NOTIZ: S.notiz, STORIES: S.stories,
+        HELL: S.hell, DUNKEL: S.dunkel
     };
 })();
 
@@ -757,16 +977,7 @@ var Generator = (function () {
     var MAX_VERSUCHE = 60;
     var MAX_AKTIONEN = 70;
     // name, Nominativ und Akkusativ mit Artikel (die Engine beugt keine Namen)
-    var VERSTECKNAMEN = [
-        ['lose Fliese', 'die lose Fliese', 'die lose Fliese'],
-        ['Hohlraum hinter der Tapete', 'der Hohlraum hinter der Tapete', 'den Hohlraum hinter der Tapete'],
-        ['doppelter Boden im Regal', 'der doppelte Boden im Regal', 'den doppelten Boden im Regal'],
-        ['Spalt hinter der Fu\u00dfleiste', 'der Spalt hinter der Fu\u00dfleiste', 'den Spalt hinter der Fu\u00dfleiste'],
-        ['lockerer Ziegel im Kamin', 'der lockere Ziegel im Kamin', 'den lockeren Ziegel im Kamin'],
-        ['loses Brett in der Wandvert\u00e4felung', 'das lose Brett in der Wandvert\u00e4felung', 'das lose Brett in der Wandvert\u00e4felung'],
-        ['Fach unter einer Dielenstufe', 'das Fach unter einer Dielenstufe', 'das Fach unter einer Dielenstufe'],
-        ['hohler Bettpfosten', 'der hohle Bettpfosten', 'den hohlen Bettpfosten']
-    ];
+    var VERSTECKNAMEN = Katalog.VERSTECKE;
 
     function Fehlschlag(grund) { this.fehlschlag = true; this.grund = grund; }
     function sortiert(o) { return Object.keys(o).sort(); }
@@ -872,9 +1083,9 @@ var Generator = (function () {
     Bau.prototype.enthuelle = function (rg, tiefe, opt) {
         var x = this.r.zahl(), el = this.p.dinge[rg.element];
         if (tiefe > 0 && x < 0.22) {
-            var notiz = this.ding('gegenstand', 'Notiz \u00fcber ' + el.akk, el.raum, { e: {}, vorlage: 'notiz', nom: 'die Notiz \u00fcber ' + el.akk, akk: 'die Notiz \u00fcber ' + el.akk });
+            var N = Katalog.NOTIZ, notiz = this.ding('gegenstand', N.name + el.akk, el.raum, { e: {}, vorlage: 'notiz', nom: N.nom + el.akk, akk: N.akk + el.akk });
             this.platziere(notiz, tiefe - 1, opt);
-            this.aktion({ text: 'Notiz \u00fcber ' + el.akk + ' lesen', art: 'lesen', raum: notiz.raum, braucht: ['hat:' + notiz.id],
+            this.aktion({ text: N.name + el.akk + ' lesen', art: 'lesen', raum: notiz.raum, braucht: ['hat:' + notiz.id],
                 gibt: ['kennt:' + rg.id], sicher: true });
             rg.enthuellung = { art: 'notiz', notiz: notiz.id };
         } else if (x < 0.6) {
@@ -888,9 +1099,9 @@ var Generator = (function () {
 
     Bau.prototype.licht = function (raum) {
         if (this.fixtur['licht:' + raum]) return;
-        var s = this.ding('fixtur', 'Lichtschalter', raum, { nom: 'der Lichtschalter', akk: 'den Lichtschalter' });
-        this.aktion({ text: 'Licht ausschalten', art: 'schalter', raum: raum, ding: s.id, gibt: ['licht_aus:' + raum], schalter: true, sicher: true });
-        this.aktion({ text: 'Licht einschalten', art: 'schalter', raum: raum, ding: s.id, nimmt: ['licht_aus:' + raum], schalter: true, sicher: true });
+        var L = Katalog.LICHT, s = this.ding('fixtur', L.name, raum, { vorlage: 'licht', nom: L.nom, akk: L.akk });
+        this.aktion({ text: L.schliessen, art: 'schalter', raum: raum, ding: s.id, gibt: ['licht_aus:' + raum], schalter: true, sicher: true });
+        this.aktion({ text: L.oeffnen, art: 'schalter', raum: raum, ding: s.id, nimmt: ['licht_aus:' + raum], schalter: true, sicher: true });
         this.fixtur['licht:' + raum] = s.id;
     };
 
@@ -904,15 +1115,15 @@ var Generator = (function () {
 
     Bau.prototype.hahn = function (raum, tiefe, opt) {
         if (this.fixtur['hahn:' + raum]) return;
-        var h = this.ding('fixtur', 'Wasserhahn', raum, { nom: 'der Wasserhahn', akk: 'den Wasserhahn' }), m = null;
+        var Wa = Katalog.WASSER, h = this.ding('fixtur', Wa.name, raum, { vorlage: 'wasser', nom: Wa.nom, akk: Wa.akk }), m = null;
         h.zone = this.zoneFuer(raum, opt);
         if (tiefe > 0 && this.r.chance(0.35)) {
-            h.name = 'festgerosteter Wasserhahn'; h.nom = 'der festgerostete Wasserhahn'; h.akk = 'den festgerosteten Wasserhahn';
-            m = this.anforderung(h.name, [{ text: 'mit Gewalt aufdrehen', b: { stumpf: 1 } }, { text: 'Rost weg\u00e4tzen', b: { saeurehaltig: 1 } }]);
+            h.name = Wa.rost.name; h.nom = Wa.rost.nom; h.akk = Wa.rost.akk;
+            m = this.anforderung(h.name, Wa.rost.alt);
             var alt = this.p.anforderungen[m].alt;
             this.liefere(alt[this.r.bis(alt.length)].b, tiefe - 1, opt);
         }
-        this.aktion({ text: 'Hahn aufdrehen', art: m ? 'benutzen' : 'bedienen', raum: raum, ding: h.id, mittel: m, gibt: ['wasser:' + raum] });
+        this.aktion({ text: Wa.tun, art: m ? 'benutzen' : 'bedienen', raum: raum, ding: h.id, mittel: m, gibt: ['wasser:' + raum] });
         this.fixtur['hahn:' + raum] = true;
     };
 
@@ -1019,9 +1230,10 @@ var Generator = (function () {
         for (k2 = 0; k2 < keys.length; k2++) if (!this.fixtur['versteck:' + keys[k2]]) unbenutzt.push(keys[k2]);
         var hk = this.r.waehle(unbenutzt.length ? unbenutzt : keys), h = Katalog.HINDERNISSE[hk];
         this.fixtur['versteck:' + hk] = (this.fixtur['versteck:' + hk] || 0) + 1;
+        if (this.fixtur['versteck:' + hk] > 2) throw new Fehlschlag('drittes Versteck derselben Art: ' + hk);
         var zweit = this.fixtur['versteck:' + hk] > 1;
-        var v = this.ding('versteck', (zweit ? 'zweite ' : '') + h.name, g.raum, { vorlage: hk,
-            nom: zweit ? h.nom.replace(' ', ' zweite ') : h.nom, akk: zweit ? h.akk.replace(' ', ' zweite ') : h.akk });
+        var v = this.ding('versteck', zweit ? h.zweit[0] : h.name, g.raum, { vorlage: hk,
+            nom: zweit ? h.zweit[1] : h.nom, akk: zweit ? h.zweit[2] : h.akk });
         v.zone = this.zoneFuer(g.raum, opt);
         var m = this.anforderung(v.name, h.alt), alt = this.p.anforderungen[m].alt;
         var reihe = this.r.mischen([0, 1, 2].slice(0, alt.length)), geliefert = 0, i;
@@ -1060,7 +1272,7 @@ var Generator = (function () {
         if (!namen.length) return false;
         var vname = this.r.waehle(namen);
         this.fixtur['name:' + vname[0]] = true;
-        var v = this.ding('versteck', vname[0], g.raum, { verborgen: true, nom: vname[1], akk: vname[2] });
+        var v = this.ding('versteck', vname[0], g.raum, { verborgen: true, nom: vname[1], akk: vname[2], modell: 'v_' + vname[3] });
         v.zone = this.zoneFuer(g.raum, opt);
         var rg = this.regel(d, el.f, aus, v);
         var bedarf = this.ausloeserBedarf(aus, d, tiefe - 1, opt);
@@ -1121,12 +1333,12 @@ var Generator = (function () {
         var schlossInfo = { id: sd.id, vorlage: art, name: s.name };
         if (s.art === 'code') {
             this.code(schlossInfo, tiefe);
-            this.aktion({ text: 'Code ' + '\u00bb' + schlossInfo.code + '\u00ab am Zahlenschloss eingeben', art: 'eingeben', raum: tuerRaum, ding: sd.id,
+            this.aktion({ text: 'Code ' + schlossInfo.code + ' an ' + s.akk + ' eingeben', art: 'eingeben', raum: tuerRaum, ding: sd.id,
                 braucht: ['code:' + sd.id], gibt: ['schloss:' + sd.id] });
         } else if (s.art === 'schluessel') {
-            var key = this.ding('gegenstand', 'Schl\u00fcssel', null, { vorlage: 'schluessel', e: { schluessel: 1 }, nom: 'der Schl\u00fcssel', akk: 'den Schl\u00fcssel' });
+            var key = this.ding('gegenstand', Katalog.SCHLUESSEL.name, null, { vorlage: 'schluessel', e: { schluessel: 1 }, nom: Katalog.SCHLUESSEL.nom, akk: Katalog.SCHLUESSEL.akk });
             this.platziere(key, tiefe, {});
-            this.aktion({ text: 'Schl\u00fcsselloch aufschlie\u00dfen', art: 'schluessel', raum: tuerRaum, ding: sd.id, braucht: ['hat:' + key.id],
+            this.aktion({ text: s.name + ' aufschlie' + '\u00df' + 'en', art: 'schluessel', raum: tuerRaum, ding: sd.id, braucht: ['hat:' + key.id],
                 gibt: ['schloss:' + sd.id] });
         } else {
             var m = this.anforderung(s.name, s.alt), alt = this.p.anforderungen[m].alt, i, mitB = [];
@@ -1139,7 +1351,11 @@ var Generator = (function () {
     };
 
     Bau.prototype.baue = function () {
-        var p = this.p, cfg = this.cfg, i, namen = this.r.mischen(Katalog.RAUMNAMEN.slice());
+        var p = this.p, cfg = this.cfg, i;
+        // Die Story ist der Anlass, eingeschlossen zu sein: Einstieg, Ausgang, Raumnamen, Ende (kern/setting.js)
+        var story = this.r.waehle(Katalog.STORIES), namen = this.r.mischen(story.raeume.slice());
+        p.setting = Katalog.SETTING;
+        p.story = { id: story.id, titel: story.titel, intro: story.intro, ende: story.ende, auf: story.ausgang.auf, verb: story.ausgang.verb };
         var zwei = this.spieler > 1 ? this.r.chance(0.45) : this.r.chance(0.12);
         p.raeume.push({ id: 'r1', name: namen[0].name, in: namen[0].in, nach: namen[0].nach });
         if (zwei) p.raeume.push({ id: 'r2', name: namen[1].name, in: namen[1].in, nach: namen[1].nach });
@@ -1149,7 +1365,7 @@ var Generator = (function () {
         if (this.r.chance(cfg.bedrohung[1])) this.bedrohung();
 
         var tuerRaum = 'r1';
-        var tuer = this.ding('fixtur', 'Ausgangst\u00fcr', tuerRaum, { nom: 'die Ausgangst\u00fcr', akk: 'die Ausgangst\u00fcr' });
+        var tuer = this.ding('fixtur', story.ausgang.name, tuerRaum, { vorlage: 'ausgang', nom: story.ausgang.nom, akk: story.ausgang.akk });
         var anzahl = Math.min(3, cfg.schloesser + (this.spieler >= 3 && cfg.schloesser < 3 ? 1 : 0));
         var arten = this.r.mischen(['zahlenschloss', 'schluesselloch', 'doppelhebel', 'druckplatte']);
         // Codes und Schluessel tragen die Raetselketten; Hebel und Platte sind Beigaben
@@ -1164,7 +1380,7 @@ var Generator = (function () {
             braucht.push('schloss:' + s.id);
         }
         p.tuer = { id: tuer.id, raum: tuerRaum, schloesser: schloesser };
-        this.aktion({ text: 'Ausgangst\u00fcr \u00f6ffnen', raum: tuerRaum, ding: tuer.id, braucht: braucht, gibt: ['ausgang'], sicher: true });
+        this.aktion({ text: story.ausgang.name + ' ' + '\u00f6' + 'ffnen', raum: tuerRaum, ding: tuer.id, braucht: braucht, gibt: ['ausgang'], sicher: true });
 
         // Jeder Raum hat einen Lichtschalter, sonst verraet sein Vorhandensein das Raetsel
         for (i = 0; i < p.raeume.length; i++) this.licht(p.raeume[i].id);
@@ -1548,7 +1764,7 @@ var Spiel = (function () {
         for (i = 0; i < a.gibt.length; i++) {
             if (a.gibt[i].indexOf('hat:') === 0) g.push(s.partie.dinge[a.gibt[i].slice(4)].name);
             if (a.gibt[i].indexOf('gebannt:') === 0) t.push(gross(nom(s.partie.dinge[a.ding])) + ' kann dir jetzt nichts mehr anhaben.');
-            if (a.gibt[i].indexOf('schloss:') === 0) t.push('Ein Schloss der Ausgangst' + '\u00fc' + 'r ist offen.');
+            if (a.gibt[i].indexOf('schloss:') === 0) t.push('Ein Schloss am Ausgang ist offen.');
             if (a.gibt[i].indexOf('wasser:') === 0) t.push('Wasser l' + '\u00e4' + 'uft.');
             if (a.gibt[i].indexOf('waerme:') === 0) t.push(gross(nom(s.partie.dinge[a.ding])) + ' wird warm.');
         }
@@ -1576,7 +1792,7 @@ var Spiel = (function () {
                 if (a.art === 'lesen') {
                     var rgl = regel(s, a.gibt[0].slice(6));
                     s.f[a.gibt[0]] = true;
-                    aus.push(m('Auf der Notiz steht: \u00bb' + gross(Katalog.AUSLOESER[rgl.ausloeser].text) + ': ' + rgl.demo + '\u00ab', 'ereignis'));
+                    aus.push(m(Katalog.NOTIZ.steht + ' \u00bb' + gross(Katalog.AUSLOESER[rgl.ausloeser].text) + ': ' + rgl.demo + '\u00ab', 'ereignis'));
                     weiter = true;
                     continue;
                 }
@@ -1636,7 +1852,7 @@ var Spiel = (function () {
     function neu(partie) {
         var s = { partie: partie, f: {}, zeit: 0, raum: {}, gesehen: {}, status: 'laeuft', fristGemeldet: {}, log: [], vorfuehrungen: [] }, i;
         for (i = 0; i < partie.start.length; i++) s.f[partie.start[i]] = true;
-        var aus = [m('Die T\u00fcr f\u00e4llt hinter dir ins Schloss. Du bist ' + raumIn(s, 'r1') + '. Der einzige Ausgang ist verschlossen.', 'system')];
+        var aus = [m(partie.story.intro.replace('{in}', raumIn(s, 'r1')), 'system')];
         aus = aus.concat(betrete(s, 1, 'r1'));
         for (i = 2; i <= partie.spieler; i++) s.raum[i] = 'r1';
         s.log = aus;
@@ -1659,15 +1875,15 @@ var Spiel = (function () {
         if (d.typ === 'schloss') {
             var zu = s.f['schloss:' + d.id] ? ' Es ist offen.' : '';
             for (i = 0; i < s.partie.tuer.schloesser.length; i++) {
-                if (s.partie.tuer.schloesser[i].id === d.id && s.partie.tuer.schloesser[i].code) return 'Ein Zahlenschloss mit ' + s.partie.tuer.schloesser[i].code.length + ' Ziffern.' + zu;
+                if (s.partie.tuer.schloesser[i].id === d.id && s.partie.tuer.schloesser[i].code) return gross(d.name) + ' mit ' + s.partie.tuer.schloesser[i].code.length + ' Ziffern.' + zu;
             }
             return gross(d.name) + '.' + zu;
         }
-        if (d.name === 'Lichtschalter') return 'Ein alter Drehschalter. Das Licht ist ' + (s.f['licht_aus:' + d.raum] ? 'aus.' : 'an.');
-        if (d.name === 'Ausgangst\u00fcr') {
+        if (d.vorlage === 'licht') return Katalog.LICHT.b + ' ' + (s.f['licht_aus:' + d.raum] ? Katalog.LICHT.aus : Katalog.LICHT.an);
+        if (d.vorlage === 'ausgang') {
             var offen = 0;
             for (i = 0; i < s.partie.tuer.schloesser.length; i++) if (s.f['schloss:' + s.partie.tuer.schloesser[i].id]) offen++;
-            return 'Die Ausgangst\u00fcr. ' + offen + ' von ' + s.partie.tuer.schloesser.length + ' Schl\u00f6ssern sind offen.';
+            return gross(d.nom) + '. ' + offen + ' von ' + s.partie.tuer.schloesser.length + ' Schl\u00f6ssern sind offen.';
         }
         return gross(d.name) + '.';
     }
@@ -1737,14 +1953,14 @@ var Spiel = (function () {
                         var aus_ = s.f['licht_aus:' + a.raum];
                         if ((a.gibt.length && aus_) || (a.nimmt.length && !aus_)) continue;
                         fuehreAus(s, a, null);
-                        aus.push(m(aus_ ? 'Du schaltest das Licht wieder ein.' : 'Du schaltest das Licht aus. Es ist dunkel.'));
+                        aus.push(m(aus_ ? Katalog.LICHT.wirdHell : Katalog.LICHT.wirdDunkel));
                         getan = true; break;
                     }
                     if (erledigt(s, a) || !brauchtErfuellt(s, a)) continue;
                     sp = sperre(s, a, nr, 1);
                     if (sp) { aus.push(sp); getan = true; break; }
                     fuehreAus(s, a, null);
-                    aus.push(m(a.gibt.indexOf('ausgang') >= 0 ? 'Die Ausgangst\u00fcr schwingt auf.' : ergebnis(s, a, null), a.gibt.indexOf('ausgang') >= 0 ? 'erfolg' : 'erzaehler'));
+                    aus.push(m(a.gibt.indexOf('ausgang') >= 0 ? s.partie.story.auf : ergebnis(s, a, null), a.gibt.indexOf('ausgang') >= 0 ? 'erfolg' : 'erzaehler'));
                     getan = true; break;
                 }
                 // Aufgaben fuer mehrere Haende: anfassen, waehrend genug Leute im Raum sind (ohne Gegenstand)
@@ -1764,7 +1980,7 @@ var Spiel = (function () {
                     }
                     if (!getan && mehrHaende) { aus.push(m('Allein bekommst du das so nicht hin. Daf\u00fcr br\u00e4uchte es mehr H\u00e4nde.')); getan = true; }
                 }
-                if (!getan && d.name === 'Ausgangst\u00fcr') aus.push(m(ansehenText(s, d)));
+                if (!getan && d.vorlage === 'ausgang') aus.push(m(ansehenText(s, d)));
                 else if (!getan) aus.push(m('Du fasst ' + akk(d) + ' an.'));
                 break;
 
@@ -1825,7 +2041,7 @@ var Spiel = (function () {
                 if (!l.length || !code) { aus.push(m('Hier gibt es nichts einzugeben.')); break; }
                 sp = sperre(s, l[0], nr, 1);
                 if (sp) { aus.push(sp); break; }
-                if (String(b.code) === code) { s.f['code:' + d.id] = true; fuehreAus(s, l[0], null); aus.push(m('Das Zahlenschloss springt auf.')); }
+                if (String(b.code) === code) { s.f['code:' + d.id] = true; fuehreAus(s, l[0], null); aus.push(m(gross(nom(d)) + ' springt auf.')); }
                 else aus.push(m('Falscher Code. Das Schloss bleibt zu.'));
                 break;
 
@@ -1848,7 +2064,7 @@ var Spiel = (function () {
         if (b.art !== 'gehen') aus = aus.concat(naechsteVorfuehrung(s, nr));
         if (s.f.ausgang) {
             s.status = 'gewonnen';
-            aus.push(m('Du bist drau\u00dfen. Geschafft nach ' + Math.ceil(s.zeit) + ' Zeiteinheiten.', 'erfolg'));
+            aus.push(m(s.partie.story.ende + ' Zeit: ' + Math.ceil(s.zeit) + '.', 'erfolg'));
         } else {
             aus = aus.concat(zeitPruefen(s));
         }
@@ -1881,7 +2097,28 @@ var Spiel = (function () {
         return { raum: raum, raeume: raeume, dinge: dinge, inventar: inventar, zeit: Math.ceil(s.zeit), licht: !s.f['licht_aus:' + raum], status: s.status };
     }
 
-    return { version: 1, neu: neu, befehl: befehl, sicht: sicht };
+    // Was die Oberflaeche ueber die Dinge wissen muss: Name, Art, Rolle (fuer das Modell) und die Handlung unter dem
+    // Fadenkreuz. Das Verb kommt aus dem Setting: eine Truhe oeffnet man, eine Kette zieht man.
+    function namen(partie) {
+        var aus = {}, k;
+        for (k in partie.dinge) {
+            if (!partie.dinge.hasOwnProperty(k)) continue;
+            var d = partie.dinge[k], v = d.vorlage || '', verb = '';
+            if (d.typ === 'element' && Katalog.ELEMENTE[v]) verb = Katalog.ELEMENTE[v].verb;
+            else if (d.typ === 'schloss' && Katalog.SCHLOESSER[v]) verb = Katalog.SCHLOESSER[v].verb;
+            else if (v === 'licht') verb = Katalog.LICHT.verb;
+            else if (v === 'wasser') verb = Katalog.WASSER.verb;
+            else if (v === 'ausgang') verb = partie.story.verb;
+            aus[k] = { name: d.name, typ: d.typ, vorlage: v, modell: d.modell || '', verborgen: !!d.verborgen, verb: verb };
+        }
+        return aus;
+    }
+    // Rahmen der Partie fuer die Oberflaeche: Setting, Story-Titel, wie Hell und Dunkel hier heissen
+    function rahmen(partie) {
+        return { setting: partie.setting, titel: partie.story.titel, hell: Katalog.HELL, dunkel: Katalog.DUNKEL };
+    }
+
+    return { version: 2, neu: neu, befehl: befehl, sicht: sicht, namen: namen, rahmen: rahmen };
 })();
 
 if (typeof module !== 'undefined' && module.exports) { module.exports = Spiel; }
