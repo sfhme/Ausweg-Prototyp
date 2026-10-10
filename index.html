@@ -1765,6 +1765,7 @@ if (typeof module !== 'undefined' && module.exports) { module.exports = Protokol
 // Spiel.sicht(sitzung, spielerNr)           -> was dieser Spieler sieht (Raum, Dinge, Inventar, Zeit, Status)
 //
 // Befehle: { art: 'ansehen', ding }, { art: 'anfassen', ding }, { art: 'nehmen', ding }, { art: 'benutzen', ding, mit: [ids] },
+//          { art: 'geben', ding, an: spielerNr } (an jemanden im selben Raum), { art: 'ablegen', ding, x, z } (auf den Boden),
 //          { art: 'krach', mit: [id] }, { art: 'eingeben', ding, code }, { art: 'warten' }, { art: 'gehen', raum },
 //          { art: 'verlassen' } (Spieler steigt aus; er zaehlt danach in keinem Raum mehr, seine Befehle werden abgewiesen)
 //
@@ -1778,7 +1779,7 @@ if (typeof module !== 'undefined' && module.exports) {
 var Spiel = (function () {
     'use strict';
 
-    var ZEIT = { ansehen: 0, anfassen: 1, nehmen: 1, benutzen: 1, krach: 1, eingeben: 1, warten: 3, gehen: 1, verlassen: 0 };
+    var ZEIT = { ansehen: 0, anfassen: 1, nehmen: 1, benutzen: 1, krach: 1, eingeben: 1, warten: 3, gehen: 1, verlassen: 0, geben: 0, ablegen: 0 };
     var LAERM_STRAFE = 5;
     // Der Katalog im Stil der Partie (Namen und Texte koennen je Stil anders sein). Jeder Einstieg setzt ihn zuerst.
     var KAT = Katalog;
@@ -1898,11 +1899,28 @@ var Spiel = (function () {
         return wer + ' daf\u00fcr ' + (KAT.ZU_WENIG[best] || 'nicht geeignet') + '.';
     }
 
-    function itemsAus(s, ids) {
+    // Jeder Spieler hat seine eigene Tasche. Der Fakt 'hat:<id>' sagt nur, dass ein Gegenstand gefunden ist (damit
+    // rechnet der Pruefer); WER ihn traegt, steht in s.wer[id]: eine Spielernummer, oder { raum, x, z }, wenn er am Boden
+    // liegt (abgelegt oder von jemandem zurueckgelassen, der die Partie verlassen hat). Weil jeder jederzeit uebergeben
+    // oder ablegen kann, bleibt loesbar, was der Pruefer fuer die gemeinsame Tasche bewiesen hat.
+    function traegt(s, id, nr) { return !!s.f['hat:' + id] && s.wer[id] === nr; }
+    function liegt(s, id) { var w = s.wer[id]; return s.f['hat:' + id] && w && typeof w === 'object' ? w : null; }
+    // Was seit dem letzten Befehl gefunden wurde, steckt der ein, der gehandelt hat
+    function verteile(s, nr) {
+        var k;
+        for (k in s.partie.dinge) {
+            if (!s.partie.dinge.hasOwnProperty(k)) continue;
+            if (s.partie.dinge[k].typ === 'gegenstand' && s.f['hat:' + k] && s.wer[k] === undefined) s.wer[k] = nr;
+        }
+    }
+    function zahl(v) { return typeof v === 'number' && isFinite(v) ? Math.round(v * 100) / 100 : null; }
+    function legeAb(s, id, raum, x, z) { s.wer[id] = { raum: raum, x: zahl(x), z: zahl(z) }; }
+
+    function itemsAus(s, ids, nr) {
         var l = [], i;
         for (i = 0; i < (ids || []).length; i++) {
             var d = s.partie.dinge[ids[i]];
-            if (d && d.e && s.f['hat:' + d.id]) l.push(d);
+            if (d && d.e && traegt(s, d.id, nr)) l.push(d);
         }
         return l;
     }
@@ -2023,8 +2041,9 @@ var Spiel = (function () {
 
     function neu(partie) {
         kat(partie);
-        var s = { partie: partie, f: {}, zeit: 0, raum: {}, gesehen: {}, status: 'laeuft', fristGemeldet: {}, log: [], vorfuehrungen: [] }, i;
+        var s = { partie: partie, f: {}, zeit: 0, raum: {}, gesehen: {}, status: 'laeuft', fristGemeldet: {}, log: [], vorfuehrungen: [], wer: {} }, i;
         for (i = 0; i < partie.start.length; i++) s.f[partie.start[i]] = true;
+        verteile(s, 1);
         var aus = [m(partie.story.intro.replace('{in}', raumIn(s, 'r1')), 'system')];
         aus = aus.concat(betrete(s, 1, 'r1'));
         for (i = 2; i <= partie.spieler; i++) s.raum[i] = 'r1';
@@ -2095,13 +2114,16 @@ var Spiel = (function () {
         if (s.status !== 'laeuft') return [m('Die Partie ist vorbei.', 'system')];
         if (s.raum[nr] === null) return [m('Du hast die Partie verlassen.', 'system')];
         if (b.art === 'verlassen') {
+            // was er traegt, bleibt im Raum liegen, sonst waere es fuer die anderen verloren
+            var kv;
+            for (kv in s.wer) if (s.wer.hasOwnProperty(kv) && s.wer[kv] === nr) legeAb(s, kv, s.raum[nr], b.x, b.z);
             s.raum[nr] = null;
             return [m('Du verl\u00e4sst die Partie. Die anderen spielen ohne dich weiter.', 'system')];
         }
         var aus = [], d = b.ding ? s.partie.dinge[b.ding] : null, i, a, sp;
         if (b.ding && !d) return [m('Das gibt es hier nicht.', 'system')];
         if (!ZEIT.hasOwnProperty(b.art)) return [m('Das geht nicht.', 'system')];
-        if ((b.art === 'ansehen' || b.art === 'anfassen' || b.art === 'nehmen' || b.art === 'benutzen' || b.art === 'eingeben') && !d) {
+        if ((b.art === 'ansehen' || b.art === 'anfassen' || b.art === 'nehmen' || b.art === 'benutzen' || b.art === 'eingeben' || b.art === 'geben' || b.art === 'ablegen') && !d) {
             return [m('W\u00e4hle zuerst etwas aus.', 'system')];
         }
         if (b.art === 'gehen') {
@@ -2109,7 +2131,14 @@ var Spiel = (function () {
             for (i = 0; i < s.partie.raeume.length; i++) if (s.partie.raeume[i].id === b.raum) gibtRaum = true;
             if (!gibtRaum) return [m('Diesen Raum gibt es nicht.', 'system')];
         }
-        if (d && d.raum !== s.raum[nr] && b.art !== 'gehen') return [m('Das ist nicht hier.', 'system')];
+        // Wo ein Ding ist: Gefundene Gegenstaende sind dort, wo sie liegen, oder in einer Tasche
+        var dort = d ? d.raum : null, mitIds = b.mit || [];
+        if (d && d.typ === 'gegenstand' && s.f['hat:' + d.id]) dort = liegt(s, d.id) ? liegt(s, d.id).raum : (traegt(s, d.id, nr) ? s.raum[nr] : null);
+        if ((b.art === 'geben' || b.art === 'ablegen') && !traegt(s, d.id, nr)) return [m('Das tr\u00e4gst du nicht bei dir.', 'system')];
+        if (d && dort !== s.raum[nr] && b.art !== 'gehen') return [m('Das ist nicht hier.', 'system')];
+        for (i = 0; i < mitIds.length; i++) {
+            if (s.partie.dinge[mitIds[i]] && s.f['hat:' + mitIds[i]] && !traegt(s, mitIds[i], nr)) return [m('Das tr\u00e4gst du nicht bei dir. Lass es dir geben.', 'system')];
+        }
         // Die Uhr ist gemeinsam: Mehrere arbeiten gleichzeitig, also kostet jede Handlung nur ihren Anteil
         s.zeit += (ZEIT[b.art] || 0) / aktive(s);
 
@@ -2159,6 +2188,7 @@ var Spiel = (function () {
                 break;
 
             case 'nehmen':
+                if (liegt(s, d.id)) { s.wer[d.id] = nr; aus.push(m('Du nimmst ' + akk(d) + '.')); break; }
                 l = aktionenAn(s, d.id, ['nehmen']);
                 if (!l.length || erledigt(s, l[0])) { aus.push(m('Das kannst du nicht mitnehmen.')); break; }
                 sp = sperre(s, l[0], nr, 1);
@@ -2168,7 +2198,7 @@ var Spiel = (function () {
                 break;
 
             case 'benutzen':
-                var items = itemsAus(s, b.mit), versucht = false, erfolg = false, grund = null;
+                var items = itemsAus(s, b.mit, nr), versucht = false, erfolg = false, grund = null;
                 l = aktionenAn(s, d.id, ['benutzen', 'schluessel']);
                 for (i = 0; i < l.length && !erfolg; i++) {
                     a = l[i];
@@ -2198,7 +2228,7 @@ var Spiel = (function () {
                 break;
 
             case 'krach':
-                items = itemsAus(s, b.mit);
+                items = itemsAus(s, b.mit, nr);
                 var laut = false;
                 for (i = 0; i < items.length; i++) if ((items[i].e.laut || 0) >= 1) laut = true;
                 if (!laut) { aus.push(m('Damit kannst du keinen L\u00e4rm machen.')); break; }
@@ -2219,6 +2249,19 @@ var Spiel = (function () {
                 else aus.push(m('Falscher Code. Das Schloss bleibt zu.'));
                 break;
 
+            case 'geben':
+                var an = b.an;
+                if (!(an >= 1 && an <= s.partie.spieler) || an === nr || s.raum[an] !== s.raum[nr]) { aus.push(m('Daf\u00fcr m\u00fcsst ihr im selben Raum sein.', 'system')); break; }
+                s.wer[d.id] = an;
+                aus.push(m('Du gibst ' + akk(d) + ' weiter.'));
+                aus.push(m('Du bekommst ' + akk(d) + '.', 'erzaehler', an));
+                break;
+
+            case 'ablegen':
+                legeAb(s, d.id, s.raum[nr], b.x, b.z);
+                aus.push(m('Du legst ' + akk(d) + ' ab.'));
+                break;
+
             case 'warten':
                 aus.push(m('Du wartest eine Weile.'));
                 for (i = 0; i < s.partie.aktionen.length; i++) {
@@ -2235,6 +2278,7 @@ var Spiel = (function () {
         }
 
         aus = aus.concat(ereignisse(s, nr, b));
+        verteile(s, nr);
         if (b.art !== 'gehen') aus = aus.concat(naechsteVorfuehrung(s, nr));
         if (s.f.ausgang) {
             s.status = 'gewonnen';
@@ -2277,13 +2321,20 @@ var Spiel = (function () {
 
     function sicht(s, nr) {
         kat(s.partie);
-        var raum = s.raum[nr], dinge = [], inventar = [], k, i, nehmbar = {};
+        var raum = s.raum[nr], dinge = [], inventar = [], tragen = {}, k, i, nehmbar = {};
         for (i = 0; i < s.partie.aktionen.length; i++) if (s.partie.aktionen[i].art === 'nehmen') nehmbar[s.partie.aktionen[i].ding] = true;
         var keys = Object.keys(s.partie.dinge).sort(function (a, b) { return parseInt(a.slice(1), 10) - parseInt(b.slice(1), 10); });
         for (i = 0; i < keys.length; i++) {
             var d = s.partie.dinge[keys[i]];
             // ohne Eigenschaften und Stufen: Spieler sollen ueberlegen, was ein Ding kann, nicht Zahlen vergleichen
-            if (d.typ === 'gegenstand' && s.f['hat:' + d.id]) { inventar.push({ id: d.id, name: d.name, b: beschreibung(d), code: !!(d.e && d.e.schluessel) }); continue; }
+            if (d.typ === 'gegenstand' && s.f['hat:' + d.id]) {
+                // gefunden: in der eigenen Tasche, bei einem anderen (dann nur der Name, zum Absprechen) oder am Boden
+                var w0 = s.wer[d.id];
+                if (w0 === nr) inventar.push({ id: d.id, name: d.name, b: beschreibung(d), code: !!(d.e && d.e.schluessel) });
+                else if (typeof w0 === 'number') { if (!tragen[w0]) tragen[w0] = []; tragen[w0].push(d.name); }
+                else if (w0 && w0.raum === raum) dinge.push({ id: d.id, name: d.name, typ: d.typ, offen: false, code: false, liegt: { x: w0.x, z: w0.z } });
+                continue;
+            }
             if (d.raum !== raum) continue;
             if (d.typ === 'gegenstand' && !nehmbar[d.id]) continue;
             if (d.typ === 'versteck' && d.verborgen && !s.f['versteck:' + d.id]) continue;
@@ -2301,7 +2352,7 @@ var Spiel = (function () {
         var raeume = [];
         for (i = 0; i < s.partie.raeume.length; i++) raeume.push({ id: s.partie.raeume[i].id, name: s.partie.raeume[i].name, hier: s.partie.raeume[i].id === raum });
         return { raum: raum, raeume: raeume, dinge: dinge, inventar: inventar, zeit: Math.ceil(s.zeit), licht: !s.f['licht_aus:' + raum],
-            wasser: !!s.f['wasser:' + raum], status: s.status };
+            wasser: !!s.f['wasser:' + raum], status: s.status, tragen: tragen };
     }
 
     // Was die Oberflaeche ueber die Dinge wissen muss: Name, Art, Rolle (fuer das Modell) und die Handlung unter dem
@@ -2327,7 +2378,7 @@ var Spiel = (function () {
         return { setting: partie.setting, stil: partie.stil, titel: partie.story.titel, hell: KAT.HELL, dunkel: KAT.DUNKEL };
     }
 
-    return { version: 3, neu: neu, befehl: befehl, sicht: sicht, namen: namen, rahmen: rahmen };
+    return { version: 4, neu: neu, befehl: befehl, sicht: sicht, namen: namen, rahmen: rahmen };
 })();
 
 if (typeof module !== 'undefined' && module.exports) { module.exports = Spiel; }
