@@ -463,10 +463,37 @@ var Setting = (function () {
                     wandhoehe: { schrank_oben: 2.25 },
                     grund: { becken: [0.62, 0.4] }
                 }
+            },
+            // Quaternius, neue detailreiche Reihe (Fantasy Props MegaKit + Medieval Village MegaKit): Fachwerkhaus statt
+            // Steingew\u00f6lbe, deshalb ohne die Stories Verlies und Gruft (siehe stories[].stile)
+            quaternius: {
+                name: 'Quaternius',
+                ohne: ['standuhr', 'spiegel', 'gemaelde', 'katze', 'bodenschacht', 'schrank_oben', 'druckplatte', 'hammer', 'schere', 'feuerzeug',
+                    'besen', 'angel', 'v_balken', 'v_bodenplatte', 'v_wappen'],
+                anders: {
+                    radio: { b: 'Ein aufgeschlagenes Buch auf einem Lesepult. Die Seiten rascheln, als atme es, und manchmal fl\u00fcstert es.' },
+                    messer: { name: 'Messer', nom: 'das Messer', akk: 'das Messer', b: 'Ein Messer mit frisch geschliffener Klinge.' },
+                    streichhoelzer: { name: 'Kerzenstummel', nom: 'der Kerzenstummel', akk: 'den Kerzenstummel', b: 'Ein Kerzenstummel. Er brennt noch.' },
+                    taschenlampe: { name: 'Handleuchter', nom: 'der Handleuchter', akk: 'den Handleuchter', b: 'Ein Handleuchter mit kr\u00e4ftiger Flamme.' },
+                    tuch: { name: 'Tuch', nom: 'das Tuch', akk: 'das Tuch', b: 'Ein gro\u00dfes Tuch. Es nimmt auch etwas Wasser auf.' },
+                    decke: { name: 'Wolldecke', nom: 'die Wolldecke', akk: 'die Wolldecke', b: 'Eine dicke, sehr gro\u00dfe Wolldecke.' },
+                    kleiderhaken: { name: 'Hakenleiste', nom: 'die Hakenleiste', akk: 'die Hakenleiste', b: 'Eine Holzleiste mit eisernen Haken.' },
+                    pfanne: { name: 'Eisentopf', nom: 'der Eisentopf', akk: 'den Eisentopf', b: 'Ein schwerer Topf aus Eisen.' },
+                    diele: { name: 'vernagelte Bodenluke', nom: 'die vernagelte Bodenluke', akk: 'die vernagelte Bodenluke',
+                        zweit: ['zweite vernagelte Bodenluke', 'die zweite vernagelte Bodenluke', 'die zweite vernagelte Bodenluke'],
+                        ersetze: [['Fugen auskratzen', 'N\u00e4gel herausschneiden']] }
+                },
+                raum: {
+                    geschoss: 2.5,
+                    stand: { radio: 'boden' },
+                    wandhoehe: { licht: 1.5 },
+                    grund: { radio: [0.22, 0.22], holzkiste: [0.49, 0.3], wasser: [0.55, 0.31], schaukelstuhl: [0.28, 0.27], v_fass: [0.36, 0.36],
+                        v_urne: [0.23, 0.23], v_schemel: [0.19, 0.19], fass: [0.36, 0.36], kisten: [0.38, 0.4], stuhl: [0.19, 0.19], tisch: [0.61, 0.25] }
+                }
             }
         },
         stories: [
-            { id: 'verlies', titel: 'Das Verlies',
+            { id: 'verlies', titel: 'Das Verlies', stile: ['kaykit'],          // Steingew\u00f6lbe: nicht im Fachwerkhaus
                 intro: 'Die Wache hat dich ins Verlies geworfen. Zur n\u00e4chsten Glocke holen sie dich. Du bist {in}, und die Kerkert\u00fcr ist verriegelt.',
                 ende: 'Du bist drau\u00dfen, bevor die Wache kommt.',
                 ausgang: { name: 'Kerkert\u00fcr', nom: 'die Kerkert\u00fcr', akk: 'die Kerkert\u00fcr', verb: 'T\u00fcr \u00f6ffnen', auf: 'Die Kerkert\u00fcr schwingt auf.' },
@@ -484,7 +511,7 @@ var Setting = (function () {
                 ausgang: { name: 'Labort\u00fcr', nom: 'die Labort\u00fcr', akk: 'die Labort\u00fcr', verb: 'T\u00fcr \u00f6ffnen', auf: 'Die Labort\u00fcr schwingt auf.' },
                 raeume: [{ name: 'Labor', in: 'im Labor', nach: 'ins Labor' }, { name: 'Kr\u00e4uterkammer', in: 'in der Kr\u00e4uterkammer', nach: 'in die Kr\u00e4uterkammer' },
                     { name: 'Studierstube', in: 'in der Studierstube', nach: 'in die Studierstube' }, { name: 'Destillierkeller', in: 'im Destillierkeller', nach: 'in den Destillierkeller' }] },
-            { id: 'gruft', titel: 'Die Gruft',
+            { id: 'gruft', titel: 'Die Gruft', stile: ['kaykit'],
                 intro: 'Du solltest nur eine Urkunde aus der Gruft unter der Kapelle holen. Dann fiel hinter dir die Gruftt\u00fcr zu. Du bist {in}.',
                 ende: 'Du bist drau\u00dfen, oben in der Kapelle, und atmest durch.',
                 ausgang: { name: 'Gruftt\u00fcr', nom: 'die Gruftt\u00fcr', akk: 'die Gruftt\u00fcr', verb: 'T\u00fcr \u00f6ffnen', auf: 'Die Gruftt\u00fcr schwingt auf.' },
@@ -770,6 +797,7 @@ var Katalog = (function () {
     var MINDEST = { elemente: 6, jeArt: { zahl: 2, richtung: 2, behaelter: 2, bedrohung: 2 }, hindernisse: 3, schloesser: 2, verstecke: 4 };
     function maengelVon(K, st) {
         var m = [], k, i, j, art, zahl, n;
+        if (st.entwurf) m.push('noch im Bau (entwurf)');
         var fest = ['licht', 'wasser', 'ausgang', 'schluessel', 'notiz'];
         for (i = 0; i < fest.length; i++) if ((st.ohne || []).indexOf(fest[i]) >= 0) m.push('feste Einrichtung fehlt: ' + fest[i]);
         n = 0; for (k in K.ELEMENTE) if (K.ELEMENTE.hasOwnProperty(k)) n++;
@@ -838,7 +866,8 @@ var Katalog = (function () {
             for (k in st.anders[r]) if (st.anders[r].hasOwnProperty(k) && k !== 'ersetze') ziel[k] = st.anders[r][k];
         }
         K.STIL = id; K.STILNAME = st.name || id;
-        K.RAUM = { stand: (st.raum && st.raum.stand) || {}, wandhoehe: (st.raum && st.raum.wandhoehe) || {}, grund: (st.raum && st.raum.grund) || {} };
+        K.RAUM = { stand: (st.raum && st.raum.stand) || {}, wandhoehe: (st.raum && st.raum.wandhoehe) || {}, grund: (st.raum && st.raum.grund) || {},
+            geschoss: (st.raum && st.raum.geschoss) || 0 };
         K.maengel = maengelVon(K, st);
         STILCACHE[id] = K;
         return K;
