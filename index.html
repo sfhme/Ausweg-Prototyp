@@ -409,6 +409,7 @@ var Setting = (function () {
             ['Nische hinter der Wandlaterne', 'die Nische hinter der Wandlaterne', 'die Nische hinter der Wandlaterne', 'laterne'],
             ['Urne mit doppeltem Boden', 'die Urne mit doppeltem Boden', 'die Urne mit doppeltem Boden', 'urne'],
             ['lose Bodenplatte', 'die lose Bodenplatte', 'die lose Bodenplatte', 'bodenplatte'],
+            ['Nische hinter dem Wappenschild', 'die Nische hinter dem Wappenschild', 'die Nische hinter dem Wappenschild', 'wappen'],
             ['hohles Bein des Schemels', 'das hohle Bein des Schemels', 'das hohle Bein des Schemels', 'schemel']
         ],
         schloesser: {
@@ -435,6 +436,35 @@ var Setting = (function () {
         wasser: { name: 'Wasserfass', nom: 'das Wasserfass', akk: 'das Wasserfass', verb: 'Zapfhahn aufdrehen', tun: 'Zapfhahn aufdrehen',
             rost: { name: 'Wasserfass mit festgerostetem Zapfhahn', nom: 'das Wasserfass mit festgerostetem Zapfhahn', akk: 'das Wasserfass mit festgerostetem Zapfhahn',
                 alt: ['mit Gewalt aufdrehen', 'Rost weg\u00e4tzen'] } },
+        // STILE: Dasselbe Setting in den Modellen verschiedener Hersteller. Ein Stil ist immer EIN Hersteller, nie gemischt.
+        //   ohne    Rollen, fuer die der Stil kein passendes Modell hat. Sie kommen in Partien dieses Stils nicht vor;
+        //           der Generator baut dann andere Raetsel.
+        //   anders  Rollen, deren Modell etwas anderes zeigt als im Setting beschrieben: neue Namen und Texte, damit das
+        //           Wort zum Bild passt. ersetze = Wortpaare, die in allen Texten der Rolle getauscht werden.
+        //   raum    wo eine Rolle in diesem Stil steht (stand), wie hoch an der Wand (wandhoehe), ihre Grundflaeche (grund)
+        // Ob ein Stil fuer das Setting genug hergibt, prueft kern/katalog.js (Katalog.fuer(stil).maengel). Ein Stil mit
+        // Maengeln ist nicht zulaessig und wird nie gewuerfelt.
+        stile: {
+            kaykit: {
+                name: 'KayKit',
+                ohne: ['puppe', 'ventilator', 'katze', 'vitrine', 'doppelhebel', 'wecker', 'v_laterne', 'v_urne'],
+                anders: {
+                    becken: { ersetze: [['Kessel', 'Zuber']],
+                        b: 'Ein gro\u00dfer Zuber voll tr\u00fcbem Wasser, daneben ein enger Schacht im Boden.' },
+                    kerze: { name: 'Kerzenb\u00fcndel', nom: 'das Kerzenb\u00fcndel', akk: 'das Kerzenb\u00fcndel',
+                        b: 'Drei dicke Kerzen, zu einem B\u00fcndel zusammengeschmolzen, nicht angez\u00fcndet.' },
+                    paket: { name: 'mit Draht verschn\u00fcrte Kiste', nom: 'die mit Draht verschn\u00fcrte Kiste', akk: 'die mit Draht verschn\u00fcrte Kiste',
+                        zweit: ['zweite mit Draht verschn\u00fcrte Kiste', 'die zweite mit Draht verschn\u00fcrte Kiste', 'die zweite mit Draht verschn\u00fcrte Kiste'] },
+                    schrank_oben: { name: 'hohes Wandbord', nom: 'das hohe Wandbord', akk: 'das hohe Wandbord',
+                        zweit: ['zweites hohes Wandbord', 'das zweite hohe Wandbord', 'das zweite hohe Wandbord'] }
+                },
+                raum: {
+                    stand: { schrank_oben: 'wand', paket: 'tisch' },
+                    wandhoehe: { schrank_oben: 2.25 },
+                    grund: { becken: [0.62, 0.4] }
+                }
+            }
+        },
         stories: [
             { id: 'verlies', titel: 'Das Verlies',
                 intro: 'Die Wache hat dich ins Verlies geworfen. Zur n\u00e4chsten Glocke holen sie dich. Du bist {in}, und die Kerkert\u00fcr ist verriegelt.',
@@ -493,6 +523,7 @@ if (typeof module !== 'undefined' && module.exports) { module.exports = Setting;
 //   SCHLOESSER   was die Tuer verlangt
 //   GEGENMITTEL  wie eine Bedrohung gebannt wird, je Ausloeser
 //   VERSTECKE, LICHT, WASSER, SCHLUESSEL, NOTIZ, STORIES   aus dem Setting
+//   fuer(stil)   der Katalog in einem Stil (Modellsatz eines Herstellers); STILE = die zulaessigen Stile
 if (typeof module !== 'undefined' && module.exports) {
     var Setting = require('./setting.js');
 }
@@ -714,12 +745,113 @@ var Katalog = (function () {
     if (!S.stories || !S.stories.length) fehlt('stories');
     for (i = 0; i < S.stories.length; i++) if (!S.stories[i].raeume || S.stories[i].raeume.length < 2) fehlt('stories[' + i + '].raeume (mindestens zwei)');
 
-    return {
-        version: 2, SETTING: S.id, ARTEN: ARTEN, AUSLOESER: AUSLOESER, ELEMENTE: ELEMENTE, GEGENSTAENDE: GEGENSTAENDE,
+    var BASIS = {
+        version: 3, SETTING: S.id, ARTEN: ARTEN, AUSLOESER: AUSLOESER, ELEMENTE: ELEMENTE, GEGENSTAENDE: GEGENSTAENDE,
         EIGENSCHAFT_TEXT: EIGENSCHAFT_TEXT, ZU_WENIG: S.zuWenig, HINDERNISSE: HINDERNISSE, SCHLOESSER: SCHLOESSER, GEGENMITTEL: GEGENMITTEL,
         VERSTECKE: S.verstecke, LICHT: S.licht, WASSER: WASSER, SCHLUESSEL: S.schluessel, NOTIZ: S.notiz, STORIES: S.stories,
         HELL: S.hell, DUNKEL: S.dunkel
     };
+
+    // ------------------------------------------------------------ Stile
+    // Katalog.fuer(stil): der Katalog, wie er in einem Stil gilt. Rollen ohne Modell fehlen, umbenannte Rollen tragen
+    // ihre neuen Texte. Die Mechanik (Arten, Ausloeser, Eigenschaften, Wege) ist in jedem Stil dieselbe.
+    var STILCACHE = {};
+    function tief(o) { return JSON.parse(JSON.stringify(o)); }
+    function tausche(o, paare) {
+        var k, i;
+        for (k in o) {
+            if (!o.hasOwnProperty(k)) continue;
+            if (typeof o[k] === 'string') { for (i = 0; i < paare.length; i++) o[k] = o[k].split(paare[i][0]).join(paare[i][1]); }
+            else if (o[k] && typeof o[k] === 'object') tausche(o[k], paare);
+        }
+    }
+    // Was ein Stil mindestens hergeben muss, damit das Setting in ihm spielbar ist und genug Abwechslung bleibt.
+    // Liefert die Maengel als Liste; leer heisst zulaessig.
+    var MINDEST = { elemente: 6, jeArt: { zahl: 2, richtung: 2, behaelter: 2, bedrohung: 2 }, hindernisse: 3, schloesser: 2, verstecke: 4 };
+    function maengelVon(K, st) {
+        var m = [], k, i, j, art, zahl, n;
+        var fest = ['licht', 'wasser', 'ausgang', 'schluessel', 'notiz'];
+        for (i = 0; i < fest.length; i++) if ((st.ohne || []).indexOf(fest[i]) >= 0) m.push('feste Einrichtung fehlt: ' + fest[i]);
+        n = 0; for (k in K.ELEMENTE) if (K.ELEMENTE.hasOwnProperty(k)) n++;
+        if (n < MINDEST.elemente) m.push('nur ' + n + ' Elemente (mindestens ' + MINDEST.elemente + ')');
+        for (art in MINDEST.jeArt) {
+            if (!MINDEST.jeArt.hasOwnProperty(art)) continue;
+            zahl = 0;
+            for (k in K.ELEMENTE) if (K.ELEMENTE.hasOwnProperty(k)) { for (j = 0; j < K.ELEMENTE[k].f.length; j++) if (K.ELEMENTE[k].f[j].art === art) { zahl++; break; } }
+            if (zahl < MINDEST.jeArt[art]) m.push('Art ' + art + ' nur bei ' + zahl + ' Elementen (mindestens ' + MINDEST.jeArt[art] + ')');
+        }
+        n = 0; for (k in K.HINDERNISSE) if (K.HINDERNISSE.hasOwnProperty(k)) n++;
+        if (n < MINDEST.hindernisse) m.push('nur ' + n + ' Hindernisse (mindestens ' + MINDEST.hindernisse + ')');
+        n = 0; for (k in K.SCHLOESSER) if (K.SCHLOESSER.hasOwnProperty(k)) n++;
+        if (n < MINDEST.schloesser || !K.SCHLOESSER.zahlenschloss || !K.SCHLOESSER.schluesselloch) m.push('Schloesser: Ziffernschloss und Tuerschloss muessen dabei sein');
+        if (K.VERSTECKE.length < MINDEST.verstecke) m.push('nur ' + K.VERSTECKE.length + ' freie Verstecke (mindestens ' + MINDEST.verstecke + ')');
+        // Jeder Weg braucht Gegenstaende: Jede Anforderung muss mindestens einen Weg haben, den die Gegenstaende des Stils
+        // hergeben (jede verlangte Eigenschaft in der noetigen Staerke bei irgendeinem Gegenstand)
+        function gangbar(alt) {
+            var e, g, da;
+            if (alt.h) return true;
+            for (e in alt.b) {
+                if (!alt.b.hasOwnProperty(e)) continue;
+                da = false;
+                for (g in K.GEGENSTAENDE) if (K.GEGENSTAENDE.hasOwnProperty(g) && (K.GEGENSTAENDE[g].e[e] || 0) >= alt.b[e]) da = true;
+                if (!da) return false;
+            }
+            return true;
+        }
+        function pruefeWege(was, alts) {
+            var x, ok = false;
+            for (x = 0; x < alts.length; x++) if (gangbar(alts[x]) && !alts[x].h) ok = true;
+            if (!ok) m.push(was + ': kein Weg mit den Gegenst\u00e4nden dieses Stils');
+        }
+        for (k in K.HINDERNISSE) if (K.HINDERNISSE.hasOwnProperty(k)) pruefeWege('Hindernis ' + k, K.HINDERNISSE[k].alt);
+        for (k in K.SCHLOESSER) if (K.SCHLOESSER.hasOwnProperty(k) && K.SCHLOESSER[k].alt) pruefeWege('Schloss ' + k, K.SCHLOESSER[k].alt);
+        for (k in K.GEGENMITTEL) if (K.GEGENMITTEL.hasOwnProperty(k) && K.GEGENMITTEL[k]) pruefeWege('Gegenmittel ' + k, K.GEGENMITTEL[k].alt);
+        pruefeWege('festgerosteter Wasserspender', K.WASSER.rost.alt);
+        var noetig = { entzuendend: 1, laut: 1 };       // Waerme und Laerm als Ausloeser
+        for (k in noetig) {
+            if (!noetig.hasOwnProperty(k)) continue;
+            zahl = 0;
+            for (j in K.GEGENSTAENDE) if (K.GEGENSTAENDE.hasOwnProperty(j) && (K.GEGENSTAENDE[j].e[k] || 0) >= noetig[k]) zahl++;
+            if (!zahl) m.push('kein Gegenstand mit ' + k);
+        }
+        return m;
+    }
+    function fuer(id) {
+        if (STILCACHE[id]) return STILCACHE[id];
+        var st = S.stile && S.stile[id], K, i, k, r, ziel, tabellen;
+        if (!st) throw new Error('Setting ' + S.id + ': Stil ' + id + ' gibt es nicht');
+        K = tief(BASIS);
+        tabellen = [K.ELEMENTE, K.GEGENSTAENDE, K.HINDERNISSE, K.SCHLOESSER];
+        for (i = 0; i < (st.ohne || []).length; i++) {
+            r = st.ohne[i];
+            for (k = 0; k < tabellen.length; k++) delete tabellen[k][r];
+        }
+        var bleiben = [];
+        for (i = 0; i < K.VERSTECKE.length; i++) if ((st.ohne || []).indexOf('v_' + K.VERSTECKE[i][3]) < 0) bleiben.push(K.VERSTECKE[i]);
+        K.VERSTECKE = bleiben;
+        for (r in (st.anders || {})) {
+            if (!st.anders.hasOwnProperty(r)) continue;
+            ziel = null;
+            for (k = 0; k < tabellen.length; k++) if (tabellen[k][r]) ziel = tabellen[k][r];
+            if (!ziel) throw new Error('Setting ' + S.id + ', Stil ' + id + ': anders.' + r + ' meint eine Rolle, die es nicht gibt oder die in ohne steht');
+            if (st.anders[r].ersetze) tausche(ziel, st.anders[r].ersetze);
+            for (k in st.anders[r]) if (st.anders[r].hasOwnProperty(k) && k !== 'ersetze') ziel[k] = st.anders[r][k];
+        }
+        K.STIL = id; K.STILNAME = st.name || id;
+        K.RAUM = { stand: (st.raum && st.raum.stand) || {}, wandhoehe: (st.raum && st.raum.wandhoehe) || {}, grund: (st.raum && st.raum.grund) || {} };
+        K.maengel = maengelVon(K, st);
+        STILCACHE[id] = K;
+        return K;
+    }
+    // alle Stile des Settings, sortiert; zulaessig sind die ohne Maengel
+    var ALLE_STILE = [], ZULAESSIG = [];
+    for (k in (S.stile || {})) if (S.stile.hasOwnProperty(k)) ALLE_STILE.push(k);
+    ALLE_STILE.sort();
+    for (i = 0; i < ALLE_STILE.length; i++) if (!fuer(ALLE_STILE[i]).maengel.length) ZULAESSIG.push(ALLE_STILE[i]);
+    if (!ZULAESSIG.length) fehlt('ein zulaessiger Stil');
+
+    BASIS.fuer = fuer; BASIS.ALLE_STILE = ALLE_STILE; BASIS.STILE = ZULAESSIG; BASIS.MINDEST = MINDEST;
+    return BASIS;
 })();
 
 if (typeof module !== 'undefined' && module.exports) { module.exports = Katalog; }
@@ -977,7 +1109,6 @@ var Generator = (function () {
     var MAX_VERSUCHE = 60;
     var MAX_AKTIONEN = 70;
     // name, Nominativ und Akkusativ mit Artikel (die Engine beugt keine Namen)
-    var VERSTECKNAMEN = Katalog.VERSTECKE;
 
     function Fehlschlag(grund) { this.fehlschlag = true; this.grund = grund; }
     function sortiert(o) { return Object.keys(o).sort(); }
@@ -992,17 +1123,19 @@ var Generator = (function () {
     }
     function kopiere(o) { return JSON.parse(JSON.stringify(o)); }
 
-    function Bau(seed, spieler, stufe, versuch) {
+    function Bau(seed, spieler, stufe, versuch, stil) {
         this.r = Zufall.strom(String(seed), 'partie:' + spieler + ':' + stufe + ':' + versuch);
+        this.K = Katalog.fuer(stil);            // der Katalog in diesem Stil: nur Rollen, fuer die es ein Modell gibt
         this.cfg = STUFE[stufe];
         this.spieler = spieler;
         this.n = 0;
         this.p = {
             version: 1, seed: seed, spieler: spieler, stufe: stufe, versuch: versuch,
-            raeume: [], dinge: {}, regeln: [], bedrohungen: [], anforderungen: {}, aktionen: [], tuer: null, start: []
+            raeume: [], dinge: {}, regeln: [], bedrohungen: [], anforderungen: {}, aktionen: [], tuer: null, start: [],
+            stil: stil, platz: this.K.RAUM
         };
-        this.elementeFrei = this.r.mischen(sortiert(Katalog.ELEMENTE));
-        this.gegenstaendeFrei = this.r.mischen(sortiert(Katalog.GEGENSTAENDE));
+        this.elementeFrei = this.r.mischen(sortiert(this.K.ELEMENTE));
+        this.gegenstaendeFrei = this.r.mischen(sortiert(this.K.GEGENSTAENDE));
         this.fixtur = {};
     }
 
@@ -1050,7 +1183,7 @@ var Generator = (function () {
     Bau.prototype.nimmElement = function (art) {
         var i, j, f, passend;
         for (i = 0; i < this.elementeFrei.length; i++) {
-            f = Katalog.ELEMENTE[this.elementeFrei[i]].f;
+            f = this.K.ELEMENTE[this.elementeFrei[i]].f;
             passend = [];
             for (j = 0; j < f.length; j++) if (f[j].art === art) passend.push(f[j]);
             if (passend.length) {
@@ -1063,7 +1196,7 @@ var Generator = (function () {
     };
 
     Bau.prototype.elementDing = function (key, raum, opt) {
-        var d = this.ding('element', Katalog.ELEMENTE[key].name, raum, { vorlage: key, nom: Katalog.ELEMENTE[key].nom, akk: Katalog.ELEMENTE[key].akk });
+        var d = this.ding('element', this.K.ELEMENTE[key].name, raum, { vorlage: key, nom: this.K.ELEMENTE[key].nom, akk: this.K.ELEMENTE[key].akk });
         d.zone = this.zoneFuer(raum, opt);
         return d;
     };
@@ -1083,7 +1216,7 @@ var Generator = (function () {
     Bau.prototype.enthuelle = function (rg, tiefe, opt) {
         var x = this.r.zahl(), el = this.p.dinge[rg.element];
         if (tiefe > 0 && x < 0.22) {
-            var N = Katalog.NOTIZ, notiz = this.ding('gegenstand', N.name + el.akk, el.raum, { e: {}, vorlage: 'notiz', nom: N.nom + el.akk, akk: N.akk + el.akk });
+            var N = this.K.NOTIZ, notiz = this.ding('gegenstand', N.name + el.akk, el.raum, { e: {}, vorlage: 'notiz', nom: N.nom + el.akk, akk: N.akk + el.akk });
             this.platziere(notiz, tiefe - 1, opt);
             this.aktion({ text: N.name + el.akk + ' lesen', art: 'lesen', raum: notiz.raum, braucht: ['hat:' + notiz.id],
                 gibt: ['kennt:' + rg.id], sicher: true });
@@ -1099,7 +1232,7 @@ var Generator = (function () {
 
     Bau.prototype.licht = function (raum) {
         if (this.fixtur['licht:' + raum]) return;
-        var L = Katalog.LICHT, s = this.ding('fixtur', L.name, raum, { vorlage: 'licht', nom: L.nom, akk: L.akk });
+        var L = this.K.LICHT, s = this.ding('fixtur', L.name, raum, { vorlage: 'licht', nom: L.nom, akk: L.akk });
         this.aktion({ text: L.schliessen, art: 'schalter', raum: raum, ding: s.id, gibt: ['licht_aus:' + raum], schalter: true, sicher: true });
         this.aktion({ text: L.oeffnen, art: 'schalter', raum: raum, ding: s.id, nimmt: ['licht_aus:' + raum], schalter: true, sicher: true });
         this.fixtur['licht:' + raum] = s.id;
@@ -1115,7 +1248,7 @@ var Generator = (function () {
 
     Bau.prototype.hahn = function (raum, tiefe, opt) {
         if (this.fixtur['hahn:' + raum]) return;
-        var Wa = Katalog.WASSER, h = this.ding('fixtur', Wa.name, raum, { vorlage: 'wasser', nom: Wa.nom, akk: Wa.akk }), m = null;
+        var Wa = this.K.WASSER, h = this.ding('fixtur', Wa.name, raum, { vorlage: 'wasser', nom: Wa.nom, akk: Wa.akk }), m = null;
         h.zone = this.zoneFuer(raum, opt);
         if (tiefe > 0 && this.r.chance(0.35)) {
             h.name = Wa.rost.name; h.nom = Wa.rost.nom; h.akk = Wa.rost.akk;
@@ -1129,7 +1262,7 @@ var Generator = (function () {
 
     // Was die Spieler tun muessen, damit der Ausloeser eintritt; liefert die noetigen Fakten.
     Bau.prototype.ausloeserBedarf = function (aus, el, tiefe, opt) {
-        switch (Katalog.AUSLOESER[aus].bedarf) {
+        switch (this.K.AUSLOESER[aus].bedarf) {
             case 'licht': this.licht(el.raum); return ['licht_aus:' + el.raum];
             case 'laerm': this.laerm(el.raum, tiefe, opt); return ['laerm:' + el.raum];
             case 'wasser': this.hahn(el.raum, tiefe, opt); return ['wasser:' + el.raum];
@@ -1154,7 +1287,7 @@ var Generator = (function () {
         if (vorhanden.length && this.r.chance(0.3)) return true;
         var schluesselB = sortiert(b), einzeln = [];
         for (i = 0; i < this.gegenstaendeFrei.length; i++) {
-            if (Pruefer.deckt(Katalog.GEGENSTAENDE[this.gegenstaendeFrei[i]].e, b)) einzeln.push(this.gegenstaendeFrei[i]);
+            if (Pruefer.deckt(this.K.GEGENSTAENDE[this.gegenstaendeFrei[i]].e, b)) einzeln.push(this.gegenstaendeFrei[i]);
         }
         var zweiteilig = schluesselB.length >= 2 && this.r.chance(0.3);
         if (einzeln.length && !zweiteilig) { this.neuerGegenstand(this.r.waehle(einzeln), tiefe, opt); return true; }
@@ -1170,7 +1303,7 @@ var Generator = (function () {
         for (i = 0; i < frei.length; i++) {
             for (j = 0; j < frei.length; j++) {
                 if (i === j) continue;
-                ea = Katalog.GEGENSTAENDE[frei[i]].e; eb = Katalog.GEGENSTAENDE[frei[j]].e;
+                ea = this.K.GEGENSTAENDE[frei[i]].e; eb = this.K.GEGENSTAENDE[frei[j]].e;
                 if (Pruefer.deckt(ea, b) || Pruefer.deckt(eb, b)) continue;
                 u = {};
                 for (k in ea) if (ea.hasOwnProperty(k)) u[k] = ea[k];
@@ -1184,7 +1317,7 @@ var Generator = (function () {
         var g0 = this.reserviere(paar[0]), g1 = this.reserviere(paar[1]);
         this.platziere(g0, tiefe, opt);
         this.platziere(g1, tiefe, opt);
-        if (!((Katalog.GEGENSTAENDE[paar[0]].e.reissfest || 0) >= 1 || (Katalog.GEGENSTAENDE[paar[1]].e.reissfest || 0) >= 1)) {
+        if (!((this.K.GEGENSTAENDE[paar[0]].e.reissfest || 0) >= 1 || (this.K.GEGENSTAENDE[paar[1]].e.reissfest || 0) >= 1)) {
             this.liefere({ reissfest: 1 }, tiefe, opt);
         }
         return true;
@@ -1194,8 +1327,8 @@ var Generator = (function () {
         var i = this.gegenstaendeFrei.indexOf(key);
         if (i < 0) throw new Fehlschlag('Gegenstand schon vergeben: ' + key);
         this.gegenstaendeFrei.splice(i, 1);
-        return this.ding('gegenstand', Katalog.GEGENSTAENDE[key].name, null, { vorlage: key, e: kopiere(Katalog.GEGENSTAENDE[key].e),
-            nom: Katalog.GEGENSTAENDE[key].nom, akk: Katalog.GEGENSTAENDE[key].akk });
+        return this.ding('gegenstand', this.K.GEGENSTAENDE[key].name, null, { vorlage: key, e: kopiere(this.K.GEGENSTAENDE[key].e),
+            nom: this.K.GEGENSTAENDE[key].nom, akk: this.K.GEGENSTAENDE[key].akk });
     };
 
     Bau.prototype.neuerGegenstand = function (key, tiefe, opt) {
@@ -1226,9 +1359,9 @@ var Generator = (function () {
     };
 
     Bau.prototype.lege_hindernis = function (g, tiefe, opt) {
-        var keys = sortiert(Katalog.HINDERNISSE), unbenutzt = [], k2;
+        var keys = sortiert(this.K.HINDERNISSE), unbenutzt = [], k2;
         for (k2 = 0; k2 < keys.length; k2++) if (!this.fixtur['versteck:' + keys[k2]]) unbenutzt.push(keys[k2]);
-        var hk = this.r.waehle(unbenutzt.length ? unbenutzt : keys), h = Katalog.HINDERNISSE[hk];
+        var hk = this.r.waehle(unbenutzt.length ? unbenutzt : keys), h = this.K.HINDERNISSE[hk];
         this.fixtur['versteck:' + hk] = (this.fixtur['versteck:' + hk] || 0) + 1;
         if (this.fixtur['versteck:' + hk] > 2) throw new Fehlschlag('drittes Versteck derselben Art: ' + hk);
         var zweit = this.fixtur['versteck:' + hk] > 1;
@@ -1268,6 +1401,7 @@ var Generator = (function () {
         if (!el) return false;
         var d = this.elementDing(el.key, g.raum, opt), aus = this.r.waehle(el.f.aus);
         var namen = [], i;
+        var VERSTECKNAMEN = this.K.VERSTECKE;
         for (i = 0; i < VERSTECKNAMEN.length; i++) if (!this.fixtur['name:' + VERSTECKNAMEN[i][0]]) namen.push(VERSTECKNAMEN[i]);
         if (!namen.length) return false;
         var vname = this.r.waehle(namen);
@@ -1281,7 +1415,7 @@ var Generator = (function () {
             gibt: ['versteck:' + v.id], sicher: !nah });
         var m = null;
         if (tiefe > 1 && this.r.chance(0.4)) {
-            m = this.anforderung(v.name, Katalog.HINDERNISSE.diele.alt);
+            m = this.anforderung(v.name, Katalog.HINDERNISSE.diele.alt);   // Mechanik, gilt in jedem Stil
             var alt = this.p.anforderungen[m].alt;
             this.liefere(alt[this.r.bis(alt.length)].b, tiefe - 2, opt);
         }
@@ -1310,7 +1444,7 @@ var Generator = (function () {
         var el = this.nimmElement('bedrohung');
         if (!el) return;
         var raum = this.raum(), d = this.elementDing(el.key, raum, { zoneFrei: true }), aus = this.r.waehle(el.f.aus);
-        var rg = this.regel(d, el.f, aus, null), gm = Katalog.GEGENMITTEL[aus];
+        var rg = this.regel(d, el.f, aus, null), gm = this.K.GEGENMITTEL[aus];
         var b = { id: this.id('b'), regel: rg.id, element: d.id, raum: raum, ausloeser: aus, beobachter: !!(gm && gm.beobachter),
             gegenmittel: null, frist: null };
         this.p.bedrohungen.push(b);
@@ -1327,7 +1461,7 @@ var Generator = (function () {
     };
 
     Bau.prototype.schloss = function (art, tuerRaum, tiefe) {
-        var s = Katalog.SCHLOESSER[art];
+        var s = this.K.SCHLOESSER[art];
         var sd = this.ding('schloss', s.name, tuerRaum, { vorlage: art, nom: s.nom, akk: s.akk });
         sd.zone = this.zoneFuer(tuerRaum, {});
         var schlossInfo = { id: sd.id, vorlage: art, name: s.name };
@@ -1336,7 +1470,7 @@ var Generator = (function () {
             this.aktion({ text: 'Code ' + schlossInfo.code + ' an ' + s.akk + ' eingeben', art: 'eingeben', raum: tuerRaum, ding: sd.id,
                 braucht: ['code:' + sd.id], gibt: ['schloss:' + sd.id] });
         } else if (s.art === 'schluessel') {
-            var key = this.ding('gegenstand', Katalog.SCHLUESSEL.name, null, { vorlage: 'schluessel', e: { schluessel: 1 }, nom: Katalog.SCHLUESSEL.nom, akk: Katalog.SCHLUESSEL.akk });
+            var key = this.ding('gegenstand', this.K.SCHLUESSEL.name, null, { vorlage: 'schluessel', e: { schluessel: 1 }, nom: this.K.SCHLUESSEL.nom, akk: this.K.SCHLUESSEL.akk });
             this.platziere(key, tiefe, {});
             this.aktion({ text: s.name + ' aufschlie' + '\u00df' + 'en', art: 'schluessel', raum: tuerRaum, ding: sd.id, braucht: ['hat:' + key.id],
                 gibt: ['schloss:' + sd.id] });
@@ -1353,8 +1487,11 @@ var Generator = (function () {
     Bau.prototype.baue = function () {
         var p = this.p, cfg = this.cfg, i;
         // Die Story ist der Anlass, eingeschlossen zu sein: Einstieg, Ausgang, Raumnamen, Ende (kern/setting.js)
-        var story = this.r.waehle(Katalog.STORIES), namen = this.r.mischen(story.raeume.slice());
-        p.setting = Katalog.SETTING;
+        // nur Stories, die in diesem Stil spielen duerfen (ein Verlies braucht Steinwaende, eine Wirtsstube Fachwerk)
+        var stil = this.p.stil, stories = this.K.STORIES.filter(function (x) { return !x.stile || x.stile.indexOf(stil) >= 0; });
+        if (!stories.length) throw new Error('Generator: keine Story fuer den Stil ' + stil);
+        var story = this.r.waehle(stories), namen = this.r.mischen(story.raeume.slice());
+        p.setting = this.K.SETTING;
         p.story = { id: story.id, titel: story.titel, intro: story.intro, ende: story.ende, auf: story.ausgang.auf, verb: story.ausgang.verb };
         var zwei = this.spieler > 1 ? this.r.chance(0.45) : this.r.chance(0.12);
         p.raeume.push({ id: 'r1', name: namen[0].name, in: namen[0].in, nach: namen[0].nach });
@@ -1367,7 +1504,7 @@ var Generator = (function () {
         var tuerRaum = 'r1';
         var tuer = this.ding('fixtur', story.ausgang.name, tuerRaum, { vorlage: 'ausgang', nom: story.ausgang.nom, akk: story.ausgang.akk });
         var anzahl = Math.min(3, cfg.schloesser + (this.spieler >= 3 && cfg.schloesser < 3 ? 1 : 0));
-        var arten = this.r.mischen(['zahlenschloss', 'schluesselloch', 'doppelhebel', 'druckplatte']);
+        var K = this.K, arten = this.r.mischen(['zahlenschloss', 'schluesselloch', 'doppelhebel', 'druckplatte'].filter(function (x) { return !!K.SCHLOESSER[x]; }));
         // Codes und Schluessel tragen die Raetselketten; Hebel und Platte sind Beigaben
         // stabil sortiert (Rhino sortiert nicht stabil): Gleichstand entscheidet die gewuerfelte Reihenfolge
         var rang = function (x) { return (x === 'zahlenschloss' || x === 'schluesselloch' ? 0 : 1) * 10 + arten.indexOf(x); };
@@ -1397,9 +1534,9 @@ var Generator = (function () {
             rg.enthuellung = { art: 'vorfuehrung' };
         }
         if (this.gegenstaendeFrei.length && this.r.chance(0.6)) {
-            var g = this.ding('gegenstand', Katalog.GEGENSTAENDE[this.gegenstaendeFrei[0]].name, null,
-                { vorlage: this.gegenstaendeFrei[0], e: kopiere(Katalog.GEGENSTAENDE[this.gegenstaendeFrei[0]].e), ablenkung: true,
-                  nom: Katalog.GEGENSTAENDE[this.gegenstaendeFrei[0]].nom, akk: Katalog.GEGENSTAENDE[this.gegenstaendeFrei[0]].akk });
+            var g = this.ding('gegenstand', this.K.GEGENSTAENDE[this.gegenstaendeFrei[0]].name, null,
+                { vorlage: this.gegenstaendeFrei[0], e: kopiere(this.K.GEGENSTAENDE[this.gegenstaendeFrei[0]].e), ablenkung: true,
+                  nom: this.K.GEGENSTAENDE[this.gegenstaendeFrei[0]].nom, akk: this.K.GEGENSTAENDE[this.gegenstaendeFrei[0]].akk });
             this.gegenstaendeFrei.shift();
             this.platziere(g, 0, {});
         }
@@ -1416,9 +1553,12 @@ var Generator = (function () {
     function erzeuge(seed, opt) {
         var spieler = opt.spieler, stufe = opt.stufe, v, gruende = [];
         if (!(spieler >= 1 && spieler <= 4) || !STUFE[stufe]) throw new Error('Generator.erzeuge: spieler 1..4, stufe 1..3');
+        // Der Stil (Modellsatz) wird je Partie gewuerfelt, aus den zulaessigen. opt.stil legt ihn fest (Pruefwerkzeuge).
+        var stil = opt.stil || Zufall.strom(String(seed), 'stil').waehle(Katalog.STILE);
+        if (Katalog.ALLE_STILE.indexOf(stil) < 0) throw new Error('Generator.erzeuge: Stil ' + stil + ' gibt es nicht');
         for (v = 0; v < MAX_VERSUCHE; v++) {
             var p;
-            try { p = new Bau(seed, spieler, stufe, v).baue(); }
+            try { p = new Bau(seed, spieler, stufe, v, stil).baue(); }
             catch (e) { if (e && e.fehlschlag) { gruende.push(e.grund); continue; } throw e; }
             var a = Pruefer.pruefe(p, spieler), b = spieler > 1 ? Pruefer.pruefe(p, spieler - 1) : null;
             if (!a.loesbar || (b && !b.loesbar)) { gruende.push(!a.loesbar ? 'unloesbar' : 'unloesbar mit einem weniger'); continue; }
@@ -1611,6 +1751,9 @@ var Spiel = (function () {
 
     var ZEIT = { ansehen: 0, anfassen: 1, nehmen: 1, benutzen: 1, krach: 1, eingeben: 1, warten: 3, gehen: 1, verlassen: 0 };
     var LAERM_STRAFE = 5;
+    // Der Katalog im Stil der Partie (Namen und Texte koennen je Stil anders sein). Jeder Einstieg setzt ihn zuerst.
+    var KAT = Katalog;
+    function kat(partie) { KAT = partie && partie.stil ? Katalog.fuer(partie.stil) : Katalog; }
 
     function gross(t) { return t.charAt(0).toUpperCase() + t.slice(1); }
     function nom(d) { return d.nom || d.name; }
@@ -1700,7 +1843,7 @@ var Spiel = (function () {
 
     // Was man einem Gegenstand ansieht: Worte statt Eigenschaften und Stufen
     function beschreibung(d) {
-        var g = Katalog.GEGENSTAENDE[d.vorlage];
+        var g = KAT.GEGENSTAENDE[d.vorlage];
         return g && g.b ? g.b : d.name + '.';
     }
 
@@ -1722,8 +1865,8 @@ var Spiel = (function () {
             if (fehlt.length < bestZahl) { bestZahl = fehlt.length; best = fehlt[0]; }
         }
         if (!best) return null;
-        var wer = items.length === 1 ? gross(nom(items[0])) + (Katalog.GEGENSTAENDE[items[0].vorlage] && Katalog.GEGENSTAENDE[items[0].vorlage].pl ? ' sind' : ' ist') : 'Zusammen ist das';
-        return wer + ' daf\u00fcr ' + (Katalog.ZU_WENIG[best] || 'nicht geeignet') + '.';
+        var wer = items.length === 1 ? gross(nom(items[0])) + (KAT.GEGENSTAENDE[items[0].vorlage] && KAT.GEGENSTAENDE[items[0].vorlage].pl ? ' sind' : ' ist') : 'Zusammen ist das';
+        return wer + ' daf\u00fcr ' + (KAT.ZU_WENIG[best] || 'nicht geeignet') + '.';
     }
 
     function itemsAus(s, ids) {
@@ -1792,7 +1935,7 @@ var Spiel = (function () {
                 if (a.art === 'lesen') {
                     var rgl = regel(s, a.gibt[0].slice(6));
                     s.f[a.gibt[0]] = true;
-                    aus.push(m(Katalog.NOTIZ.steht + ' \u00bb' + gross(Katalog.AUSLOESER[rgl.ausloeser].text) + ': ' + rgl.demo + '\u00ab', 'ereignis'));
+                    aus.push(m(KAT.NOTIZ.steht + ' \u00bb' + gross(KAT.AUSLOESER[rgl.ausloeser].text) + ': ' + rgl.demo + '\u00ab', 'ereignis'));
                     weiter = true;
                     continue;
                 }
@@ -1844,12 +1987,13 @@ var Spiel = (function () {
             if (ding && s.vorfuehrungen[i].aktion.ding !== ding) continue;
             var a = s.vorfuehrungen.splice(i, 1)[0].aktion, rg = regel(s, a.gibt[0].slice(6));
             s.f[a.gibt[0]] = true;
-            return [m(Katalog.AUSLOESER[rg.ausloeser].vor + ' ' + rg.demo, 'ereignis')];
+            return [m(KAT.AUSLOESER[rg.ausloeser].vor + ' ' + rg.demo, 'ereignis')];
         }
         return [];
     }
 
     function neu(partie) {
+        kat(partie);
         var s = { partie: partie, f: {}, zeit: 0, raum: {}, gesehen: {}, status: 'laeuft', fristGemeldet: {}, log: [], vorfuehrungen: [] }, i;
         for (i = 0; i < partie.start.length; i++) s.f[partie.start[i]] = true;
         var aus = [m(partie.story.intro.replace('{in}', raumIn(s, 'r1')), 'system')];
@@ -1862,11 +2006,11 @@ var Spiel = (function () {
     function ansehenText(s, d) {
         var t, i, k;
         if (d.typ === 'element') {
-            t = Katalog.ELEMENTE[d.vorlage].b;
+            t = KAT.ELEMENTE[d.vorlage].b;
             var rs = regelVonElement(s, d.id);
             for (i = 0; i < rs.length; i++) {
                 if (rs[i].enthuellung && rs[i].enthuellung.art === 'spur') {
-                    t += ' Spuren verraten, was geschieht. ' + gross(Katalog.AUSLOESER[rs[i].ausloeser].text) + ': ' + rs[i].demo;
+                    t += ' Spuren verraten, was geschieht. ' + gross(KAT.AUSLOESER[rs[i].ausloeser].text) + ': ' + rs[i].demo;
                 }
             }
             return t;
@@ -1879,7 +2023,7 @@ var Spiel = (function () {
             }
             return gross(d.name) + '.' + zu;
         }
-        if (d.vorlage === 'licht') return Katalog.LICHT.b + ' ' + (s.f['licht_aus:' + d.raum] ? Katalog.LICHT.aus : Katalog.LICHT.an);
+        if (d.vorlage === 'licht') return KAT.LICHT.b + ' ' + (s.f['licht_aus:' + d.raum] ? KAT.LICHT.aus : KAT.LICHT.an);
         if (d.vorlage === 'ausgang') {
             var offen = 0;
             for (i = 0; i < s.partie.tuer.schloesser.length; i++) if (s.f['schloss:' + s.partie.tuer.schloesser[i].id]) offen++;
@@ -1918,6 +2062,7 @@ var Spiel = (function () {
     }
 
     function befehl(s, nr, b) {
+        kat(s.partie);
         if (s.status !== 'laeuft') return [m('Die Partie ist vorbei.', 'system')];
         if (s.raum[nr] === null) return [m('Du hast die Partie verlassen.', 'system')];
         if (b.art === 'verlassen') {
@@ -1953,7 +2098,7 @@ var Spiel = (function () {
                         var aus_ = s.f['licht_aus:' + a.raum];
                         if ((a.gibt.length && aus_) || (a.nimmt.length && !aus_)) continue;
                         fuehreAus(s, a, null);
-                        aus.push(m(aus_ ? Katalog.LICHT.wirdHell : Katalog.LICHT.wirdDunkel));
+                        aus.push(m(aus_ ? KAT.LICHT.wirdHell : KAT.LICHT.wirdDunkel));
                         getan = true; break;
                     }
                     if (erledigt(s, a) || !brauchtErfuellt(s, a)) continue;
@@ -2102,6 +2247,7 @@ var Spiel = (function () {
     }
 
     function sicht(s, nr) {
+        kat(s.partie);
         var raum = s.raum[nr], dinge = [], inventar = [], k, i, nehmbar = {};
         for (i = 0; i < s.partie.aktionen.length; i++) if (s.partie.aktionen[i].art === 'nehmen') nehmbar[s.partie.aktionen[i].ding] = true;
         var keys = Object.keys(s.partie.dinge).sort(function (a, b) { return parseInt(a.slice(1), 10) - parseInt(b.slice(1), 10); });
@@ -2132,14 +2278,15 @@ var Spiel = (function () {
     // Was die Oberflaeche ueber die Dinge wissen muss: Name, Art, Rolle (fuer das Modell) und die Handlung unter dem
     // Fadenkreuz. Das Verb kommt aus dem Setting: eine Truhe oeffnet man, eine Kette zieht man.
     function namen(partie) {
+        kat(partie);
         var aus = {}, k;
         for (k in partie.dinge) {
             if (!partie.dinge.hasOwnProperty(k)) continue;
             var d = partie.dinge[k], v = d.vorlage || '', verb = '';
-            if (d.typ === 'element' && Katalog.ELEMENTE[v]) verb = Katalog.ELEMENTE[v].verb;
-            else if (d.typ === 'schloss' && Katalog.SCHLOESSER[v]) verb = Katalog.SCHLOESSER[v].verb;
-            else if (v === 'licht') verb = Katalog.LICHT.verb;
-            else if (v === 'wasser') verb = Katalog.WASSER.verb;
+            if (d.typ === 'element' && KAT.ELEMENTE[v]) verb = KAT.ELEMENTE[v].verb;
+            else if (d.typ === 'schloss' && KAT.SCHLOESSER[v]) verb = KAT.SCHLOESSER[v].verb;
+            else if (v === 'licht') verb = KAT.LICHT.verb;
+            else if (v === 'wasser') verb = KAT.WASSER.verb;
             else if (v === 'ausgang') verb = partie.story.verb;
             aus[k] = { name: d.name, typ: d.typ, vorlage: v, modell: d.modell || '', verborgen: !!d.verborgen, verb: verb };
         }
@@ -2147,7 +2294,8 @@ var Spiel = (function () {
     }
     // Rahmen der Partie fuer die Oberflaeche: Setting, Story-Titel, wie Hell und Dunkel hier heissen
     function rahmen(partie) {
-        return { setting: partie.setting, titel: partie.story.titel, hell: Katalog.HELL, dunkel: Katalog.DUNKEL };
+        kat(partie);
+        return { setting: partie.setting, stil: partie.stil, titel: partie.story.titel, hell: KAT.HELL, dunkel: KAT.DUNKEL };
     }
 
     return { version: 3, neu: neu, befehl: befehl, sicht: sicht, namen: namen, rahmen: rahmen };
