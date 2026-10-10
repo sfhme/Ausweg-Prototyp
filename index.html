@@ -1380,7 +1380,8 @@ if (typeof module !== 'undefined' && module.exports) { module.exports = Protokol
 // Spiel.sicht(sitzung, spielerNr)           -> was dieser Spieler sieht (Raum, Dinge, Inventar, Zeit, Status)
 //
 // Befehle: { art: 'ansehen', ding }, { art: 'anfassen', ding }, { art: 'nehmen', ding }, { art: 'benutzen', ding, mit: [ids] },
-//          { art: 'krach', mit: [id] }, { art: 'eingeben', ding, code }, { art: 'warten' }, { art: 'gehen', raum }
+//          { art: 'krach', mit: [id] }, { art: 'eingeben', ding, code }, { art: 'warten' }, { art: 'gehen', raum },
+//          { art: 'verlassen' } (Spieler steigt aus; er zaehlt danach in keinem Raum mehr, seine Befehle werden abgewiesen)
 //
 // Die Engine kennt dieselben Fakten und Aktionen wie der Pruefer. Anders als der Pruefer verlangt sie kein Wissen
 // ('kennt'): Was Spieler wissen, steht in ihren Koepfen. Bedrohungen und Fristen wirken wie im Pruefer.
@@ -1392,7 +1393,7 @@ if (typeof module !== 'undefined' && module.exports) {
 var Spiel = (function () {
     'use strict';
 
-    var ZEIT = { ansehen: 0, anfassen: 1, nehmen: 1, benutzen: 1, krach: 1, eingeben: 1, warten: 3, gehen: 1 };
+    var ZEIT = { ansehen: 0, anfassen: 1, nehmen: 1, benutzen: 1, krach: 1, eingeben: 1, warten: 3, gehen: 1, verlassen: 0 };
     var LAERM_STRAFE = 5;
 
     function gross(t) { return t.charAt(0).toUpperCase() + t.slice(1); }
@@ -1431,6 +1432,12 @@ var Spiel = (function () {
         var i;
         for (i = 0; i < a.braucht.length; i++) if (!s.f[a.braucht[i]]) return false;
         return true;
+    }
+    // Spieler, die noch dabei sind (wer die Partie verlassen hat, steht in keinem Raum)
+    function aktive(s) {
+        var n = 0, k;
+        for (k in s.raum) if (s.raum.hasOwnProperty(k) && s.raum[k] !== null) n++;
+        return n || 1;
     }
     function spielerImRaum(s, raum) {
         var n = 0, k;
@@ -1679,7 +1686,7 @@ var Spiel = (function () {
             }
         }
         if (laeuftAb && s.status === 'laeuft') {
-            var r = Pruefer.pruefe(s.partie, s.partie.spieler, { f: s.f, schritte: s.zeit });
+            var r = Pruefer.pruefe(s.partie, aktive(s), { f: s.f, schritte: s.zeit });
             if (!r.loesbar) { s.status = 'verloren'; aus.push(m('Zu sp\u00e4t. Von hier aus gibt es keinen Ausweg mehr.', 'system')); }
         }
         return aus;
@@ -1696,6 +1703,11 @@ var Spiel = (function () {
 
     function befehl(s, nr, b) {
         if (s.status !== 'laeuft') return [m('Die Partie ist vorbei.', 'system')];
+        if (s.raum[nr] === null) return [m('Du hast die Partie verlassen.', 'system')];
+        if (b.art === 'verlassen') {
+            s.raum[nr] = null;
+            return [m('Du verl\u00e4sst die Partie. Die anderen spielen ohne dich weiter.', 'system')];
+        }
         var aus = [], d = b.ding ? s.partie.dinge[b.ding] : null, i, a, sp;
         if (b.ding && !d) return [m('Das gibt es hier nicht.', 'system')];
         if (!ZEIT.hasOwnProperty(b.art)) return [m('Das geht nicht.', 'system')];
@@ -1708,7 +1720,8 @@ var Spiel = (function () {
             if (!gibtRaum) return [m('Diesen Raum gibt es nicht.', 'system')];
         }
         if (d && d.raum !== s.raum[nr] && b.art !== 'gehen') return [m('Das ist nicht hier.', 'system')];
-        s.zeit += ZEIT[b.art] || 0;
+        // Die Uhr ist gemeinsam: Mehrere arbeiten gleichzeitig, also kostet jede Handlung nur ihren Anteil
+        s.zeit += (ZEIT[b.art] || 0) / aktive(s);
 
         switch (b.art) {
             case 'ansehen':
@@ -1733,6 +1746,23 @@ var Spiel = (function () {
                     fuehreAus(s, a, null);
                     aus.push(m(a.gibt.indexOf('ausgang') >= 0 ? 'Die Ausgangst\u00fcr schwingt auf.' : ergebnis(s, a, null), a.gibt.indexOf('ausgang') >= 0 ? 'erfolg' : 'erzaehler'));
                     getan = true; break;
+                }
+                // Aufgaben fuer mehrere Haende: anfassen, waehrend genug Leute im Raum sind (ohne Gegenstand)
+                if (!getan) {
+                    var lh = aktionenAn(s, d.id, ['benutzen']), mehrHaende = false;
+                    for (i = 0; i < lh.length && !getan; i++) {
+                        a = lh[i];
+                        if (erledigt(s, a) || !brauchtErfuellt(s, a)) continue;
+                        var anfH = s.partie.anforderungen[a.mittel], wh = waehleAlternative(s, anfH, [], a.raum), q;
+                        for (q = 0; q < anfH.alt.length; q++) if (anfH.alt[q].h) mehrHaende = true;
+                        if (!wh.alt) continue;
+                        sp = sperre(s, a, nr, wh.alt.h || 1);
+                        if (sp) { aus.push(sp); getan = true; break; }
+                        aus.push(m(ergebnis(s, a, wh.alt)));
+                        aus = aus.concat(fuehreAus(s, a, wh.alt));
+                        getan = true;
+                    }
+                    if (!getan && mehrHaende) { aus.push(m('Allein bekommst du das so nicht hin. Daf\u00fcr br\u00e4uchte es mehr H\u00e4nde.')); getan = true; }
                 }
                 if (!getan && d.name === 'Ausgangst\u00fcr') aus.push(m(ansehenText(s, d)));
                 else if (!getan) aus.push(m('Du fasst ' + akk(d) + ' an.'));
@@ -1818,7 +1848,7 @@ var Spiel = (function () {
         if (b.art !== 'gehen') aus = aus.concat(naechsteVorfuehrung(s, nr));
         if (s.f.ausgang) {
             s.status = 'gewonnen';
-            aus.push(m('Du bist drau\u00dfen. Geschafft nach ' + s.zeit + ' Zeiteinheiten.', 'erfolg'));
+            aus.push(m('Du bist drau\u00dfen. Geschafft nach ' + Math.ceil(s.zeit) + ' Zeiteinheiten.', 'erfolg'));
         } else {
             aus = aus.concat(zeitPruefen(s));
         }
@@ -1848,7 +1878,7 @@ var Spiel = (function () {
         }
         var raeume = [];
         for (i = 0; i < s.partie.raeume.length; i++) raeume.push({ id: s.partie.raeume[i].id, name: s.partie.raeume[i].name, hier: s.partie.raeume[i].id === raum });
-        return { raum: raum, raeume: raeume, dinge: dinge, inventar: inventar, zeit: s.zeit, licht: !s.f['licht_aus:' + raum], status: s.status };
+        return { raum: raum, raeume: raeume, dinge: dinge, inventar: inventar, zeit: Math.ceil(s.zeit), licht: !s.f['licht_aus:' + raum], status: s.status };
     }
 
     return { version: 1, neu: neu, befehl: befehl, sicht: sicht };
