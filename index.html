@@ -2072,6 +2072,35 @@ var Spiel = (function () {
         return aus;
     }
 
+    // Was man einem Element ANSIEHT (fuer die sichtbaren Wirkungen im Raum): je Regel, ob sie schon gezeigt wurde,
+    // ob sie ausgeloest ist, worauf sie weist, welche Ziffern erscheinen. Reiner Zustand, aus den Fakten abgeleitet:
+    // Wer spaeter in den Raum kommt oder neu laedt, sieht dasselbe wie der, der dabei war.
+    function wirkungen(s, d, nr) {
+        var rs = regelVonElement(s, d.id), aus = [], i, j;
+        for (i = 0; i < rs.length; i++) {
+            var rg = rs[i], w = { art: rg.art, aus: rg.ausloeser, gezeigt: !!s.f['kennt:' + rg.id] && !(rg.enthuellung && rg.enthuellung.art === 'spur'), an: false };
+            for (j = 0; j < s.partie.aktionen.length; j++) {
+                var a = s.partie.aktionen[j];
+                if (a.art === 'ereignis' && a.kennt && a.kennt[0] === rg.id && erledigt(s, a)) w.an = true;
+            }
+            if (rg.art === 'richtung' && rg.ziel) w.ziel = rg.ziel;
+            // Ziffern nur fuer den, dem sie gelten (manche Hinweise sieht nur ein Spieler)
+            if (rg.art === 'zahl' && w.an && (!rg.privat || s.partie.spieler < 2 || rg.privat === nr)) w.code = rg.code;
+            if (rg.art === 'bedrohung') {
+                for (j = 0; j < s.partie.bedrohungen.length; j++) {
+                    var b = s.partie.bedrohungen[j];
+                    if (b.regel !== rg.id) continue;
+                    w.gebannt = !!s.f['gebannt:' + b.id];
+                    w.an = !w.gebannt && b.ausloeser !== 'laerm' && bedrohungWirkt(s, b);
+                    // bei einer Frist: wie weit sie abgelaufen ist (0 bis 1), damit man es kommen sieht
+                    if (b.ausloeser === 'zeit' && b.frist) { w.stufe = w.gebannt ? 0 : Math.round(Math.min(1, s.zeit / b.frist) * 100) / 100; w.an = !w.gebannt && w.stufe > 0; }
+                }
+            }
+            aus.push(w);
+        }
+        return aus;
+    }
+
     function sicht(s, nr) {
         var raum = s.raum[nr], dinge = [], inventar = [], k, i, nehmbar = {};
         for (i = 0; i < s.partie.aktionen.length; i++) if (s.partie.aktionen[i].art === 'nehmen') nehmbar[s.partie.aktionen[i].ding] = true;
@@ -2090,11 +2119,14 @@ var Spiel = (function () {
             }
             var code = false;
             for (k = 0; k < s.partie.tuer.schloesser.length; k++) if (s.partie.tuer.schloesser[k].id === d.id && s.partie.tuer.schloesser[k].code) code = true;
-            dinge.push({ id: d.id, name: d.name, typ: d.typ, offen: offen, code: code });
+            var eintrag = { id: d.id, name: d.name, typ: d.typ, offen: offen, code: code };
+            if (d.typ === 'element') { eintrag.w = wirkungen(s, d, nr); if (s.f['waerme:' + d.id]) eintrag.warm = true; }
+            dinge.push(eintrag);
         }
         var raeume = [];
         for (i = 0; i < s.partie.raeume.length; i++) raeume.push({ id: s.partie.raeume[i].id, name: s.partie.raeume[i].name, hier: s.partie.raeume[i].id === raum });
-        return { raum: raum, raeume: raeume, dinge: dinge, inventar: inventar, zeit: Math.ceil(s.zeit), licht: !s.f['licht_aus:' + raum], status: s.status };
+        return { raum: raum, raeume: raeume, dinge: dinge, inventar: inventar, zeit: Math.ceil(s.zeit), licht: !s.f['licht_aus:' + raum],
+            wasser: !!s.f['wasser:' + raum], status: s.status };
     }
 
     // Was die Oberflaeche ueber die Dinge wissen muss: Name, Art, Rolle (fuer das Modell) und die Handlung unter dem
@@ -2118,7 +2150,7 @@ var Spiel = (function () {
         return { setting: partie.setting, titel: partie.story.titel, hell: Katalog.HELL, dunkel: Katalog.DUNKEL };
     }
 
-    return { version: 2, neu: neu, befehl: befehl, sicht: sicht, namen: namen, rahmen: rahmen };
+    return { version: 3, neu: neu, befehl: befehl, sicht: sicht, namen: namen, rahmen: rahmen };
 })();
 
 if (typeof module !== 'undefined' && module.exports) { module.exports = Spiel; }
