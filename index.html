@@ -536,8 +536,11 @@ var Setting = (function () {
         stile: {
             kaykit: {
                 name: 'KayKit',
-                ohne: ['puppe', 'ventilator', 'katze', 'vitrine', 'doppelhebel', 'wecker', 'v_laterne', 'v_urne'],
+                ohne: ['ventilator', 'katze', 'vitrine', 'doppelhebel', 'wecker', 'v_laterne', 'v_urne'],
                 anders: {
+                    // die \u00dcbungspuppe ist hier ein Gerippe: kein Stroh, kein Sackleinen, kein aufgemaltes Gesicht
+                    puppe: { ersetze: [['Auf dem Sackleinen der', 'Auf dem Umhang der'], ['Eine Naht im R\u00fccken der \u00dcbungspuppe platzt auf. Im Stroh steckt', 'Der Umhang der \u00dcbungspuppe rutscht zur Seite. Zwischen den Rippen steckt'], ['den Kopf', 'den Sch\u00e4del']],
+                        b: 'Ein Gerippe, mit ausgebreiteten Armen an einen Pfahl gebunden: die \u00dcbungspuppe der Wachen. In den Augenh\u00f6hlen glimmt es, und das sieht zu wach aus.' },
                     becken: { ersetze: [['Kessel', 'Zuber']],
                         b: 'Ein gro\u00dfer Zuber voll tr\u00fcbem Wasser, daneben ein enger Schacht im Boden.' },
                     kerze: { name: 'Kerzenb\u00fcndel', nom: 'das Kerzenb\u00fcndel', akk: 'das Kerzenb\u00fcndel',
@@ -550,7 +553,7 @@ var Setting = (function () {
                 raum: {
                     stand: { schrank_oben: 'wand', paket: 'tisch' },
                     wandhoehe: { schrank_oben: 2.25 },
-                    grund: { becken: [0.62, 0.4] }
+                    grund: { becken: [0.62, 0.4], puppe: [0.55, 0.3] }
                 }
             },
             // Quaternius, neue detailreiche Reihe (Fantasy Props MegaKit + Medieval Village MegaKit): Fachwerkhaus statt
@@ -2543,6 +2546,9 @@ var Spiel = (function () {
     function laermFolgen(s, raum) {
         var i, aus = [];
         s.f['laerm:' + raum] = true;
+        // wie oft es in diesem Raum laut war: Daran erkennt die Oberflaeche neuen Laerm und zeigt ihn allen im Raum
+        if (!s.laut) s.laut = {};
+        s.laut[raum] = (s.laut[raum] || 0) + 1;
         for (i = 0; i < s.partie.bedrohungen.length; i++) {
             var b = s.partie.bedrohungen[i];
             if (b.raum === raum && b.ausloeser === 'laerm') {
@@ -3126,6 +3132,11 @@ var Spiel = (function () {
                 w.code = rg.teil.ziffern;
                 w.zeichen = KAT.ZEICHEN[rg.teil.zeichen][0];
             }
+            // Zeigerstellung: Stunde und Minute fuer das Zifferblatt (die Ziffern muss man weiter selbst ablesen)
+            if (rg.art === 'teil' && w.an && rg.teil.form === 'uhr' && (!rg.privat || s.partie.spieler < 2 || rg.privat === nr)) {
+                w.uhr = [parseInt(rg.teil.ziffern.charAt(0), 10), parseInt(rg.teil.ziffern.slice(1), 10)];
+                if (rg.teil.zeichen !== null) w.zeichen = KAT.ZEICHEN[rg.teil.zeichen][0];
+            }
             // Zeitgeber: Stufe der Frist wie bei der Bedrohung selbst
             if (rg.art === 'zeitgeber') {
                 for (j = 0; j < s.partie.bedrohungen.length; j++) {
@@ -3191,19 +3202,28 @@ var Spiel = (function () {
             var eintrag = { id: d.id, name: d.name, typ: d.typ, offen: offen, code: code };
             if (suchen) eintrag.suchen = true;
             if (d.typ === 'element') { eintrag.w = wirkungen(s, d, nr); if (s.f['waerme:' + d.id]) eintrag.warm = true; }
+            // Inschrift: einmal lesbar gemacht, steht ihr Teil fuer alle sichtbar im Stein
+            if (d.vorlage === 'inschrift') {
+                for (k = 0; k < s.partie.aktionen.length; k++) {
+                    var ain = s.partie.aktionen[k];
+                    if (ain.ding !== d.id || !ain.teil) continue;
+                    eintrag.w = [{ art: 'teil', aus: '', gezeigt: false, an: erledigt(s, ain) }];
+                    if (eintrag.w[0].an) { eintrag.w[0].code = ain.teil.ziffern; if (ain.teil.zeichen !== null) eintrag.w[0].zeichen = KAT.ZEICHEN[ain.teil.zeichen][0]; }
+                }
+            }
             dinge.push(eintrag);
         }
         var raeume = [];
         for (i = 0; i < s.partie.raeume.length; i++) raeume.push({ id: s.partie.raeume[i].id, name: s.partie.raeume[i].name, hier: s.partie.raeume[i].id === raum, zu: zugangZu(s, s.partie.raeume[i].id, nr) });
         return { raum: raum, raeume: raeume, dinge: dinge, inventar: inventar, zeit: Math.ceil(s.zeit), licht: !s.f['licht_aus:' + raum],
-            wasser: !!s.f['wasser:' + raum], status: s.status, tragen: tragen };
+            wasser: !!s.f['wasser:' + raum], status: s.status, tragen: tragen, laerm: (s.laut && s.laut[raum]) || 0 };
     }
 
     // Was die Oberflaeche ueber die Dinge wissen muss: Name, Art, Rolle (fuer das Modell) und die Handlung unter dem
     // Fadenkreuz. Das Verb kommt aus dem Setting: eine Truhe oeffnet man, eine Kette zieht man.
     function namen(partie) {
         kat(partie);
-        var aus = {}, k;
+        var aus = {}, k, i;
         for (k in partie.dinge) {
             if (!partie.dinge.hasOwnProperty(k)) continue;
             var d = partie.dinge[k], v = d.vorlage || '', verb = '';
@@ -3218,9 +3238,33 @@ var Spiel = (function () {
             // nur gesetzte Felder: Das Partie-Ereignis muss unter der Groessengrenze von Knuddels bleiben
             aus[k] = { name: d.name, typ: d.typ, vorlage: v };
             if (d.modell) aus[k].modell = d.modell;
+            if (v === 'zwischentuer' && partie.durchgang && partie.durchgang.opfer) aus[k].modell = 'fallgitter';
             if (d.anzahl) aus[k].anzahl = d.anzahl;
             if (d.verborgen) aus[k].verborgen = true;
             if (verb) aus[k].verb = verb;
+            // Zaehlreihe: das Zeichen, das daran steht
+            if (v === 'zaehl') {
+                for (i = 0; i < partie.aktionen.length; i++) {
+                    var az = partie.aktionen[i];
+                    if (az.ding === k && az.teil && az.teil.zeichen !== null) aus[k].zeichen = KAT.ZEICHEN[az.teil.zeichen][0];
+                }
+            }
+        }
+        // Schloesser: Zahl der Stellen und was daneben eingraviert ist. zeichen: [Name, erste Stelle, Stellen] je Gruppe;
+        // legende: [Name, Ziffer] je Zeichen (Logikgitter). Beides zeigt schon das Ansehen, es ist kein Geheimnis.
+        var alle = schloesserAlle(partie), g;
+        for (i = 0; i < alle.length; i++) {
+            var sc = alle[i], e = aus[sc.id];
+            if (!e || !sc.code) continue;
+            e.stellen = sc.code.length;
+            if (sc.gruppen) {
+                e.zeichen = [];
+                for (g = 0; g < sc.gruppen.length; g++) if (sc.gruppen[g].zeichen !== null) e.zeichen.push([KAT.ZEICHEN[sc.gruppen[g].zeichen][0], sc.gruppen[g].von, sc.gruppen[g].laenge]);
+            }
+            if (sc.legende) {
+                e.legende = [];
+                for (g = 0; g < sc.legende.length; g++) e.legende.push([KAT.ZEICHEN[sc.legende[g].zeichen][0], sc.legende[g].ziffer]);
+            }
         }
         return aus;
     }
