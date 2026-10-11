@@ -2102,7 +2102,7 @@ var Generator = (function () {
     // Noch ohne Bild: Raetsel, die es im Kern schon gibt, deren Dinge die Oberflaeche aber noch aus Kaesten baut. Mit
     // opt.bild (Server, Spielseite, Probeseite) kommen sie in keiner Partie vor; ohne (Tests, zeige.js) in jeder. Die
     // PC-Sitzung streicht hier einen Eintrag, sobald das Raetsel Modelle und ein Bild hat (ARBEITSTEILUNG.md 3.1f).
-    var NOCH_OHNE_BILD = { spiegel: 1, kaefig: 1, pakt: 1, kreide: 1, waegen: 1, hebelreihe: 1,
+    var NOCH_OHNE_BILD = { spiegel: 1, kaefig: 1, pakt: 1, waegen: 1, hebelreihe: 1,
         bauen: 1, traenke: 1, notizen: 1, faehrte: 1, orakel: 1, reihe: 1, tinte: 1 };      // R64, R62, R112, R115, R106, R110, R43
     function Bau(seed, spieler, stufe, versuch, stil, bild) {
         this.aus = bild ? NOCH_OHNE_BILD : {};
