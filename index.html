@@ -296,7 +296,7 @@ var Setting = (function () {
                 ['teil', 'Auf dem Sackleinen der \u00dcbungspuppe leuchtet etwas auf. {teil}'],
                 ['zeitgeber', 'Der Arm der \u00dcbungspuppe r\u00fcckt wie ein Uhrzeiger vor. Steht er oben, ist es zu sp\u00e4t.']] },
             becken: { name: 'Kessel', nom: 'der Kessel', akk: 'den Kessel', verb: 'Hineingreifen',
-                b: 'Ein gro\u00dfer Kessel voll tr\u00fcbem Wasser, daneben ein enger Schacht im Boden.',
+                b: 'Ein gro\u00dfer Kessel voll tr\u00fcbem Wasser, daneben ragt ein enger steinerner Schacht aus dem Boden.',
                 tief: 'Tief unten im Schacht treibt ein Holzk\u00e4stchen auf dem Wasser, zu tief f\u00fcr den Arm.',
                 // Schwimmen und Sinken (R68): Was sinkt, hebt den Wasserspiegel im Schacht, und was schwimmt, steigt mit
                 // Steigendes Wasser hebt (R51): L\u00e4uft der Kessel mit der Zeit voll, steigt das Wasser auch im Schacht
@@ -864,7 +864,7 @@ var Setting = (function () {
                     puppe: { ersetze: [['Auf dem Sackleinen der', 'Auf dem Umhang der'], ['Eine Naht im R\u00fccken der \u00dcbungspuppe platzt auf. Im Stroh steckt', 'Der Umhang der \u00dcbungspuppe rutscht zur Seite. Zwischen den Rippen steckt'], ['den Kopf', 'den Sch\u00e4del']],
                         b: 'Ein Gerippe, mit ausgebreiteten Armen an einen Pfahl gebunden: die \u00dcbungspuppe der Wachen. In den Augenh\u00f6hlen glimmt es, und das sieht zu wach aus.' },
                     becken: { ersetze: [['Kessel', 'Zuber']],
-                        b: 'Ein gro\u00dfer Zuber voll tr\u00fcbem Wasser, daneben ein enger Schacht im Boden.' },
+                        b: 'Ein gro\u00dfer Zuber voll tr\u00fcbem Wasser, daneben ragt ein enger steinerner Schacht aus dem Boden.' },
                     kerze: { name: 'Kerzenb\u00fcndel', nom: 'das Kerzenb\u00fcndel', akk: 'das Kerzenb\u00fcndel',
                         b: 'Drei dicke Kerzen, zu einem B\u00fcndel zusammengeschmolzen, nicht angez\u00fcndet.' },
                     paket: { name: 'mit Draht verschn\u00fcrte Kiste', offen: 'aufgeschn\u00fcrte Kiste', nom: 'die mit Draht verschn\u00fcrte Kiste', akk: 'die mit Draht verschn\u00fcrte Kiste',
@@ -900,7 +900,7 @@ var Setting = (function () {
                 raum: {
                     stand: { schrank_oben: 'wand', paket: 'tisch' },
                     wandhoehe: { schrank_oben: 2.25, doppelhebel: 1.05, hebelpaar: 1.05 },
-                    grund: { becken: [0.62, 0.4], puppe: [0.55, 0.3] }
+                    grund: { becken: [1.0, 0.4], puppe: [0.55, 0.3] }
                 }
             },
             // Quaternius, neue detailreiche Reihe (Fantasy Props MegaKit + Medieval Village MegaKit): Fachwerkhaus statt
@@ -1937,7 +1937,7 @@ var Generator = (function () {
     // Noch ohne Bild: Raetsel, die es im Kern schon gibt, deren Dinge die Oberflaeche aber noch aus Kaesten baut. Mit
     // opt.bild (Server, Spielseite, Probeseite) kommen sie in keiner Partie vor; ohne (Tests, zeige.js) in jeder. Die
     // PC-Sitzung streicht hier einen Eintrag, sobald das Raetsel Modelle und ein Bild hat (ARBEITSTEILUNG.md 3.1f).
-    var NOCH_OHNE_BILD = { drehlade: 1, flut: 1, sinken: 1, spiegel: 1, kaefig: 1, winde: 1, notschacht: 1, pakt: 1, kreide: 1, nachschlagen: 1, waegen: 1, hebelreihe: 1 };
+    var NOCH_OHNE_BILD = { drehlade: 1, spiegel: 1, kaefig: 1, winde: 1, notschacht: 1, pakt: 1, kreide: 1, nachschlagen: 1, waegen: 1, hebelreihe: 1 };
     function Bau(seed, spieler, stufe, versuch, stil, bild) {
         this.aus = bild ? NOCH_OHNE_BILD : {};
         this.r = Zufall.strom(String(seed), 'partie:' + spieler + ':' + stufe + ':' + versuch);
@@ -1954,7 +1954,6 @@ var Generator = (function () {
         this.gegenstaendeFrei = this.r.mischen(sortiert(this.K.GEGENSTAENDE));
         this.fixtur = {};
         // was es nur einmal je Partie gibt, gilt als schon vergeben, wenn es noch kein Bild hat
-        if (this.aus.flut) this.fixtur.flut = true;
         if (this.aus.spiegel) this.fixtur.spiegel = true;
         if (this.aus.hebelreihe) this.fixtur.hebelreihe = true;
         if (this.aus.pakt) this.fixtur.pakt = true;
@@ -5309,7 +5308,7 @@ var Spiel = (function () {
                     if (a.verbrauchtMittel) {
                         for (var vm = 0; vm < items.length; vm++) s.f['weg:' + items[vm].id] = true;
                         s.wer[a.gibt[0].slice(4)] = nr;
-                        aus[ergIdx] = m(a.satz);
+                        aus[ergIdx] = a.sinken ? zeigt(m(a.satz)) : m(a.satz);        // R68: Man sieht es versinken und das Kaestchen steigen
                     }
                     // Aufgebrauchtes (Phiole): danach leer
                     for (var vb = 0; vb < items.length; vb++) {
