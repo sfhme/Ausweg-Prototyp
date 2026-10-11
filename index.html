@@ -4739,8 +4739,34 @@ var Spiel = (function () {
     // oder ablegen kann, bleibt loesbar, was der Pruefer fuer die gemeinsame Tasche bewiesen hat.
     function traegt(s, id, nr) { return !!s.f['hat:' + id] && !s.f['weg:' + id] && s.wer[id] === nr; }
     function liegt(s, id) { var w = s.wer[id]; return s.f['hat:' + id] && w && typeof w === 'object' ? w : null; }
-    // Was seit dem letzten Befehl gefunden wurde, steckt der ein, der gehandelt hat
-    // Gefundenes traegt, wer es gefunden hat; wer nur eine Hand hat (R152) und schon etwas traegt, laesst es liegen
+    // Funde liegen, wo sie zum Vorschein kommen (PC-Sitzung, 2026-10-11, Entscheidung des Projektinhabers: nicht mehr von
+    // selbst einstecken). Oeffnet jemand eine Truhe, durchsucht ein Versteck oder gibt ein Ding etwas frei, liegt der
+    // Gegenstand sichtbar an diesem Ding (wer: { raum, an }), bis ihn jemand nimmt oder davontraegt. So sieht man, woher
+    // etwas kommt, und auch ein Mitspieler kann zugreifen. In die Hand kommt direkt nur, was man baut, umarbeitet, vom
+    // Boden aufhebt oder von der Steinhand bekommt, und was man von Anfang an bei sich hat.
+    var FUND_IN_DIE_HAND = { nehmen: 1, bauen: 1, verwandeln: 1, pakt: 1 };
+    function fundOrt(s, k) {
+        var i, a, d;
+        for (i = 0; i < s.partie.aktionen.length; i++) {
+            a = s.partie.aktionen[i];
+            if (!a.ding || FUND_IN_DIE_HAND[a.art] || a.gibt.indexOf('hat:' + k) < 0 || !erledigt(s, a)) continue;
+            d = s.partie.dinge[a.ding];
+            if (d && d.typ !== 'gegenstand' && d.raum) return d;
+        }
+        return null;
+    }
+    function legeFund(s, k) {
+        var g = s.partie.dinge[k], d;
+        if (!g || g.typ !== 'gegenstand' || !s.f['hat:' + k] || s.wer[k] !== undefined) return;
+        d = fundOrt(s, k);
+        if (d) s.wer[k] = { raum: d.raum, x: null, z: null, an: d.id };
+    }
+    function legeFunde(s) {
+        var k;
+        for (k in s.partie.dinge) if (s.partie.dinge.hasOwnProperty(k)) legeFund(s, k);
+    }
+    // Was danach noch niemandem gehoert (gebaut, umgearbeitet, von Anfang an dabei), steckt der ein, der gehandelt hat;
+    // wer nur eine Hand hat (R152) und schon etwas traegt, laesst es liegen
     function verteile(s, nr) {
         var k, aus = [];
         for (k in s.partie.dinge) {
@@ -5098,9 +5124,10 @@ var Spiel = (function () {
         if (sp) return [sp];
         var d = s.partie.dinge[a.ding], g = s.partie.dinge[a.gibt[0].slice(4)];
         fuehreAus(s, a, null);
+        legeFunde(s);                                    // was der Waechter freigibt, liegt bei ihm, bis es jemand nimmt
         verteile(s, nr);
-        var aus = [zeigt(m(KAT.WACHE[d.modell === 'gemaelde' ? 'bild' : 'buch'].auf.replace('{was}', nom(g)), 'erfolg')), zeigt(m('Du steckst den Fund ein.', 'erzaehler', nr))];   // was aufgeht, sehen alle; wer es nimmt, nur der Sprecher
-        aus = aus.concat(ereignisse(s, nr, null));       // ein freigegebenes Pergament liest, wer es nimmt
+        var aus = [zeigt(m(KAT.WACHE[d.modell === 'gemaelde' ? 'bild' : 'buch'].auf.replace('{was}', nom(g)), 'erfolg'))];   // was aufgeht, sehen alle
+        aus = aus.concat(ereignisse(s, nr, null));
         s.log = s.log.concat(aus);
         return aus;
     }
@@ -5357,9 +5384,10 @@ var Spiel = (function () {
             for (i = 0; i < s.partie.aktionen.length; i++) {
                 var a = s.partie.aktionen[i];
                 if ((a.art !== 'ereignis' && a.art !== 'lesen') || erledigt(s, a) || !brauchtErfuellt(s, a)) continue;
-                // Liegt das Blatt noch, wo ein Raetsel es freigegeben hat (im Fach drueben, R88), liest es erst, wer in dem Raum ist
-                var lw = a.art === 'lesen' && a.braucht.length && String(a.braucht[0]).indexOf('hat:') === 0 ? s.wer[a.braucht[0].slice(4)] : null;
-                if (lw && typeof lw === 'object' && lw.raum && lw.raum !== s.raum[nr]) continue;
+                // Gelesen wird ein Blatt erst, wenn es jemand in der Hand hat: Solange es liegt, wo es zum Vorschein kam (in der
+                // Truhe, im Fach drueben, R88), kennt niemand seinen Inhalt
+                var lesDing = a.art === 'lesen' && a.braucht.length && String(a.braucht[0]).indexOf('hat:') === 0 ? a.braucht[0].slice(4) : null;
+                if (lesDing) { legeFund(s, lesDing); if (s.wer[lesDing] && typeof s.wer[lesDing] === 'object') continue; }
                 if (a.art === 'lesen' && (a.teil || a.zettel)) {
                     s.f[a.gibt[0]] = true;
                     // den Fetzen liest, wer ihn traegt; die anderen sehen den Text erst, wenn er ihn weitergibt
@@ -5777,7 +5805,8 @@ var Spiel = (function () {
         // Die Uhr ist gemeinsam: Mehrere arbeiten gleichzeitig, also kostet jede Handlung nur ihren Anteil
         // Kreide (R41): ein Kreuz malen oder wegwischen kostet keine Zeit; die Durchreiche und die Waage nehmen die Kreide wie alles
         if (b.art === 'benutzen' && kreideAn(s, d, itemsAus(s, b.mit, nr))) return kreuz(s, d, b);
-        s.zeit = zwoelftel(s.zeit + (ZEIT[b.art] || 0) / aktive(s));
+        // Aufheben, was liegt (ein Fund in der Truhe, etwas Abgelegtes), kostet keine Zeit: Das Finden hat sie schon gekostet
+        if (!(b.art === 'nehmen' && d && liegt(s, d.id))) s.zeit = zwoelftel(s.zeit + (ZEIT[b.art] || 0) / aktive(s));
 
         switch (b.art) {
             case 'ansehen':
@@ -6023,7 +6052,9 @@ var Spiel = (function () {
         // Der Gefangene (R154): eben befreit? dann erfahren es alle
         if (s.partie.gefangener && s.f.befreit && !s.befreitGemeldet) { s.befreitGemeldet = true; aus.push(zeigt(m(KAT.KAEFIG.frei.replace('{wer}', '{nick' + s.partie.gefangener + '}'), 'erfolg'))); }
         verlasseneRaeume(s);
+        legeFunde(s);
         aus = aus.concat(ereignisse(s, nr, b));
+        legeFunde(s);
         aus = aus.concat(verteile(s, nr));
         // Was eine Handlung im anderen Raum ausloest (Laerm oder Dunkel nebenan), geschieht dort sofort, wenn jemand dort ist
         var nebenDran = {};
@@ -6032,6 +6063,7 @@ var Spiel = (function () {
             nebenDran[s.raum[i]] = true;
             // was dort geschieht, erfaehrt der Spieler dort, nicht der Handelnde hier
             aus = aus.concat(ereignisse(s, i, null).map(function (x) { if (!x.an) x.an = i; return x; }));
+            legeFunde(s);
             aus = aus.concat(verteile(s, i));
         }
         if (b.art !== 'gehen') aus = aus.concat(naechsteVorfuehrung(s, nr));
