@@ -303,7 +303,8 @@ var Setting = (function () {
                 ['richtung', 'Die Walze der Spieluhr bleibt stehen, und ihr Zeiger weist auf eine Stelle: {ziel}.'],
                 ['behaelter', 'Am Ende der Melodie springt ein Fach im Sockel auf. Darin: {ziel}.'],
                 ['keine', 'Die Spieluhr klimpert eine Melodie ohne Bedeutung.'],
-                ['teil', 'Die Walze der Spieluhr bleibt stehen, und auf ihrem Messing ist etwas eingeritzt. {teil}']] },
+                ['teil', 'Die Walze der Spieluhr bleibt stehen, und auf ihrem Messing ist etwas eingeritzt. {teil}'],
+                ['melodie', 'Die Spieluhr spielt eine kurze Folge von T\u00f6nen, immer dieselbe.']] },
             standuhr: { name: 'R\u00e4derwerk', nom: 'das R\u00e4derwerk', akk: 'das R\u00e4derwerk', verb: 'Anhalten',
                 b: 'Ein R\u00e4derwerk aus Eisenzahnr\u00e4dern, das ein Gewicht an einer Kette hebt und wieder fallen l\u00e4sst.', f: [
                 ['zahl', 'Das R\u00e4derwerk schl\u00e4gt einen Hammer an. Die Schl\u00e4ge, mit Pausen dazwischen, ergeben die Ziffern.'],
@@ -490,6 +491,14 @@ var Setting = (function () {
         },
         // Ziffer je Kopf (R91): was ein Spieler privat sieht, {teile} z. B. "an zweiter Stelle eine 7"
         zifferJeKopf: 'Nur f\u00fcr deine Augen erscheinen Ziffern: {teile}. Die anderen sehen andere Stellen.',
+        // Raetsel mit Ton (R26, R27, R28). klopfen: Regel am Versteck, nennt es nicht. takt: haengt an Regeln, deren Ziffern man
+        // mitzaehlen muss, statt sie zu lesen. staebe: Text am Schloss, {n} = Zahl der Klangstaebe
+        klang: {
+            klopfen: 'Irgendwo im Raum klopft es, dumpf und in gleichem Abstand. Es kommt immer von derselben Stelle.',
+            klopfenWeg: 'verr\u00e4t sich durch Klopfen',
+            takt: 'Welche Ziffern es sind, sagt dir niemand: Z\u00e4hl mit.',
+            staebe: 'Daneben h\u00e4ngen {n} Klangst\u00e4be, jeder mit einem Zeichen. In der richtigen Folge angeschlagen, \u00f6ffnen sie das Schloss. Von links nach rechts z\u00e4hlen sie 1 bis {n}.'
+        },
         // Was hat sich veraendert? (R24): Im Dunkeln rueckt ein Versteck an eine andere Stelle; welches, sagt der Text nicht
         verrueckt: { text: 'Etwas scharrt \u00fcber den Boden. Als du wieder siehst, steht ein Ding im Raum nicht mehr dort, wo es stand.',
             weg: 'es steht nach dem Dunkel an anderer Stelle' },
@@ -770,14 +779,15 @@ var Katalog = (function () {
             { art: 'teil', aus: ['wasser'] }
         ] },
         grammophon: { f: [
-            { art: 'zahl', aus: ['beruehrung', 'zeit', 'stille', 'laerm_nebenan'] },
+            { art: 'zahl', aus: ['beruehrung', 'zeit', 'stille', 'laerm_nebenan'], takt: true },
             { art: 'richtung', aus: ['laerm', 'laerm_nebenan'] },
             { art: 'behaelter', aus: ['beruehrung', 'zeit', 'stille'] },
             { art: 'keine', aus: ['beruehrung', 'zeit'] },
-            { art: 'teil', aus: ['beruehrung', 'zeit'] }
+            { art: 'teil', aus: ['beruehrung', 'zeit'] },
+            { art: 'melodie', aus: ['beruehrung', 'zeit', 'stille'] }       // R27: spielt die Folge fuer die Klangstaebe am Schloss
         ] },
         standuhr: { f: [
-            { art: 'zahl', aus: ['zeit', 'beruehrung', 'stille'] },
+            { art: 'zahl', aus: ['zeit', 'beruehrung', 'stille'], takt: true },
             { art: 'behaelter', aus: ['zeit'] },
             { art: 'richtung', aus: ['beruehrung'] },
             { art: 'bedrohung', aus: ['zeit'] },
@@ -827,7 +837,7 @@ var Katalog = (function () {
             { art: 'teil', aus: ['beruehrung', 'zeit'] }
         ] },
         schaukelstuhl: { f: [
-            { art: 'zahl', aus: ['wegsehen', 'zeit'] },
+            { art: 'zahl', aus: ['wegsehen', 'zeit'], takt: true },
             { art: 'richtung', aus: ['wegsehen', 'anzahl'] },
             { art: 'behaelter', aus: ['beruehrung'] },
             { art: 'bedrohung', aus: ['wegsehen', 'licht_aus'] },
@@ -874,6 +884,9 @@ var Katalog = (function () {
     // kein Hindernis und soll im Protokoll der Eigenschaften nicht auftauchen. Schriftstuecke passen immer.
     // Was hat sich veraendert? (R24): freie Verstecke, die sich verruecken lassen (Platz-Schluessel aus dem Setting)
     var BEWEGLICH = ['fass', 'balken', 'urne', 'schemel'];
+    // Raetsel mit Ton. takt (an einer Faehigkeit zahl): Die Ziffern erklingen als Schlaege zum Mitzaehlen, darum ohne Null (R28).
+    // KLOPF_AUS: wann ein Versteck zu klopfen beginnt (R26). STAEBE: Klangstaebe an einem Schloss mit Melodie (R27).
+    var KLOPF_AUS = ['stille', 'licht_aus', 'laerm'], STAEBE = 5;
     var KLEIN = ['messer', 'schere', 'saeurehaltig', 'feuerzeug', 'streichhoelzer', 'taschenlampe', 'tuch', 'handspiegel', 'kleiderhaken',
         'schnur', 'wecker', 'schluessel', 'notiz', 'plaettchen'];
 
@@ -1025,7 +1038,7 @@ var Katalog = (function () {
         version: 3, SETTING: S.id, ARTEN: ARTEN, AUSLOESER: AUSLOESER, ELEMENTE: ELEMENTE, GEGENSTAENDE: GEGENSTAENDE,
         EIGENSCHAFT_TEXT: EIGENSCHAFT_TEXT, ZU_WENIG: S.zuWenig, HINDERNISSE: HINDERNISSE, SCHLOESSER: SCHLOESSER, GEGENMITTEL: GEGENMITTEL,
         VERSTECKE: S.verstecke, LICHT: S.licht, WASSER: WASSER, SCHLUESSEL: S.schluessel, NOTIZ: S.notiz, STORIES: S.stories,
-        VERWANDLUNGEN: S.verwandlungen, ZAEHL: S.zaehl, LOGIK: S.logik, LUEGNER: S.luegner, HANDBUCH: S.handbuch, ZIFFER_JE_KOPF: S.zifferJeKopf, KLEIN: KLEIN, BEWEGLICH: BEWEGLICH, VERRUECKT: S.verrueckt, DURCHREICHE: S.durchreiche, HAUSORDNUNG: S.hausordnung, FALLGITTER: FALLGITTER_K, ZEICHEN: S.zeichen, FETZEN: S.fetzen, UHR: S.uhr, ZWISCHENTUER: S.zwischentuer, TAFEL: S.tafel, INSCHRIFT: INSCHRIFT_K,
+        VERWANDLUNGEN: S.verwandlungen, ZAEHL: S.zaehl, LOGIK: S.logik, LUEGNER: S.luegner, HANDBUCH: S.handbuch, ZIFFER_JE_KOPF: S.zifferJeKopf, KLEIN: KLEIN, BEWEGLICH: BEWEGLICH, VERRUECKT: S.verrueckt, KLANG: S.klang, KLOPF_AUS: KLOPF_AUS, STAEBE: STAEBE, DURCHREICHE: S.durchreiche, HAUSORDNUNG: S.hausordnung, FALLGITTER: FALLGITTER_K, ZEICHEN: S.zeichen, FETZEN: S.fetzen, UHR: S.uhr, ZWISCHENTUER: S.zwischentuer, TAFEL: S.tafel, INSCHRIFT: INSCHRIFT_K,
         SCHLOSSTEXT: S.schlosstext,
         HELL: S.hell, DUNKEL: S.dunkel
     };
@@ -1430,11 +1443,11 @@ var Generator = (function () {
     'use strict';
 
     var STUFE = {
-        1: { tiefe: 2, schloesser: 1, bedrohung: [0.35, 0], ablenkung: 1, zweiterWeg: 0.55, codeLaenge: 3, frist: 1.8, teile: 0.4, formen: ['ganz', 'ganz', 'symbol', 'folge'],
+        1: { tiefe: 2, schloesser: 1, bedrohung: [0.35, 0], ablenkung: 1, zweiterWeg: 0.55, codeLaenge: 3, frist: 1.8, teile: 0.4, formen: ['ganz', 'ganz', 'symbol', 'folge', 'melodie'],
             reihen: ['plus'] },
-        2: { tiefe: 3, schloesser: 2, bedrohung: [0.75, 0], ablenkung: 2, zweiterWeg: 0.65, codeLaenge: 3, frist: 1.5, teile: 0.6, formen: ['ganz', 'symbol', 'rechnung', 'raten', 'logik', 'folge', 'handbuch'],
+        2: { tiefe: 3, schloesser: 2, bedrohung: [0.75, 0], ablenkung: 2, zweiterWeg: 0.65, codeLaenge: 3, frist: 1.5, teile: 0.6, formen: ['ganz', 'symbol', 'rechnung', 'raten', 'logik', 'folge', 'handbuch', 'melodie'],
             reihen: ['plus', 'verschraenkt', 'wachsend'] },
-        3: { tiefe: 3, schloesser: 3, bedrohung: [1, 0.45], ablenkung: 2, zweiterWeg: 0.75, codeLaenge: 4, frist: 1.3, teile: 0.7, formen: ['ganz', 'symbol', 'rechnung', 'raten', 'logik', 'folge', 'handbuch'],
+        3: { tiefe: 3, schloesser: 3, bedrohung: [1, 0.45], ablenkung: 2, zweiterWeg: 0.75, codeLaenge: 4, frist: 1.3, teile: 0.7, formen: ['ganz', 'symbol', 'rechnung', 'raten', 'logik', 'folge', 'handbuch', 'melodie'],
             reihen: ['plus', 'verschraenkt', 'wachsend', 'summe', 'doppelt'] }
     };
     // teile: Anteil der Ziffernschloesser, deren Code aus Teilen besteht (Metaraetsel, RAETSEL.md R120) statt an einem Ding
@@ -1575,6 +1588,7 @@ var Generator = (function () {
         if ((f.art === 'zahl' || f.art === 'richtung' || f.art === 'teil') && this.spieler > 1 && this.r.chance(0.5)) {
             rg.privat = 1 + this.r.bis(this.spieler);
         }
+        if (f.takt) rg.takt = true;                                  // R28: die Ziffern erklingen zum Mitzaehlen
         this.p.regeln.push(rg);
         return rg;
     };
@@ -1807,7 +1821,7 @@ var Generator = (function () {
         g.raum = g.raum || this.raum();
         g.zone = this.zoneFuer(g.raum, opt);
         var arten = tiefe <= 0 ? ['frei'] : this.r.mischen(['frei', 'hindernis', 'hindernis', 'hindernis', 'behaelter', 'behaelter',
-            'traeger', 'richtung', 'richtung', 'zweitfach', 'luegner', 'hausordnung', 'verrueckt']);
+            'traeger', 'richtung', 'richtung', 'zweitfach', 'luegner', 'hausordnung', 'verrueckt', 'klopfen']);
         var i;
         if (tiefe > 0 && arten[0] === 'frei' && this.r.chance(0.6)) arten.push(arten.shift());
         for (i = 0; i < arten.length; i++) {
@@ -1922,6 +1936,32 @@ var Generator = (function () {
         // ohne das Dunkel: gruendlich durchsuchen (kostet Zeit)
         this.aktion({ text: v.name + ' durchsuchen', art: 'durchsuchen', raum: v.raum, ding: v.id, gibt: ['versteck:' + v.id], kosten: SUCHKOSTEN });
         g.lage = v.name + ' (' + V.weg + ')';
+        this.aktion({ text: v.name + ' \u00f6ffnen', art: 'oeffnen', raum: v.raum, ding: v.id, braucht: ['versteck:' + v.id], gibt: ['hat:' + g.id] });
+        return true;
+    };
+
+    // Klopfzeichen orten (R26): Der Gegenstand steckt in einem freien Versteck, aus dem es klopft, sobald der Ausloeser
+    // eintritt. Kein Element zeigt darauf und kein Text nennt es: Man geht dem Klang nach (wer nichts hoert, sieht bei
+    // jedem Schlag Staub rieseln). Hoechstens einmal je Partie.
+    Bau.prototype.lege_klopfen = function (g, tiefe, opt) {
+        var KL = this.K.KLANG, VN = this.K.VERSTECKE, namen = [], i;
+        if (!KL || this.fixtur.klopfen || tiefe < 1 || !this.r.chance(0.5)) return false;
+        for (i = 0; i < VN.length; i++) if (!this.fixtur['name:' + VN[i][0]]) namen.push(VN[i]);
+        if (!namen.length) return false;
+        var vname = this.r.waehle(namen), aus = this.r.waehle(this.K.KLOPF_AUS);
+        this.fixtur['name:' + vname[0]] = true;
+        this.fixtur.klopfen = true;
+        var v = this.ding('versteck', vname[0], g.raum, { verborgen: true, klopft: true, nom: vname[1], akk: vname[2], modell: 'v_' + vname[3] });
+        v.zone = this.zoneFuer(g.raum, opt);
+        var rg = { id: this.id('r'), element: v.id, art: 'klopfen', ausloeser: aus, text: KL.klopfen, ziel: v.id,
+            enthuellung: { art: 'spur' }, privat: null, demo: KL.klopfen };
+        this.p.regeln.push(rg);
+        this.p.start.push('kennt:' + rg.id);
+        var bedarf = this.ausloeserBedarf(aus, v, tiefe - 1, opt);
+        this.aktion({ text: 'dem Klopfen nachgehen (' + v.name + ')', art: 'ereignis', ausloeser: aus, raum: v.raum, ding: v.id, braucht: bedarf,
+            kennt: [rg.id], gibt: ['versteck:' + v.id, 'klopft:' + v.id], sicher: true });
+        this.aktion({ text: v.name + ' durchsuchen', art: 'durchsuchen', raum: v.raum, ding: v.id, gibt: ['versteck:' + v.id], kosten: SUCHKOSTEN });
+        g.lage = v.name + ' (' + KL.klopfenWeg + ')';
         this.aktion({ text: v.name + ' \u00f6ffnen', art: 'oeffnen', raum: v.raum, ding: v.id, braucht: ['versteck:' + v.id], gibt: ['hat:' + g.id] });
         return true;
     };
@@ -2075,22 +2115,47 @@ var Generator = (function () {
         if (form === 'logik') return this.logikCode(schloss, tiefe);
         if (form === 'folge') return this.folgeCode(schloss, tiefe);
         if (form === 'handbuch') return this.handbuchCode(schloss, tiefe);
+        if (form === 'melodie' && this.melodieCode(schloss, tiefe)) return;      // ohne freie Spieluhr: ein gewoehnlicher Code
         schloss.form = 'ganz';
         var el = this.nimmElement('zahl');
         if (!el) throw new Fehlschlag('kein Element fuer einen Code');
         var d = this.elementDing(el.key, this.raum(), {}), aus = this.ausWahl(el.f);
         var rg = this.regel(d, el.f, aus, null), ziffern = '', i;
-        for (i = 0; i < this.cfg.codeLaenge; i++) ziffern += String(this.r.bis(10));
+        // Takt (R28): Schlaege zaehlt man mit, null Schlaege gibt es nicht
+        for (i = 0; i < this.cfg.codeLaenge; i++) ziffern += String(rg.takt ? 1 + this.r.bis(9) : this.r.bis(10));
         schloss.code = ziffern;
         rg.code = ziffern;
         // Ziffer je Kopf (R91): Im Mehrspiel zeigt das Element oft jedem nur seine Stellen; wer noch dabei ist, teilt sich
         // die Stellen (Stelle j gehoert dem Spieler mit Rang (j + versatz) modulo Anzahl). Zusammen ergibt es den Code.
-        if (this.spieler > 1 && this.r.chance(0.6)) { rg.privat = null; rg.verteilt = true; rg.versatz = this.r.bis(this.spieler); }
+        if (!rg.takt && this.spieler > 1 && this.r.chance(0.6)) { rg.privat = null; rg.verteilt = true; rg.versatz = this.r.bis(this.spieler); }
         var bedarf = this.ausloeserBedarf(aus, d, tiefe - 1, {});
         this.aktion({ text: 'Code an ' + d.name + ' ablesen', art: 'ereignis', ausloeser: aus, raum: d.raum, ding: d.id, braucht: bedarf, kennt: [rg.id],
             gibt: ['code:' + schloss.id], sicher: aus !== 'beruehrung' });
         this.enthuelle(rg, tiefe - 1, {});
         schloss.braucht = ['code:' + schloss.id];
+    };
+
+    // Melodie nachspielen (R27): Die Spieluhr spielt eine Folge, am Schloss haengen Klangstaebe mit Zeichen. Der Code ist
+    // die Folge der Staebe (von links 1 bis STAEBE); man hoert ihn, und wer nichts hoert, sieht an der Spieluhr die
+    // Zeichen der Staebe nacheinander aufleuchten. Im Mehrspiel hoert und sieht sie oft nur einer.
+    Bau.prototype.melodieCode = function (schloss, tiefe) {
+        var el = this.nimmElement('melodie');
+        if (!el) return false;
+        var N = this.K.STAEBE, alle = [], i, code = '';
+        for (i = 0; i < this.K.ZEICHEN.length; i++) alle.push(i);
+        var d = this.elementDing(el.key, this.raum(), {}), aus = this.ausWahl(el.f), rg = this.regel(d, el.f, aus, null);
+        for (i = 0; i < this.cfg.codeLaenge; i++) code += String(1 + this.r.bis(N));
+        schloss.code = code;
+        schloss.form = 'melodie';
+        schloss.staebe = this.r.mischen(alle).slice(0, N);
+        rg.code = code;
+        if (this.spieler > 1 && this.r.chance(0.5)) rg.privat = 1 + this.r.bis(this.spieler);
+        var bedarf = this.ausloeserBedarf(aus, d, tiefe - 1, {});
+        this.aktion({ text: 'Melodie an ' + d.name + ' h\u00f6ren', art: 'ereignis', ausloeser: aus, raum: d.raum, ding: d.id, braucht: bedarf, kennt: [rg.id],
+            gibt: ['code:' + schloss.id], sicher: aus !== 'beruehrung' });
+        this.enthuelle(rg, tiefe - 1, {});
+        schloss.braucht = ['code:' + schloss.id];
+        return true;
     };
 
     // Symbolschluessel (R5) und Rechenbild (R3): Am Schloss stehen Zeichen ueber den Stellen, ein Pergament verraet ihre
@@ -2770,6 +2835,8 @@ var Protokoll = (function () {
         zahl: 'zeigt einen Code',
         richtung: 'weist auf ein Versteck',
         verrueckt: 'steht danach woanders',
+        klopfen: 'klopft, bis man es findet',
+        melodie: 'spielt die Folge f\u00fcr die Klangst\u00e4be',
         behaelter: 'gibt etwas frei',
         traeger: 'bringt Unerreichbares heran',
         bedrohung: 'BEDROHUNG',
@@ -2829,7 +2896,7 @@ var Protokoll = (function () {
         var gt = [], j;
         for (j = 0; j < (s.gruppen || []).length; j++) gt.push(Katalog.ZEICHEN[s.gruppen[j].zeichen][0] + ' ' + s.code.substr(s.gruppen[j].von, s.gruppen[j].laenge));
         for (j = 0; j < (s.legende || []).length; j++) gt.push(Katalog.ZEICHEN[s.legende[j].zeichen][0] + ' ' + s.legende[j].ziffer);
-        var form = { symbol: ', Symbolschl\u00fcssel', rechnung: ', Rechenbild', raten: ', nur zu erraten, mit R\u00fcckmeldung', logik: ', Logikgitter', folge: ', Zahlenreihen', handbuch: ', Handbuch und Ger\u00e4t' }[s.form] || '';
+        var form = { symbol: ', Symbolschl\u00fcssel', rechnung: ', Rechenbild', raten: ', nur zu erraten, mit R\u00fcckmeldung', logik: ', Logikgitter', melodie: ', als Folge an Klangst\u00e4ben', folge: ', Zahlenreihen', handbuch: ', Handbuch und Ger\u00e4t' }[s.form] || '';
         return s.name + (s.code ? ' (Code ' + s.code + form + (gt.length ? (s.form === 'teile' || !s.form ? ', aus Teilen: ' : ', Zeichen: ') + gt.join(' \u00b7 ') : '') + ')' : '');
     }
 
@@ -3314,6 +3381,7 @@ var Spiel = (function () {
                         privat.push(m(KAT.ZIFFER_JE_KOPF.replace('{teile}', teile.join(', ')), 'ereignis', vk));
                     }
                 }
+                else if (rg.art === 'zahl' && rg.takt) text += ' ' + KAT.KLANG.takt;          // R28: mitzaehlen statt ablesen
                 else if (rg.art === 'zahl') text += ' Die Ziffern: ' + rg.code.split('').join(' ') + '.';
                 if (rg.art === 'behaelter' || rg.art === 'traeger' || rg.art === 'werkzeug') text += ' Du nimmst es an dich.';
                 if (rg.art === 'richtung') text += ' Die Stelle ist jetzt sichtbar.';
@@ -3386,7 +3454,7 @@ var Spiel = (function () {
             var zu = s.f['schloss:' + d.id] ? ' Es ist offen.' : '';
             for (i = 0; i < schloesserAlle(s.partie).length; i++) {
                 var sc = schloesserAlle(s.partie)[i];
-                if (sc.id === d.id && sc.code) return gross(d.name) + ' mit ' + sc.code.length + ' Ziffern.' + zeichenText(sc) + legendeText(sc) + geraetText(sc) +
+                if (sc.id === d.id && sc.code) return gross(d.name) + ' mit ' + sc.code.length + ' Ziffern.' + zeichenText(sc) + legendeText(sc) + geraetText(sc) + (sc.staebe ? ' ' + KAT.KLANG.staebe.split('{n}').join(String(sc.staebe.length)) : '') +
                     (sc.rueckmeldung ? ' ' + KAT.SCHLOSSTEXT.rueckmeldung : '') + zu;
             }
             return gross(d.name) + '.' + zu;
@@ -3773,6 +3841,11 @@ var Spiel = (function () {
                 if (a.art === 'ereignis' && a.kennt && a.kennt[0] === rg.id && erledigt(s, a)) w.an = true;
             }
             if (rg.art === 'richtung' && rg.ziel) w.ziel = rg.ziel;
+            if (rg.takt) w.takt = true;                                  // R28: Ziffern als Schlaege zum Mitzaehlen
+            // R27: die Folge fuer die Klangstaebe, nur fuer den, der die Spieluhr hoert
+            if (rg.art === 'melodie' && (!rg.privat || s.partie.spieler < 2 || rg.privat === nr)) {
+                for (j = 0; j < s.partie.aktionen.length; j++) { var am = s.partie.aktionen[j]; if (am.art === 'ereignis' && am.kennt && am.kennt[0] === rg.id && erledigt(s, am)) w.code = rg.code; }
+            }
             // Ziffern nur fuer den, dem sie gelten (manche Hinweise sieht nur ein Spieler)
             if (rg.art === 'zahl' && w.an && rg.verteilt) w.code = meineStellen(s, rg, nr);
             else if (rg.art === 'zahl' && w.an && (!rg.privat || s.partie.spieler < 2 || rg.privat === nr)) w.code = rg.code;
@@ -3854,7 +3927,7 @@ var Spiel = (function () {
             for (k = 0; k < alleS.length; k++) if (alleS[k].id === d.id && alleS[k].code) code = true;
             var eintrag = { id: d.id, name: d.name, typ: d.typ, offen: offen, code: code };
             if (suchen) eintrag.suchen = true;
-            if (d.verrueckt) eintrag.w = wirkungen(s, d, nr);       // R24: art verrueckt, an = steht jetzt an seinem zweiten Platz
+            if (d.verrueckt || d.klopft) eintrag.w = wirkungen(s, d, nr);       // R24: art verrueckt, an = steht am zweiten Platz; R26: art klopfen, an = es klopft
             if (d.typ === 'element') { eintrag.w = wirkungen(s, d, nr); if (s.f['waerme:' + d.id]) eintrag.warm = true; }
             // Hausordnung: die drei Plaettchen, wie sie gerade auf der Tafel stehen
             if (d.vorlage === 'hausordnung') eintrag.tafel = ordnungZeile(s, d).split(' \u00b7 ');
@@ -3927,6 +4000,8 @@ var Spiel = (function () {
             }
             // Geraet am Schloss (R80): Farbe der Lampe (Index), Zahl der Zahnraeder, Zeichen, Stand des Hebels (Index)
             if (sc.geraet) e.geraet = [sc.geraet.farbe, sc.geraet.raeder, KAT.ZEICHEN[sc.geraet.zeichen][0], sc.geraet.stand];
+            // Klangstaebe (R27): das Zeichen je Stab, von links
+            if (sc.staebe) { e.staebe = []; for (g = 0; g < sc.staebe.length; g++) e.staebe.push(KAT.ZEICHEN[sc.staebe[g]][0]); }
         }
         return aus;
     }
