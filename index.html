@@ -117,10 +117,16 @@ details summary{cursor:pointer;font-weight:500}
           <button class="knopf" type="button" data-b="benutzen" disabled>Gew&auml;hlte Gegenst&auml;nde benutzen</button>
         </div>
         <div class="reihe" id="codereihe" hidden>
-          <label for="codefeld" class="ziel">Code</label>
-          <input id="codefeld" class="code" inputmode="numeric" maxlength="6">
+          <label for="codefeld" class="ziel" id="codelabel">Code</label>
+          <input id="codefeld" class="code" maxlength="8" autocomplete="off" autocapitalize="characters">
           <button class="knopf" type="button" data-b="eingeben">Eingeben</button>
         </div>
+        <div class="reihe" id="sagreihe" hidden>
+          <label for="sagfeld" class="ziel">Losung</label>
+          <input id="sagfeld" class="code" maxlength="40" autocomplete="off">
+          <button class="knopf" type="button" id="sagKnopf">Sagen</button>
+        </div>
+        <p class="hinweis" id="wahr" hidden></p>
         <div class="reihe">
           <button class="knopf" type="button" data-b="warten">Warten</button>
           <button class="knopf" type="button" data-b="krach" disabled>Mit gew&auml;hltem Gegenstand Krach machen</button>
@@ -274,7 +280,8 @@ var Setting = (function () {
             stille: 'Eine Weile ist es ganz still. Dann:',
             anzahl: 'Als ihr zu zweit davorsteht:',
             licht_nebenan: 'Nebenan wird es dunkel. Hier:',
-            laerm_nebenan: 'Von nebenan dringt L\u00e4rm herein. Dabei:'
+            laerm_nebenan: 'Von nebenan dringt L\u00e4rm herein. Dabei:',
+            abwesenheit: 'Als du zur\u00fcckkommst, ist etwas anders:'
         },
         elemente: {
             puppe: { name: '\u00dcbungspuppe', nom: 'die \u00dcbungspuppe', akk: 'die \u00dcbungspuppe', verb: 'Ansto\u00dfen',
@@ -287,7 +294,6 @@ var Setting = (function () {
                 ['bedrohung', 'Die \u00dcbungspuppe kommt n\u00e4her.'],
                 ['keine', 'Die \u00dcbungspuppe neigt den Kopf. Sonst nichts.'],
                 ['teil', 'Auf dem Sackleinen der \u00dcbungspuppe leuchtet etwas auf. {teil}'],
-                ['werkzeug', 'Die \u00dcbungspuppe l\u00f6st sich vom Pfahl. Man kann sie jetzt tragen, sie ist schwer.'],
                 ['zeitgeber', 'Der Arm der \u00dcbungspuppe r\u00fcckt wie ein Uhrzeiger vor. Steht er oben, ist es zu sp\u00e4t.']] },
             becken: { name: 'Kessel', nom: 'der Kessel', akk: 'den Kessel', verb: 'Hineingreifen',
                 b: 'Ein gro\u00dfer Kessel voll tr\u00fcbem Wasser, daneben ein enger Schacht im Boden.', f: [
@@ -368,8 +374,7 @@ var Setting = (function () {
                 ['traeger', 'Der Kronleuchter ger\u00e4t ins Schwingen und fegt vom Sims, was oben lag: {ziel}.'],
                 ['richtung', 'Der schwingende Kronleuchter wirft einen Schatten, und der Schatten zeigt auf eine Stelle: {ziel}.'],
                 ['bedrohung', 'Der Kronleuchter sackt tief und schwingt nach jedem, der darunter geht.'],
-                ['keine', 'Der Kronleuchter knarrt und dreht sich.'],
-                ['werkzeug', 'Der Kronleuchter rasselt an der Kette herab und liegt jetzt am Boden. Man kann ihn schleppen.']] }
+                ['keine', 'Der Kronleuchter knarrt und dreht sich.']] }
         },
         gegenstaende: {
             hammer: { name: 'Schmiedehammer', nom: 'der Schmiedehammer', akk: 'den Schmiedehammer', b: 'Ein Schmiedehammer mit schwerem Eisenkopf.' },
@@ -406,7 +411,7 @@ var Setting = (function () {
         },
         // Fallgitter vor dem letzten Raum: einer haelt die Kette und bleibt zurueck (Opfer kurz vor Schluss)
         fallgitter: { name: 'Fallgitter', nom: 'das Fallgitter', akk: 'das Fallgitter', verb: 'Kette halten',
-            auf: 'Das Fallgitter hebt sich.', zu: 'Das Fallgitter ist unten.',
+            auf: 'Das Fallgitter ist oben.', zu: 'Das Fallgitter ist unten.',
             halten: 'Du h\u00e4ltst die Kette mit aller Kraft. Das Gitter bleibt oben, solange du nicht losl\u00e4sst. Die anderen m\u00fcssen ohne dich weiter.',
             bleibt: 'Du h\u00e4ltst die Kette. L\u00e4sst du los, f\u00e4llt das Gitter. Du bleibst hier.',
             dank: 'Du hast die Kette gehalten, bis alle durch waren. Ohne dich w\u00e4ren sie nicht drau\u00dfen.',
@@ -489,6 +494,38 @@ var Setting = (function () {
             plaettchen: { name: 'Holzpl\u00e4ttchen', nom: 'das Holzpl\u00e4ttchen', akk: 'das Holzpl\u00e4ttchen', b: 'Ein Holzpl\u00e4ttchen, darauf eingebrannt: \u00bb{bedingung}\u00ab.' },
             getauscht: 'Du nimmst das alte Pl\u00e4ttchen heraus und setzt das neue ein. Jetzt steht da:', passt: 'Das passt nicht in die Tafel.'
         },
+        // Das Offensichtliche (R44): ein Teil eines Codes steht gro\u00df an der Wand, als Teil der Einrichtung
+        gedenktafel: [
+            { name: 'Gedenktafel', nom: 'die Gedenktafel', akk: 'die Gedenktafel', b: 'Eine Gedenktafel aus Stein. Die Namen darauf sind verblasst, gro\u00df lesbar ist nur noch eines:' },
+            { name: 'Bauinschrift', nom: 'die Bauinschrift', akk: 'die Bauinschrift', b: 'Eine Steintafel, die der Baumeister in die Mauer setzen lie\u00df. Darauf steht:' }
+        ],
+        // Wortr\u00e4tsel am Buchstabenschloss: Geheimschrift (R6) oder Anagramm (R102); W\u00f6rter ohne Umlaute, in Gro\u00dfbuchstaben
+        wort: {
+            woerter: ['KRONE', 'SCHILD', 'TURM', 'RITTER', 'FACKEL', 'KERKER', 'WACHE', 'KELCH', 'LANZE', 'MAUER', 'GRUFT', 'ZINNE',
+                'BANNER', 'HELM', 'SPEER', 'BOGEN', 'PFEIL', 'KETTE', 'RIEGEL', 'ZWINGER', 'BURG', 'GOLD', 'SCHATZ', 'DOLCH'],
+            chiffre: { name: 'Pergament in Geheimschrift', nom: 'das Pergament in Geheimschrift', akk: 'das Pergament in Geheimschrift',
+                b: 'Ein Pergament, darauf nur ein Wort in seltsamen Buchstaben: {geheim}.', verschiebung: 'Darunter, kleiner: Jeder Buchstabe steht {n} Pl\u00e4tze weiter im Alphabet.',
+                beispiel: 'Darunter, kleiner: So schreibt man {klar}: {probe}.', hinten: 'Und alles steht von hinten nach vorn.' },
+            anagramm: { name: 'Pergament mit Buchstaben', nom: 'das Pergament mit Buchstaben', akk: 'das Pergament mit Buchstaben',
+                b: 'Ein Pergament, darauf durcheinander die Buchstaben {buchstaben}. Darunter: Richtig geordnet ergeben sie etwas, das in jede Burg geh\u00f6rt.' },
+            // Anfangsbuchstaben (R101): Namen untereinander, ihre Anfaenge ergeben das Wort
+            anfang: { name: 'Liste der Gefangenen', nom: 'die Liste der Gefangenen', akk: 'die Liste der Gefangenen',
+                b: 'Eine Liste, die Namen untereinander geschrieben: {namen}.', hinweis: 'Ganz unten, klein: Auf die Anf\u00e4nge kommt es an.' },
+            namen: { A: ['Agnes', 'Albrecht'], B: ['Berta', 'Bruno'], C: ['Clara', 'Conrad'], D: ['Dietrich', 'Dora'], E: ['Elise', 'Eberhard'],
+                F: ['Friedrich', 'Frieda'], G: ['Gertrud', 'Gottfried'], H: ['Hanna', 'Heinrich'], I: ['Irmgard', 'Ingo'], K: ['Konrad', 'Kunigunde'],
+                L: ['Lutz', 'Luise'], M: ['Mechthild', 'Matthias'], N: ['Notker', 'Nele'], O: ['Otto', 'Oda'], P: ['Paul', 'Petra'], R: ['Rudolf', 'Richlind'],
+                S: ['Sieglinde', 'Siegfried'], T: ['Theodor', 'Thea'], U: ['Ulrich', 'Ute'], W: ['Walther', 'Wilhelmine'], Z: ['Zacharias', 'Zita'] }
+        },
+        // Losung (R104): wer sie im Raum in den Chat schreibt, dem gibt das W\u00e4chterbild frei, was es verbirgt
+        wache: {
+            bild: { name: 'Portr\u00e4t des Burgvogts', nom: 'das Portr\u00e4t des Burgvogts', akk: 'das Portr\u00e4t des Burgvogts',
+                b: 'Ein strenger Herr in \u00d6l. Seine Augen folgen dir. Unter dem Rahmen steht: Wer die Losung nennt, dem \u00f6ffne ich.',
+                auf: 'Das Portr\u00e4t schwingt wie eine T\u00fcr zur Seite. Dahinter: {was}.' },
+            buch: { name: 'Buch der Wache', nom: 'das Buch der Wache', akk: 'das Buch der Wache',
+                b: 'Ein schweres Buch auf einem Pult. Es fl\u00fcstert: Nenne die Losung, und ich gebe her, was ich h\u00fcte.',
+                auf: 'Das Buch klappt auf. Zwischen den Seiten liegt: {was}.' },
+            schon: 'Es hat seine Losung geh\u00f6rt.'
+        },
         // Ziffer je Kopf (R91): was ein Spieler privat sieht, {teile} z. B. "an zweiter Stelle eine 7"
         zifferJeKopf: 'Nur f\u00fcr deine Augen erscheinen Ziffern: {teile}. Die anderen sehen andere Stellen.',
         // Raetsel mit Ton (R26, R27, R28). klopfen: Regel am Versteck, nennt es nicht. takt: haengt an Regeln, deren Ziffern man
@@ -567,6 +604,7 @@ var Setting = (function () {
         ],
         schloesser: {
             zahlenschloss: { name: 'Ziffernschloss', nom: 'das Ziffernschloss', akk: 'das Ziffernschloss', verb: 'Ziffern einstellen', offen: 'Das Ziffernschloss springt auf.' },
+            buchstabenschloss: { name: 'Buchstabenschloss', nom: 'das Buchstabenschloss', akk: 'das Buchstabenschloss', verb: 'Buchstaben einstellen', offen: 'Das Buchstabenschloss springt auf.' },
             schluesselloch: { name: 'T\u00fcrschloss', nom: 'das T\u00fcrschloss', akk: 'das T\u00fcrschloss', verb: 'Aufschlie\u00dfen' },
             doppelhebel: { name: 'zwei Zugketten, weit auseinander', nom: 'die zwei Zugketten', akk: 'die zwei Zugketten', verb: 'Kette ziehen',
                 alt: ['zu zweit gleichzeitig ziehen', 'die erste Kette mit einem Seil festbinden und beim Ziehen der zweiten mitziehen',
@@ -750,7 +788,9 @@ var Katalog = (function () {
         stille:     { text: 'wenn es eine Weile still ist', bedarf: 'stille' },
         anzahl:     { text: 'sobald mindestens zwei davorstehen', bedarf: 'anzahl' },
         licht_nebenan: { text: 'sobald es nebenan dunkel ist', bedarf: 'licht_nebenan' },
-        laerm_nebenan: { text: 'bei L\u00e4rm nebenan', bedarf: 'laerm_nebenan' }
+        laerm_nebenan: { text: 'bei L\u00e4rm nebenan', bedarf: 'laerm_nebenan' },
+        // Wenn keiner im Raum ist (R56): alle gehen hinaus, wer zurueckkommt, sieht es; nur mit zwei Raeumen
+        abwesenheit: { text: 'wenn niemand im Raum ist', bedarf: 'abwesenheit' }
     };
     // nebenan: Was im anderen Raum geschieht, wirkt hier (RAETSEL.md R82); nur in Partien mit zwei Raeumen
     // anzahl braucht zwei Spieler im Raum; der Generator nimmt den Ausloeser nur ab drei Spielern (der Pruefer belegt
@@ -759,15 +799,14 @@ var Katalog = (function () {
     // Jede Faehigkeit: art, aus (erlaubte Ausloeser). Der Satz dazu (mit {ziel} = Versteck oder Inhalt) steht im Setting.
     var ELEMENTE = {
         puppe: { f: [
-            { art: 'richtung', aus: ['wegsehen', 'licht_aus', 'laerm', 'licht_an', 'licht_nebenan'] },
+            { art: 'richtung', aus: ['wegsehen', 'licht_aus', 'laerm', 'licht_an', 'licht_nebenan', 'abwesenheit'] },
             { art: 'richtung', aus: ['laerm', 'beruehrung', 'anzahl'] },
             { art: 'zahl', aus: ['licht_aus'] },
             { art: 'behaelter', aus: ['beruehrung', 'waerme'] },
-            { art: 'traeger', aus: ['laerm', 'licht_aus'] },
+            { art: 'traeger', aus: ['laerm', 'licht_aus', 'abwesenheit'] },
             { art: 'bedrohung', aus: ['wegsehen', 'licht_aus', 'laerm'] },
             { art: 'keine', aus: ['wegsehen', 'laerm', 'hinsehen'] },
             { art: 'teil', aus: ['licht_aus', 'licht_an'] },
-            { art: 'werkzeug', aus: ['beruehrung', 'anzahl'], e: { schwer: 3 } },
             { art: 'zeitgeber', aus: ['zeit'] }
         ] },
         becken: { f: [
@@ -815,7 +854,7 @@ var Katalog = (function () {
             { art: 'verwandler', aus: ['waerme'], rezept: { b: { lang: 2 }, e: { licht: 1, entzuendend: 1, lang: 2 }, zu: 'fackel' } }
         ] },
         gemaelde: { f: [
-            { art: 'richtung', aus: ['naehe', 'hinsehen', 'anzahl'] },
+            { art: 'richtung', aus: ['naehe', 'hinsehen', 'anzahl', 'abwesenheit'] },
             { art: 'zahl', aus: ['licht_aus'] },
             { art: 'behaelter', aus: ['beruehrung'] },
             { art: 'bedrohung', aus: ['hinsehen'] },
@@ -823,7 +862,7 @@ var Katalog = (function () {
             { art: 'teil', aus: ['licht_aus', 'hinsehen', 'licht_nebenan'] }
         ] },
         katze: { f: [
-            { art: 'richtung', aus: ['laerm', 'stille', 'laerm_nebenan'] },
+            { art: 'richtung', aus: ['laerm', 'stille', 'laerm_nebenan', 'abwesenheit'] },
             { art: 'traeger', aus: ['beruehrung', 'laerm'] },
             { art: 'behaelter', aus: ['waerme'] },
             { art: 'bedrohung', aus: ['naehe'] },
@@ -837,8 +876,8 @@ var Katalog = (function () {
             { art: 'teil', aus: ['beruehrung', 'zeit'] }
         ] },
         schaukelstuhl: { f: [
-            { art: 'zahl', aus: ['wegsehen', 'zeit'], takt: true },
-            { art: 'richtung', aus: ['wegsehen', 'anzahl'] },
+            { art: 'zahl', aus: ['wegsehen', 'zeit', 'abwesenheit'], takt: true },
+            { art: 'richtung', aus: ['wegsehen', 'anzahl', 'abwesenheit'] },
             { art: 'behaelter', aus: ['beruehrung'] },
             { art: 'bedrohung', aus: ['wegsehen', 'licht_aus'] },
             { art: 'keine', aus: ['wegsehen'] },
@@ -848,10 +887,10 @@ var Katalog = (function () {
             { art: 'traeger', aus: ['beruehrung'] },
             { art: 'richtung', aus: ['beruehrung'] },
             { art: 'bedrohung', aus: ['naehe'] },
-            { art: 'keine', aus: ['beruehrung'] },
-            { art: 'werkzeug', aus: ['beruehrung', 'laerm'], e: { schwer: 3 } }
+            { art: 'keine', aus: ['beruehrung'] }
         ] }
     };
+    // Werkzeug nur, was man tragen kann (Schild, Kerzen): Uebungspuppe und Kronleuchter wanderten sonst in die Tasche
 
     // Eigenschaften und Staerke wie im Eigenschaftssystem. Kein Gegenstand kennt ein Hindernis.
     // verbrauch: nach einmaligem Gebrauch leer (Phiole). zweit: zweites Leben (R60): Man kann den Gegenstand
@@ -913,6 +952,8 @@ var Katalog = (function () {
     // anforderung (braucht ein Mittel aus alt, wie ein Hindernis).
     var SCHLOESSER = {
         zahlenschloss: { art: 'code' },
+        // Code ist ein Wort (Geheimschrift R6, Anagramm R102)
+        buchstabenschloss: { art: 'code', buchstaben: true },
         schluesselloch: { art: 'schluessel' },
         doppelhebel: { art: 'anforderung', alt: [{ h: 2 }, { b: { reissfest: 1 } }, { b: { lang: 2 } }] },
         druckplatte: { art: 'anforderung', alt: [{ b: { schwer: 3 } }, { h: 2 }] },
@@ -1000,6 +1041,18 @@ var Katalog = (function () {
     if (!S.tafel) fehlt('tafel');
     // Logikgitter (R8): Zeichen brauchen bestimmte Artikel, die Saetze alle Arten des Generators
     if (!S.zifferJeKopf || S.zifferJeKopf.indexOf('{teile}') < 0) fehlt('zifferJeKopf');
+    if (!S.gedenktafel || !S.gedenktafel.length) fehlt('gedenktafel');
+    if (!S.wache || !S.wache.bild || !S.wache.buch || !S.wache.schon) fehlt('wache');
+    uebernimm({}, S.wache.bild, ['name', 'nom', 'akk', 'b', 'auf'], 'wache.bild');
+    uebernimm({}, S.wache.buch, ['name', 'nom', 'akk', 'b', 'auf'], 'wache.buch');
+    if (!S.wort || !S.wort.woerter || S.wort.woerter.length < 6 || !S.wort.chiffre || !S.wort.anagramm) fehlt('wort');
+    for (i = 0; i < S.wort.woerter.length; i++) if (!/^[A-Z]{4,8}$/.test(S.wort.woerter[i])) fehlt('wort.woerter[' + i + '] (4 bis 8 Grossbuchstaben)');
+    uebernimm({}, S.wort.chiffre, ['name', 'nom', 'akk', 'b', 'verschiebung', 'beispiel', 'hinten'], 'wort.chiffre');
+    uebernimm({}, S.wort.anagramm, ['name', 'nom', 'akk', 'b'], 'wort.anagramm');
+    uebernimm({}, S.wort.anfang || {}, ['name', 'nom', 'akk', 'b', 'hinweis'], 'wort.anfang');
+    // jeder Buchstabe der Woerter braucht Namen (Anfangsbuchstaben, R101)
+    for (i = 0; i < S.wort.woerter.length; i++) for (k = 0; k < S.wort.woerter[i].length; k++) if (!S.wort.namen || !S.wort.namen[S.wort.woerter[i].charAt(k)]) fehlt('wort.namen.' + S.wort.woerter[i].charAt(k));
+    for (i = 0; i < S.gedenktafel.length; i++) uebernimm({}, S.gedenktafel[i], ['name', 'nom', 'akk', 'b'], 'gedenktafel[' + i + ']');
     if (!S.hausordnung || !S.hausordnung.wirkung || !S.hausordnung.wirkung.behaelter || !S.hausordnung.plaettchen) fehlt('hausordnung');
     uebernimm({}, S.hausordnung, ['name', 'nom', 'akk', 'verb', 'b', 'zeile', 'nie', 'getauscht', 'passt'], 'hausordnung');
     uebernimm({}, S.hausordnung.plaettchen, ['name', 'nom', 'akk', 'b'], 'hausordnung.plaettchen');
@@ -1038,7 +1091,7 @@ var Katalog = (function () {
         version: 3, SETTING: S.id, ARTEN: ARTEN, AUSLOESER: AUSLOESER, ELEMENTE: ELEMENTE, GEGENSTAENDE: GEGENSTAENDE,
         EIGENSCHAFT_TEXT: EIGENSCHAFT_TEXT, ZU_WENIG: S.zuWenig, HINDERNISSE: HINDERNISSE, SCHLOESSER: SCHLOESSER, GEGENMITTEL: GEGENMITTEL,
         VERSTECKE: S.verstecke, LICHT: S.licht, WASSER: WASSER, SCHLUESSEL: S.schluessel, NOTIZ: S.notiz, STORIES: S.stories,
-        VERWANDLUNGEN: S.verwandlungen, ZAEHL: S.zaehl, LOGIK: S.logik, LUEGNER: S.luegner, HANDBUCH: S.handbuch, ZIFFER_JE_KOPF: S.zifferJeKopf, KLEIN: KLEIN, BEWEGLICH: BEWEGLICH, VERRUECKT: S.verrueckt, KLANG: S.klang, KLOPF_AUS: KLOPF_AUS, STAEBE: STAEBE, DURCHREICHE: S.durchreiche, HAUSORDNUNG: S.hausordnung, FALLGITTER: FALLGITTER_K, ZEICHEN: S.zeichen, FETZEN: S.fetzen, UHR: S.uhr, ZWISCHENTUER: S.zwischentuer, TAFEL: S.tafel, INSCHRIFT: INSCHRIFT_K,
+        VERWANDLUNGEN: S.verwandlungen, ZAEHL: S.zaehl, LOGIK: S.logik, LUEGNER: S.luegner, HANDBUCH: S.handbuch, ZIFFER_JE_KOPF: S.zifferJeKopf, KLEIN: KLEIN, BEWEGLICH: BEWEGLICH, VERRUECKT: S.verrueckt, KLANG: S.klang, KLOPF_AUS: KLOPF_AUS, STAEBE: STAEBE, DURCHREICHE: S.durchreiche, HAUSORDNUNG: S.hausordnung, GEDENKTAFEL: S.gedenktafel, WORT: S.wort, WACHE: S.wache, FALLGITTER: FALLGITTER_K, ZEICHEN: S.zeichen, FETZEN: S.fetzen, UHR: S.uhr, ZWISCHENTUER: S.zwischentuer, TAFEL: S.tafel, INSCHRIFT: INSCHRIFT_K,
         SCHLOSSTEXT: S.schlosstext,
         HELL: S.hell, DUNKEL: S.dunkel
     };
@@ -1537,7 +1590,8 @@ var Generator = (function () {
         for (i = 0; i < f.aus.length; i++) {
             a = f.aus[i];
             if (a === 'anzahl' && (this.spieler < 3 || this.p.opfer || this.p.getrennt)) continue;
-            if ((a === 'licht_nebenan' || a === 'laerm_nebenan') && this.p.raeume.length < 2) continue;
+            if ((a === 'licht_nebenan' || a === 'laerm_nebenan' || a === 'abwesenheit') && this.p.raeume.length < 2) continue;
+            if (a === 'abwesenheit' && this.p.opfer) continue;      // wer die Kette haelt, bleibt: der Raum wird nie leer
             l.push(a);
         }
         return this.r.waehle(l.length ? l : f.aus);
@@ -1657,6 +1711,15 @@ var Generator = (function () {
             case 'licht_an': this.licht(el.raum); return ['wieder_hell:' + el.raum];
             case 'licht_nebenan': var nl = el.raum === 'r1' ? 'r2' : 'r1'; this.licht(nl); return ['licht_aus:' + nl];
             case 'laerm_nebenan': var nn = el.raum === 'r1' ? 'r2' : 'r1'; this.laerm(nn, tiefe, opt); return ['laerm:' + nn];
+            case 'abwesenheit':
+                // alle gehen in den anderen Raum (getrennt erst, wenn die Tuer offen ist); zurueck sieht man die Wirkung
+                if (!this.fixtur['abwesend:' + el.raum]) {
+                    var na = el.raum === 'r1' ? 'r2' : 'r1';
+                    this.aktion({ text: 'alle verlassen ' + this.p.raeume.filter(function (x) { return x.id === el.raum; })[0].name, art: 'raeumen', raum: na,
+                        braucht: this.p.getrennt ? ['offen:r2'] : [], gibt: ['verlassen:' + el.raum], sicher: true });
+                    this.fixtur['abwesend:' + el.raum] = true;
+                }
+                return ['verlassen:' + el.raum];
             case 'stille':
                 if (!this.fixtur['stille:' + el.raum]) {
                     this.aktion({ text: 'still abwarten', art: 'warten', raum: el.raum, kosten: 3, gibt: ['stille:' + el.raum], sicher: true });
@@ -1821,7 +1884,7 @@ var Generator = (function () {
         g.raum = g.raum || this.raum();
         g.zone = this.zoneFuer(g.raum, opt);
         var arten = tiefe <= 0 ? ['frei'] : this.r.mischen(['frei', 'hindernis', 'hindernis', 'hindernis', 'behaelter', 'behaelter',
-            'traeger', 'richtung', 'richtung', 'zweitfach', 'luegner', 'hausordnung', 'verrueckt', 'klopfen']);
+            'traeger', 'richtung', 'richtung', 'zweitfach', 'luegner', 'hausordnung', 'verrueckt', 'klopfen', 'losung']);
         var i;
         if (tiefe > 0 && arten[0] === 'frei' && this.r.chance(0.6)) arten.push(arten.shift());
         for (i = 0; i < arten.length; i++) {
@@ -2422,6 +2485,97 @@ var Generator = (function () {
         schloss.braucht = ['code:' + schloss.id];
     };
 
+    // Wortr\u00e4tsel am Buchstabenschloss: Der Code ist ein Wort aus der Wortliste des Settings. Quelle ist ein Pergament,
+    // entweder in Geheimschrift (R6: jeder Buchstabe um n verschoben; Stufe 1 sagt n, ab Stufe 2 nur ein Beispielwort,
+    // Stufe 3 dazu von hinten nach vorn) oder als Anagramm (R102: nur Woerter, deren Buchstaben kein anderes Wort der
+    // Liste ergeben).
+    function verschiebe(w, n) {
+        var aus = '', i;
+        for (i = 0; i < w.length; i++) aus += String.fromCharCode(65 + (w.charCodeAt(i) - 65 + n) % 26);
+        return aus;
+    }
+    function umgedreht(w) { return w.split('').reverse().join(''); }
+    function buchstabenVon(w) { var l = w.split(''); l.sort(); return l.join(''); }
+    Bau.prototype.wortCode = function (schloss, tiefe) {
+        var wr = this.wortRaetsel(this.teilRaum(schloss), tiefe);
+        var a = this.aktion({ text: wr.notiz.name + ' lesen', art: 'lesen', raum: wr.notiz.raum, braucht: ['hat:' + wr.notiz.id], gibt: ['code:' + schloss.id], sicher: true });
+        a.zettel = true;
+        schloss.code = wr.wort;
+        schloss.form = wr.form;
+        schloss.buchstaben = true;
+        schloss.braucht = ['code:' + schloss.id];
+    };
+
+    // Ein Wort und das Pergament, das es verraet (Geheimschrift, Anagramm, Anfangsbuchstaben); jedes Verfahren und jedes
+    // Wort hoechstens einmal je Partie, sonst hiessen zwei Pergamente gleich
+    Bau.prototype.wortRaetsel = function (raum, tiefe) {
+        var W = this.K.WORT, i, j, eindeutig = [];
+        for (i = 0; i < W.woerter.length; i++) {
+            var gleich = 0;
+            for (j = 0; j < W.woerter.length; j++) if (buchstabenVon(W.woerter[j]) === buchstabenVon(W.woerter[i])) gleich++;
+            if (gleich === 1 && !this.fixtur['wort:' + W.woerter[i]]) eindeutig.push(W.woerter[i]);
+        }
+        var x = this.r.zahl(), form = x < 0.4 ? 'chiffre' : x < 0.7 ? 'anagramm' : 'anfang', T, wort, text, fx = this.fixtur;
+        var reihe = form === 'chiffre' ? ['chiffre', 'anagramm', 'anfang'] : form === 'anagramm' ? ['anagramm', 'anfang', 'chiffre'] : ['anfang', 'chiffre', 'anagramm'];
+        reihe = reihe.filter(function (f) { return !fx['wortform:' + f]; });
+        if (!reihe.length) throw new Fehlschlag('kein Wortraetsel mehr frei');
+        form = reihe[0]; T = W[form];
+        this.fixtur['wortform:' + form] = true;
+        wort = this.r.waehle(eindeutig);
+        this.fixtur['wort:' + wort] = true;
+        if (form === 'chiffre') {
+            var n = 1 + this.r.bis(5), hinten = this.p.stufe >= 3, kodiere = function (w) { var v = verschiebe(w, n); return hinten ? umgedreht(v) : v; };
+            text = T.b.replace('{geheim}', kodiere(wort));
+            if (this.p.stufe === 1) text += ' ' + T.verschiebung.replace('{n}', String(n));
+            else {
+                var andere = W.woerter.filter(function (x) { return x !== wort; }), probe = this.r.waehle(andere);
+                text += ' ' + T.beispiel.replace('{klar}', probe).replace('{probe}', kodiere(probe));
+            }
+            if (hinten) text += ' ' + T.hinten;
+        } else if (form === 'anfang') {
+            // Anfangsbuchstaben (R101): je Buchstabe ein Name; Stufe 3 ohne den Hinweis auf die Anfaenge
+            var namen = [], gesehen = {};
+            for (i = 0; i < wort.length; i++) {
+                var nm = this.r.waehle(W.namen[wort.charAt(i)]);
+                if (gesehen[nm]) nm = W.namen[wort.charAt(i)][0] === nm ? W.namen[wort.charAt(i)][1] : W.namen[wort.charAt(i)][0];
+                gesehen[nm] = true;
+                namen.push(nm);
+            }
+            text = T.b.replace('{namen}', namen.join(', ')) + (this.p.stufe < 3 ? ' ' + T.hinweis : '');
+        } else {
+            var l = this.r.mischen(wort.split(''));
+            if (l.join('') === wort) l.reverse();
+            text = T.b.replace('{buchstaben}', l.join(', '));
+        }
+        var g = this.ding('gegenstand', T.name, null, { vorlage: 'notiz', e: {}, nom: T.nom, akk: T.akk, b: text });
+        g.raum = raum;
+        this.platziere(g, tiefe - 1, {});
+        return { wort: wort, form: form, notiz: g };
+    };
+
+    // Losung (R104) und der Raum hoert mit (R103): Ein Waechterbild gibt frei, was es verbirgt, sobald jemand im Raum die
+    // Losung in den Chat schreibt. Die Losung verraet ein Pergament wie beim Buchstabenschloss. Im Stil ohne Gemaelde
+    // ist es das fluesternde Buch auf dem Pult. Hoechstens einmal je Partie.
+    Bau.prototype.lege_losung = function (g, tiefe, opt) {
+        if (this.fixtur.losung || !this.r.chance(0.5)) return false;
+        var W = this.K.WACHE, art = this.K.ELEMENTE.gemaelde ? 'bild' : 'buch', T = W[art];
+        // dasselbe Modell als Element im Raum saehe aus wie ein zweiter Waechter: das Element bleibt dann weg
+        var elKey = art === 'bild' ? 'gemaelde' : 'radio';
+        if (this.fixtur['name:' + T.name] || this.elementeFrei.indexOf(elKey) < 0) return false;
+        this.elementeFrei.splice(this.elementeFrei.indexOf(elKey), 1);
+        this.fixtur.losung = true;
+        this.fixtur['name:' + T.name] = true;
+        var d = this.ding('fixtur', T.name, g.raum, { vorlage: 'waechter', modell: art === 'bild' ? 'gemaelde' : 'radio', leihStand: true, nom: T.nom, akk: T.akk });
+        d.zone = this.zoneFuer(g.raum, opt);
+        var wr = this.wortRaetsel(this.raum(), tiefe);
+        var a = this.aktion({ text: wr.notiz.name + ' lesen', art: 'lesen', raum: wr.notiz.raum, braucht: ['hat:' + wr.notiz.id], gibt: ['losung:' + d.id], sicher: true });
+        a.zettel = true;
+        g.lage = 'hinter ' + d.name + ', das die Losung ' + wr.wort + ' h\u00f6ren will';
+        var la = this.aktion({ text: 'die Losung ' + wr.wort + ' sagen (' + d.name + ')', art: 'losung', raum: g.raum, ding: d.id, braucht: ['losung:' + d.id], gibt: ['hat:' + g.id] });
+        la.wort = wr.wort;
+        return true;
+    };
+
     // Raten mit Rueckmeldung (R14): keine Quelle, das Schloss zeigt nach jedem Fehlversuch, wie viele Ziffern stimmen.
     // Der Pruefer rechnet dafuer mit mehreren Versuchen (kosten).
     Bau.prototype.rateCode = function (schloss) {
@@ -2490,6 +2644,8 @@ var Generator = (function () {
                 this.zaehlReihe(zaehlKey, t, fakt, schloss);
             } else if (!el && j !== uhrBei && wahl >= 0.75 && !this.fixtur.inschrift) {
                 this.inschrift(t, fakt, tiefe);
+            } else if (!el && j !== uhrBei && wahl >= 0.62 && wahl < 0.7 && !this.fixtur.gedenktafel) {
+                this.gedenktafel(t, fakt, schloss);
             } else if (el) {
                 var d = this.elementDing(el.key, this.teilRaum(schloss), {}), aus = this.ausWahl(el.f);
                 var rg = this.regel(d, el.f, aus, null);
@@ -2530,6 +2686,17 @@ var Generator = (function () {
             zeichenText: Z.zeichen.replace('{zeichen}', this.K.ZEICHEN[t.zeichen][1]) });
         d.zone = this.zoneFuer(raum, {});
         var a = this.aktion({ text: Z.name + ' z\u00e4hlen', art: 'zaehlen', raum: raum, ding: d.id, gibt: [fakt], sicher: true });
+        a.teil = t;
+    };
+
+    // Das Offensichtliche (R44): Der Teil steht von Anfang an lesbar an der Wand, als Gedenktafel oder Bauinschrift.
+    // Man muss nur darauf kommen, dass er gemeint ist; das Zeichen daneben sagt, an welche Stelle.
+    Bau.prototype.gedenktafel = function (t, fakt, schloss) {
+        var G = this.r.waehle(this.K.GEDENKTAFEL), raum = this.teilRaum(schloss);
+        this.fixtur.gedenktafel = true;
+        var d = this.ding('fixtur', G.name, raum, { vorlage: 'gedenktafel', modell: 'inschrift', nom: G.nom, akk: G.akk, b: G.b, teilText: this.teilText(t) });
+        d.zone = this.zoneFuer(raum, {});
+        var a = this.aktion({ text: G.name + ' lesen', art: 'ablesen', raum: raum, ding: d.id, gibt: [fakt], sicher: true });
         a.teil = t;
     };
 
@@ -2608,7 +2775,7 @@ var Generator = (function () {
         sd.zone = this.zoneFuer(tuerRaum, {});
         var schlossInfo = { id: sd.id, vorlage: art, name: s.name };
         if (s.art === 'code') {
-            this.code(schlossInfo, tiefe);
+            if (s.buchstaben) { sd.modell = 'zahlenschloss'; this.wortCode(schlossInfo, tiefe); } else this.code(schlossInfo, tiefe);
             this.aktion({ text: 'Code ' + schlossInfo.code + ' an ' + s.akk + ' eingeben', art: 'eingeben', raum: tuerRaum, ding: sd.id,
                 braucht: schlossInfo.braucht, gibt: ['schloss:' + sd.id], kosten: schlossInfo.kosten || 1 });
             delete schlossInfo.braucht;
@@ -2666,14 +2833,16 @@ var Generator = (function () {
         var mitDurchreiche = getrennt && this.r.chance(0.7);
         var tuer = this.ding('fixtur', story.ausgang.name, tuerRaum, { vorlage: 'ausgang', nom: story.ausgang.nom, akk: story.ausgang.akk });
         var anzahl = Math.min(3, cfg.schloesser + (this.spieler >= 3 && cfg.schloesser < 3 ? 1 : 0));
-        var K = this.K, arten = this.r.mischen(['zahlenschloss', 'schluesselloch', 'doppelhebel', 'druckplatte', 'hebelpaar'].filter(function (x) {
+        var K = this.K, arten = this.r.mischen(['zahlenschloss', 'schluesselloch', 'doppelhebel', 'druckplatte', 'hebelpaar', 'buchstabenschloss'].filter(function (x) {
             return !!K.SCHLOESSER[x] && (x !== 'hebelpaar' || zwei);                  // Ketten in zwei Raeumen brauchen zwei Raeume
         }));
         // Codes und Schluessel tragen die Raetselketten; Hebel und Platte sind Beigaben
         // stabil sortiert (Rhino sortiert nicht stabil): Gleichstand entscheidet die gewuerfelte Reihenfolge
-        var rang = function (x) { return (x === 'zahlenschloss' || x === 'schluesselloch' ? 0 : 1) * 10 + arten.indexOf(x); };
+        // das Buchstabenschloss nur in etwa einer von drei Partien, sonst verdraengte es die anderen Schloesser
+        if (!this.r.chance(0.35)) arten = arten.filter(function (x) { return x !== 'buchstabenschloss'; });
+        var rang = function (x) { return (x === 'zahlenschloss' || x === 'schluesselloch' || x === 'buchstabenschloss' ? 0 : 1) * 10 + arten.indexOf(x); };
         arten = arten.slice().sort(function (a, b) { return rang(a) - rang(b); });
-        if (p.opfer) arten = arten.filter(function (x) { return x === 'zahlenschloss' || x === 'schluesselloch'; });
+        if (p.opfer) arten = arten.filter(function (x) { return x === 'zahlenschloss' || x === 'schluesselloch' || x === 'buchstabenschloss'; });
         if (getrennt) arten = arten.filter(function (x) { return x !== 'zahlenschloss' && (!mitDurchreiche || x !== 'schluesselloch'); });   // sitzen an der Tuer
         // linear: die Zugketten nie an die Zwischentuer, ihre zweite Kette hinge im noch verschlossenen Raum
         if (linear && arten.indexOf('hebelpaar') > 0) { arten.splice(arten.indexOf('hebelpaar'), 1); arten.unshift('hebelpaar'); }
@@ -2896,7 +3065,7 @@ var Protokoll = (function () {
         var gt = [], j;
         for (j = 0; j < (s.gruppen || []).length; j++) gt.push(Katalog.ZEICHEN[s.gruppen[j].zeichen][0] + ' ' + s.code.substr(s.gruppen[j].von, s.gruppen[j].laenge));
         for (j = 0; j < (s.legende || []).length; j++) gt.push(Katalog.ZEICHEN[s.legende[j].zeichen][0] + ' ' + s.legende[j].ziffer);
-        var form = { symbol: ', Symbolschl\u00fcssel', rechnung: ', Rechenbild', raten: ', nur zu erraten, mit R\u00fcckmeldung', logik: ', Logikgitter', melodie: ', als Folge an Klangst\u00e4ben', folge: ', Zahlenreihen', handbuch: ', Handbuch und Ger\u00e4t' }[s.form] || '';
+        var form = { symbol: ', Symbolschl\u00fcssel', rechnung: ', Rechenbild', raten: ', nur zu erraten, mit R\u00fcckmeldung', logik: ', Logikgitter', melodie: ', als Folge an Klangst\u00e4ben', folge: ', Zahlenreihen', handbuch: ', Handbuch und Ger\u00e4t', chiffre: ', Geheimschrift', anagramm: ', Anagramm', anfang: ', Anfangsbuchstaben' }[s.form] || '';
         return s.name + (s.code ? ' (Code ' + s.code + form + (gt.length ? (s.form === 'teile' || !s.form ? ', aus Teilen: ' : ', Zeichen: ') + gt.join(' \u00b7 ') : '') + ')' : '');
     }
 
@@ -3264,6 +3433,37 @@ var Spiel = (function () {
         return aus;
     }
 
+    // Wenn keiner im Raum ist (R56): Ist gerade niemand in einem Raum, gilt er als verlassen (auch einer, den noch keiner
+    // betreten hat: Wer zum ersten Mal hineinkommt, sieht die Wirkung gleich; so rechnet auch der Pruefer)
+    function verlasseneRaeume(s) {
+        for (var i = 0; i < s.partie.raeume.length; i++) if (!spielerImRaum(s, s.partie.raeume[i].id)) s.f['verlassen:' + s.partie.raeume[i].id] = true;
+    }
+
+    // Losung (R104, R103): Was im Chat geschrieben wird, hoert der Raum. hoert() sagt dem Server, ob ein Satz eine Losung
+    // traegt, die hier noch etwas oeffnet (dann geht er als Befehl sagen an die Engine, sonst nicht)
+    function losungIn(s, nr, text) {
+        var l = s.partie.aktionen, i, t = ' ' + String(text || '').toUpperCase().replace(/[^A-Z]+/g, ' ') + ' ';
+        for (i = 0; i < l.length; i++) {
+            if (l[i].art !== 'losung' || l[i].raum !== s.raum[nr] || erledigt(s, l[i])) continue;
+            if (t.indexOf(' ' + l[i].wort + ' ') >= 0) return l[i];
+        }
+        return null;
+    }
+    function hoert(s, nr, text) { if (!s || s.status !== 'laeuft' || !s.raum[nr]) return null; var a = losungIn(s, nr, text); return a ? a.wort : null; }
+    function sagen(s, nr, text) {
+        var a = losungIn(s, nr, text);
+        if (!a) return [];
+        var sp = sperre(s, a, nr, 1);
+        if (sp) return [sp];
+        var d = s.partie.dinge[a.ding], g = s.partie.dinge[a.gibt[0].slice(4)];
+        fuehreAus(s, a, null);
+        verteile(s, nr);
+        var aus = [m(KAT.WACHE[d.modell === 'gemaelde' ? 'bild' : 'buch'].auf.replace('{was}', nom(g)), 'erfolg'), m('Du steckst den Fund ein.', 'erzaehler', nr)];   // was aufgeht, sehen alle; wer es nimmt, nur der Sprecher
+        aus = aus.concat(ereignisse(s, nr, null));       // ein freigegebenes Pergament liest, wer es nimmt
+        s.log = s.log.concat(aus);
+        return aus;
+    }
+
     function itemsAus(s, ids, nr) {
         var l = [], i;
         for (i = 0; i < (ids || []).length; i++) {
@@ -3428,6 +3628,7 @@ var Spiel = (function () {
         var aus = [m(partie.story.intro.replace('{in}', raumIn(s, start1)), 'system')];
         aus = aus.concat(betrete(s, 1, start1));
         for (i = 2; i <= partie.spieler; i++) s.raum[i] = partie.getrennt && partie.getrennt.r2.indexOf(i) >= 0 ? 'r2' : 'r1';
+        verlasseneRaeume(s);
         // getrennt: Auch die andere Gruppe betritt ihren Raum (Vorfuehrungen dort beginnen)
         if (partie.getrennt) { var start2 = start1 === 'r1' ? 'r2' : 'r1'; aus = aus.concat(betrete(s, partie.getrennt[start2][0], start2)); }
         s.log = aus;
@@ -3454,13 +3655,15 @@ var Spiel = (function () {
             var zu = s.f['schloss:' + d.id] ? ' Es ist offen.' : '';
             for (i = 0; i < schloesserAlle(s.partie).length; i++) {
                 var sc = schloesserAlle(s.partie)[i];
-                if (sc.id === d.id && sc.code) return gross(d.name) + ' mit ' + sc.code.length + ' Ziffern.' + zeichenText(sc) + legendeText(sc) + geraetText(sc) + (sc.staebe ? ' ' + KAT.KLANG.staebe.split('{n}').join(String(sc.staebe.length)) : '') +
+                if (sc.id === d.id && sc.code) return gross(d.name) + ' mit ' + sc.code.length + (sc.buchstaben ? ' Buchstabenringen.' : ' Ziffern.') + zeichenText(sc) + legendeText(sc) + geraetText(sc) + (sc.staebe ? ' ' + KAT.KLANG.staebe.split('{n}').join(String(sc.staebe.length)) : '') +
                     (sc.rueckmeldung ? ' ' + KAT.SCHLOSSTEXT.rueckmeldung : '') + zu;
             }
             return gross(d.name) + '.' + zu;
         }
         if (d.vorlage === 'licht') return KAT.LICHT.b + ' ' + (s.f['licht_aus:' + d.raum] ? KAT.LICHT.aus : KAT.LICHT.an);
         if (d.vorlage === 'zaehl') return KAT.ZAEHL[d.modell].b + ' ' + d.zeichenText;
+        if (d.vorlage === 'gedenktafel') return d.b + ' ' + d.teilText;
+        if (d.vorlage === 'waechter') return (KAT.WACHE[d.modell === 'gemaelde' ? 'bild' : 'buch']).b + (aktionenAn(s, d.id, ['losung']).some(function (a) { return erledigt(s, a); }) ? ' ' + KAT.WACHE.schon : '');
         if (d.vorlage === 'inschrift') {
             for (i = 0; i < s.partie.aktionen.length; i++) {
                 var ai = s.partie.aktionen[i];
@@ -3470,7 +3673,7 @@ var Spiel = (function () {
         }
         if (d.vorlage === 'zwischentuer') {
             var dg = s.partie.durchgang, auf = 0;
-            if (dg.opfer) return gross(d.nom) + '. ' + (s.f['offen:' + dg.nach] ? KAT.FALLGITTER.auf : KAT.FALLGITTER.zu + ' ' + KAT.FALLGITTER.wer);
+            if (dg.opfer) return s.f['offen:' + dg.nach] ? KAT.FALLGITTER.auf : KAT.FALLGITTER.zu + ' ' + KAT.FALLGITTER.wer;
             if (s.f['offen:' + dg.nach]) return gross(d.nom) + '. Sie steht offen.';
             for (i = 0; i < dg.schloesser.length; i++) if (s.f['schloss:' + dg.schloesser[i].id]) auf++;
             return gross(d.nom) + '. ' + KAT.ZWISCHENTUER.zu + ' ' + auf + ' von ' + dg.schloesser.length + (dg.schloesser.length === 1 ? ' Schloss ist offen.' : ' Schl\u00f6ssern sind offen.');
@@ -3589,6 +3792,7 @@ var Spiel = (function () {
         // Wer geht? (R151): Hoelzchen ziehen vor dem Fallgitter. Das Los zeigt nur auf jemanden; bleiben muss nur, wer
         // selbst die Kette nimmt (nie zwingt die Gruppe einen Einzelnen hinaus). Bestimmt aus Seed und Zahl der Lose.
         if (b.art === 'lose') return lose(s, nr);
+        if (b.art === 'sagen') return sagen(s, nr, b.text);
         if (b.art === 'verlassen') {
             // was er traegt, bleibt im Raum liegen, sonst waere es fuer die anderen verloren
             var kv;
@@ -3624,16 +3828,16 @@ var Spiel = (function () {
             case 'ansehen':
                 aus.push(m(ansehenText(s, d)));
                 // Zaehlen: wer die Reihe ansieht, kann sie zaehlen (die Anzahl sieht man im Raum, nicht im Text)
-                l = aktionenAn(s, d.id, ['zaehlen']);
+                l = aktionenAn(s, d.id, ['zaehlen', 'ablesen']);
                 for (i = 0; i < l.length; i++) fuehreAus(s, l[i], null);
                 aus = aus.concat(naechsteVorfuehrung(s, nr, d.id));
                 break;
 
             case 'anfassen':
                 // eine Reihe zum Zaehlen: Anfassen heisst genau hinsehen und zaehlen
-                if (d.vorlage === 'zaehl') {
+                if (d.vorlage === 'zaehl' || d.vorlage === 'gedenktafel') {
                     aus.push(m(ansehenText(s, d)));
-                    l = aktionenAn(s, d.id, ['zaehlen']);
+                    l = aktionenAn(s, d.id, ['zaehlen', 'ablesen']);
                     for (i = 0; i < l.length; i++) fuehreAus(s, l[i], null);
                     break;
                 }
@@ -3757,7 +3961,7 @@ var Spiel = (function () {
                 if (!l.length || !code) { aus.push(m('Hier gibt es nichts einzugeben.')); break; }
                 sp = sperre(s, l[0], nr, 1);
                 if (sp) { aus.push(sp); break; }
-                if (String(b.code) === code) { s.f['code:' + d.id] = true; fuehreAus(s, l[0], null); aus.push(m(gross(nom(d)) + ' springt auf.')); }
+                if (String(b.code).toUpperCase() === code) { s.f['code:' + d.id] = true; fuehreAus(s, l[0], null); aus.push(m(gross(nom(d)) + ' springt auf.')); }
                 else aus.push(m('Falscher Code. Das Schloss bleibt zu.' + (rueckmeldung(s, d.id) ? ' ' + kugeln(code, String(b.code)) : '')));
                 break;
 
@@ -3803,6 +4007,7 @@ var Spiel = (function () {
                 break;
         }
 
+        verlasseneRaeume(s);
         aus = aus.concat(ereignisse(s, nr, b));
         verteile(s, nr);
         // Was eine Handlung im anderen Raum ausloest (Laerm oder Dunkel nebenan), geschieht dort sofort, wenn jemand dort ist
@@ -3923,6 +4128,7 @@ var Spiel = (function () {
                 }
             }
             if (d.vorlage === 'zwischentuer') offen = !!s.f['offen:' + s.partie.durchgang.nach];
+            if (d.vorlage === 'waechter') offen = aktionenAn(s, d.id, ['losung']).some(function (a) { return erledigt(s, a); });   // hat seine Losung gehoert: die Ansicht zeigt ihn offen
             var code = false, alleS = schloesserAlle(s.partie);
             for (k = 0; k < alleS.length; k++) if (alleS[k].id === d.id && alleS[k].code) code = true;
             var eintrag = { id: d.id, name: d.name, typ: d.typ, offen: offen, code: code };
@@ -3932,11 +4138,12 @@ var Spiel = (function () {
             // Hausordnung: die drei Plaettchen, wie sie gerade auf der Tafel stehen
             if (d.vorlage === 'hausordnung') eintrag.tafel = ordnungZeile(s, d).split(' \u00b7 ');
             // Inschrift: einmal lesbar gemacht, steht ihr Teil fuer alle sichtbar im Stein
-            if (d.vorlage === 'inschrift') {
+            if (d.vorlage === 'inschrift' || d.vorlage === 'gedenktafel') {
                 for (k = 0; k < s.partie.aktionen.length; k++) {
                     var ain = s.partie.aktionen[k];
                     if (ain.ding !== d.id || !ain.teil) continue;
-                    eintrag.w = [{ art: 'teil', aus: '', gezeigt: false, an: erledigt(s, ain) }];
+                    // die Gedenktafel ist von Anfang an lesbar (R44)
+                    eintrag.w = [{ art: 'teil', aus: '', gezeigt: false, an: d.vorlage === 'gedenktafel' || erledigt(s, ain) }];
                     if (eintrag.w[0].an) { eintrag.w[0].code = ain.teil.ziffern; if (ain.teil.zeichen !== null) eintrag.w[0].zeichen = KAT.ZEICHEN[ain.teil.zeichen][0]; }
                 }
             }
@@ -3966,6 +4173,8 @@ var Spiel = (function () {
             else if (v === 'zaehl') verb = 'Z\u00e4hlen';
             else if (v === 'hebelpaar') verb = KAT.SCHLOESSER.hebelpaar.verb;
             else if (v === 'hausordnung') verb = KAT.HAUSORDNUNG.verb;
+            else if (v === 'gedenktafel') verb = 'Lesen';
+            else if (v === 'waechter') verb = 'Ansehen';
             else if (v === 'durchreiche') verb = d.einwurf ? KAT.DURCHREICHE[partie.durchreiche.richtung].verb : 'Ansehen';
             // nur gesetzte Felder: Das Partie-Ereignis muss unter der Groessengrenze von Knuddels bleiben
             aus[k] = { name: d.name, typ: d.typ, vorlage: v };
@@ -4011,7 +4220,7 @@ var Spiel = (function () {
         return { setting: partie.setting, stil: partie.stil, titel: partie.story.titel, hell: KAT.HELL, dunkel: KAT.DUNKEL };
     }
 
-    return { version: 4, neu: neu, befehl: befehl, sicht: sicht, namen: namen, rahmen: rahmen };
+    return { version: 4, neu: neu, befehl: befehl, sicht: sicht, namen: namen, rahmen: rahmen, hoert: hoert };
 })();
 
 if (typeof module !== 'undefined' && module.exports) { module.exports = Spiel; }
@@ -4021,7 +4230,21 @@ if (typeof module !== 'undefined' && module.exports) { module.exports = Spiel; }
 (function () {
   "use strict";
   var $ = function (id) { return document.getElementById(id); };
-  var sitzung = null, gewaehlt = null, auswahl = [];
+  var sitzung = null, gewaehlt = null, auswahl = [], namen = {};
+
+  // Was man im Raum hoert und sieht, hier als Text: Im Spiel klingt und bewegt es sich, diese Seite hat nur Worte.
+  function wahrnehmung(d) {
+    var l = [], n = namen[d.id] || {}, staebe = [];
+    Object.keys(namen).forEach(function (id) { if (namen[id].staebe) staebe = namen[id].staebe; });
+    (d.w || []).forEach(function (w) {
+      if (w.art === "klopfen" && w.an && !d.offen) l.push("Von hier kommt das Klopfen.");
+      if (w.art === "verrueckt" && w.an && !d.offen) l.push("Das stand eben noch woanders.");
+      if (w.art === "zahl" && w.takt && w.code) l.push("Du hörst Schläge: " + w.code.split("").map(function (z) { return z + (z === "1" ? " Schlag" : " Schläge"); }).join(", Pause, ") + ".");
+      if (w.art === "melodie" && w.code) l.push("Du hörst die Folge, zu jedem Ton leuchtet ein Zeichen auf: " + w.code.split("").map(function (z) { return staebe[+z - 1] || z; }).join(", ") + ".");
+    });
+    if (n.staebe && !d.offen) l.push("Die Klangstäbe von links: " + n.staebe.map(function (z, i) { return (i + 1) + " " + z; }).join(", ") + ". Die Folge gibst du hier als Ziffern ein.");
+    return l.join(" ");
+  }
 
   function esc(t) { return String(t).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
   var TYP = { element: "Im Raum", gegenstand: "Gegenstand", versteck: "Versteck", schloss: "Schloss", fixtur: "Einrichtung" };
@@ -4060,7 +4283,7 @@ if (typeof module !== 'undefined' && module.exports) { module.exports = Spiel; }
     }).join("") : "";
     if (gewaehlt && !s.dinge.some(function (d) { return d.id === gewaehlt; })) gewaehlt = null;
     $("dinge").innerHTML = s.dinge.map(function (d) {
-      return '<button type="button" class="ding' + (d.id === gewaehlt ? " gewaehlt" : "") + (d.offen ? " offen" : "") + '" data-ding="' + d.id + '"><span class="typ">' + TYP[d.typ] + '</span><span class="name">' + esc(d.name) + "</span></button>";
+      return '<button type="button" class="ding' + (d.id === gewaehlt ? " gewaehlt" : "") + (d.offen ? " offen" : "") + '" data-ding="' + d.id + '"><span class="typ">' + TYP[d.typ] + '</span><span class="name">' + esc(d.name) + ((d.w || []).some(function (w) { return w.art === "klopfen" && w.an; }) && !d.offen ? " (klopft)" : "") + "</span></button>";
     }).join("");
     auswahl = auswahl.filter(function (id) { return s.inventar.some(function (g) { return g.id === id; }); });
     $("inv").innerHTML = s.inventar.length ? s.inventar.map(function (g) {
@@ -4078,6 +4301,12 @@ if (typeof module !== 'undefined' && module.exports) { module.exports = Spiel; }
       b.disabled = !an;
     });
     $("codereihe").hidden = !(d && d.code);
+    var wort = !!(d && (namen[d.id] || {}).vorlage === "buchstabenschloss");
+    $("codelabel").textContent = wort ? "Wort" : "Code";
+    $("codefeld").setAttribute("inputmode", wort ? "text" : "numeric");
+    $("sagreihe").hidden = !(d && !d.offen && (namen[d.id] || {}).vorlage === "waechter");
+    var wt = d ? wahrnehmung(d) : "";
+    $("wahr").textContent = wt; $("wahr").hidden = !wt;
     if (s.status !== "laeuft") {
       $("banner").hidden = false;
       $("banner").className = "banner " + s.status;
@@ -4090,7 +4319,7 @@ if (typeof module !== 'undefined' && module.exports) { module.exports = Spiel; }
     if (!(seed > 0)) { seed = 1 + Math.floor(Math.random() * 99999); $("seed").value = seed; }
     var p = Generator.erzeuge(seed, { spieler: 1, stufe: stufe });
     if (!p) { $("log").innerHTML = ""; melde([{ text: "Für diese Nummer ließ sich keine Partie bauen. Bitte eine andere wählen.", art: "system" }]); return; }
-    sitzung = Spiel.neu(p); gewaehlt = null; auswahl = [];
+    sitzung = Spiel.neu(p); gewaehlt = null; auswahl = []; namen = Spiel.namen(p);
     $("nr").textContent = seed + " / Stufe " + stufe;
     $("log").innerHTML = "";
     melde(sitzung.log);
@@ -4126,9 +4355,20 @@ if (typeof module !== 'undefined' && module.exports) { module.exports = Spiel; }
     else if (art === "benutzen") tue({ art: "benutzen", ding: gewaehlt, mit: auswahl.slice() }, mitText + " an " + name);
     else if (art === "krach") tue({ art: "krach", mit: auswahl.slice() }, "Krach mit " + mitText);
     else if (art === "warten") tue({ art: "warten" }, "Warten");
-    else if (art === "eingeben") { var c = $("codefeld").value.replace(/\D/g, ""); tue({ art: "eingeben", ding: gewaehlt, code: c }, "Code " + c + " an " + name); $("codefeld").value = ""; }
+    else if (art === "eingeben") { var c = $("codefeld").value.replace(/[^0-9A-Za-z]/g, "").toUpperCase(); tue({ art: "eingeben", ding: gewaehlt, code: c }, "Code " + c + " an " + name); $("codefeld").value = ""; }
   });
   $("codefeld").addEventListener("keydown", function (e) { if (e.key === "Enter") document.querySelector('[data-b="eingeben"]').click(); });
+  // Losung: Im Spiel schreibt man sie in den Chat, und der Raum hoert mit
+  function sagLosung() {
+    var text = $("sagfeld").value.replace(/^\s+|\s+$/g, "");
+    if (!text || !sitzung) return;
+    $("sagfeld").value = "";
+    var wort = Spiel.hoert(sitzung, 1, text);
+    if (wort) tue({ art: "sagen", text: wort }, "Sagen: " + text);
+    else melde([{ text: "Nichts rührt sich.", art: "erzaehler" }], "Sagen: " + text);
+  }
+  $("sagKnopf").addEventListener("click", sagLosung);
+  $("sagfeld").addEventListener("keydown", function (e) { if (e.key === "Enter") sagLosung(); });
   $("neu").addEventListener("click", function () { $("seed").value = ""; starte(); });
   $("seed").addEventListener("change", starte);
   $("stufe").addEventListener("change", starte);
