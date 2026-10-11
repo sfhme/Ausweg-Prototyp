@@ -416,6 +416,43 @@ var Setting = (function () {
                 { name: 'Bronzeschl\u00fcssel', nom: 'der Bronzeschl\u00fcssel', akk: 'den Bronzeschl\u00fcssel', b: 'Ein gr\u00fcnlich angelaufener Bronzeschl\u00fcssel.', schloss: ['Bronzeschloss', 'das Bronzeschloss', 'das Bronzeschloss'] }],
             passtNicht: 'Der Schl\u00fcssel passt nicht in dieses Schloss.' },
         // Was ein Element aus einem Gegenstand macht (R61); text: Name der Handlung im Protokoll
+        // Sprechende Gegenst\u00e4nde (R106): Das Orakelbuch beantwortet drei Ja/Nein-Fragen aus seiner Liste. {fragen} = die Liste,
+        // {n} = Nummer, {versteck} = Versteck im Nominativ (klein, mitten im Satz), {antwort} = Ja oder Nein
+        orakel: { name: 'Orakelbuch', nom: 'das Orakelbuch', akk: 'das Orakelbuch',
+            b: 'Ein aufgeschlagenes Buch. Seine Seiten sind leer, bis man ihm eine Frage stellt.',
+            schrift: 'Drei Fragen beantworte ich, mit Ja oder Nein. {fragen}', frage: '{n}: Ist {versteck} das Versteck?',
+            antwort: 'Auf der leeren Seite erscheint: {antwort}', ja: 'Ja.', nein: 'Nein.',
+            stumm: 'Das Buch bleibt leer. Drei Fragen hattest du.', wie: 'Welche Frage? Gib ihre Zahl an.' },
+        // L\u00fcgende Notizen (R112): Zettel fr\u00fcherer Gefangener nennen ein Versteck, einer l\u00fcgt; das Kerkerbuch widerlegt ihn.
+        // {wer} = Name des Gefangenen, {versteck} = Versteck im Nominativ mit gro\u00dfem Anfang, {ehrlich} = der andere
+        notizen: {
+            namen: ['Hagen', 'Ulrich', 'Bertram', 'Gisela', 'Mechthild', 'Otto', 'Irmgard', 'Konrad'],
+            zettel: { name: 'Zettel von {wer}', nom: 'der Zettel von {wer}', akk: 'den Zettel von {wer}',
+                b: 'Ein zerknitterter Zettel, die Schrift zittrig: \u00bb{versteck} ist mein Versteck. Nimm, was darin liegt. {wer}\u00ab' },
+            buch: { name: 'Kerkerbuch', nom: 'das Kerkerbuch', akk: 'das Kerkerbuch',
+                b: 'Das Kerkerbuch der Wache. Bei den Gefangenen steht: \u00bb{wer} l\u00fcgt bei jedem Wort. {ehrlich}: ehrlich bis zuletzt.\u00ab' },
+            // Falsche F\u00e4hrte (R115): der Zettel, der vor dem Element warnt; {zeigt} = Element im Nominativ mit gro\u00dfem Anfang
+            faehrte: 'Ein Zettel, hastig gekritzelt: \u00bb{zeigt} weist nur auf Leeres. Ich habe dort gesucht, bis die Wache kam, und nichts gefunden. {wer}\u00ab' },
+        // Tr\u00e4nke mischen (R62): je zwei Stoffe f\u00e4rben den Kessel; ein Rezeptblatt nennt drei Paare, die Inschrift am Kessel die
+        // verlangte Farbe. {farbe} pr\u00e4dikativ (gr\u00fcn), {stoff} wie im Rezept (ohne Artikel), {was} Nominativ, {a}/{b} Stoffe
+        traenke: {
+            stoffe: ['Quecksilber', 'Salzlauge', 'Kupferwasser', 'Schwefelsud', 'Wermutgeist', 'Bleiwei\u00df'],
+            farben: ['rot', 'gr\u00fcn', 'blau', 'golden', 'violett', 'schwarz', 'silbern'],
+            phiole: { name: 'Phiole {stoff}', b: 'Eine kleine Phiole, darin {stoff}.' },
+            kessel: { name: 'Alchemistenkessel', nom: 'der Alchemistenkessel', akk: 'den Alchemistenkessel', b: 'Ein Kessel aus geschw\u00e4rztem Kupfer auf drei F\u00fc\u00dfen.',
+                schrift: 'F\u00e4rbt sich der Kessel {farbe}, gibt er frei, was er h\u00fctet.', farbe: 'Darin schimmert es {farbe}.' },
+            rezept: { name: 'Rezeptblatt', nom: 'das Rezeptblatt', akk: 'das Rezeptblatt', b: 'Ein fleckiges Rezeptblatt:', zeile: '{a} und {b} f\u00e4rben den Kessel {farbe}.' },
+            giesst: 'Du gie\u00dft {stoff} in den Kessel.', faerbt: 'Der Kessel f\u00e4rbt sich {farbe}.',
+            raucht: 'Es zischt, bei\u00dfender Rauch steigt auf, und der Sud versickert. Das kostet Zeit.',
+            auf: 'Der Kessel f\u00e4rbt sich {farbe}. Der Sud sinkt, und am Boden liegt {was}.',
+            nicht: 'Das geh\u00f6rt nicht in den Kessel.', fertig: 'Der Kessel hat schon hergegeben, was er h\u00fctete.' },
+        // Bauen (R64): was man in der Tasche zusammensetzt. {a}, {b} = die Zutaten im Akkusativ (in der Reihenfolge des Rezepts)
+        bauen: {
+            wurfhaken: { name: 'Wurfhaken', nom: 'der Wurfhaken', akk: 'den Wurfhaken', b: 'Ein Seil mit einem Haken am Ende. Geworfen reicht er weit hinauf und hakt sich fest.',
+                satz: 'Du knotest {a} an {b}. Geworfen reicht das weit hinauf und hakt sich fest.' },
+            fackel: { name: 'Pechfackel', nom: 'die Pechfackel', akk: 'die Pechfackel', b: 'Ein Stab, mit Stoff umwickelt, der hell brennt.',
+                satz: 'Du wickelst {b} um {a} und z\u00fcndest den Stoff an. Er brennt hell.' },
+            nichts: 'Daraus l\u00e4sst sich nichts bauen.', wenig: 'W\u00e4hle zwei oder mehr Dinge, die zusammengeh\u00f6ren.' },
         verwandlungen: {
             fackel: { name: 'Fackel', nom: 'die Fackel', akk: 'die Fackel', b: 'Ein langer Stab mit brennendem Ende.', text: 'eine Fackel anz\u00fcnden',
                 satz: 'Du h\u00e4ltst das Ende in die Flammen, bis es Feuer f\u00e4ngt. Jetzt hast du eine Fackel.' }
@@ -579,6 +616,11 @@ var Setting = (function () {
             anagramm: { name: 'Pergament mit Buchstaben', nom: 'das Pergament mit Buchstaben', akk: 'das Pergament mit Buchstaben',
                 b: 'Ein Pergament, darauf durcheinander die Buchstaben {buchstaben}. Darunter: Richtig geordnet ergeben sie etwas, das in jede Burg geh\u00f6rt.' },
             // R\u00e4tselfrage (R100): Antwort ohne Umlaute; die Zahl der Ringe am Schloss sagt, wie lang sie ist
+            // Was ist hier passiert? (R110): wer zuletzt im Gew\u00f6lbe war; {namen} alphabetisch, {saetze} die Aussagen, {a}/{b} Namen
+            reihe: { name: 'Seite aus dem Wachbuch', nom: 'die Seite aus dem Wachbuch', akk: 'die Seite aus dem Wachbuch',
+                b: 'Eine herausgerissene Seite aus dem Wachbuch: In der letzten Nacht kamen {namen} einzeln ins Gew\u00f6lbe. {saetze} Wer zuletzt kam, dessen Name ist der Schl\u00fcssel.',
+                namen: ['Albert', 'Bruno', 'Clara', 'Dora', 'Emil', 'Frida', 'Gustav', 'Hilde', 'Kuno', 'Lotte'],
+                vor: '{a} kam vor {b}.', direkt: '{b} kam gleich nach {a}.', erst: '{a} war zuerst da.', nicht: '{a} kam nicht zuletzt.', und: 'und' },
             raetsel: { name: 'Pergament mit einer R\u00e4tselfrage', nom: 'das Pergament mit einer R\u00e4tselfrage', akk: 'das Pergament mit einer R\u00e4tselfrage',
                 b: 'Ein Pergament mit einer R\u00e4tselfrage: \u00bb{frage}\u00ab Darunter: Die Antwort ist der Schl\u00fcssel.' },
             fragen: [
@@ -758,6 +800,9 @@ var Setting = (function () {
             ['Lilie', 'eine Lilie', 'die Lilie', 'der Lilie'], ['Schlange', 'eine Schlange', 'die Schlange', 'der Schlange'],
             ['Mond', 'ein Mond', 'der Mond', 'dem Mond'], ['Turm', 'ein Turm', 'der Turm', 'dem Turm'],
             ['Schwert', 'ein Schwert', 'das Schwert', 'dem Schwert'], ['Eichel', 'eine Eichel', 'die Eichel', 'der Eichel']],
+        // Unsichtbare Tinte (R43): ein scheinbar leeres Blatt, das ein Teil des Codes tr\u00e4gt; W\u00e4rme oder N\u00e4sse holen die Schrift hervor
+        tinte: { name: 'leeres Blatt', nom: 'das leere Blatt', akk: 'das leere Blatt', b: 'Ein Blatt Papier, scheinbar leer. Es riecht leicht nach Zitrone.',
+            offen: 'Braune Schrift ist auf dem Blatt hervorgetreten:', alt: ['vorsichtig \u00fcber eine Flamme halten', 'mit etwas Feuchtem benetzen'] },
         fetzen: { name: 'Pergamentfetzen', nom: 'der Pergamentfetzen', akk: 'den Pergamentfetzen', b: 'Ein abgerissener Fetzen Pergament.' },
         // Zeigerstellung (R2): {klein} und {gross} sind Zahlen auf dem Zifferblatt
         uhr: { zeiger: 'Der kleine Zeiger steht {klein}, der gro\u00dfe auf der {gross}.', zwischen: 'zwischen der {a} und der {b}', auf: 'auf der {a}' },
@@ -1154,6 +1199,13 @@ var Katalog = (function () {
     // verwandeln (zerreissen, zerschlagen, entwirren) und hat dann einen anderen mit diesen Eigenschaften, den ersten
     // nicht mehr. Wann sich das lohnt, ist das Raetsel.
     // "lang" meint eine steife Stange (ein Seil ist nicht lang), "haken" etwas, das greift oder einhakt.
+    // Bauen (R64): Rezepte nach Eigenschaften, nicht nach festen Dingen. aus: je Zutat die Bedingung; verbrauch: welche
+    // Zutaten im Gebauten aufgehen (der Feuerstahl bleibt); e: was das Gebaute kann. Geworfen am Seil reicht ein Haken
+    // hinauf (lang), umwickelt und angezuendet gibt ein Stab Licht.
+    var BAUEN = {
+        wurfhaken: { aus: [{ haken: 1 }, { reissfest: 1 }], verbrauch: [0, 1], e: { haken: 1, lang: 3, reissfest: 1 }, modell: ['schnur', 'kleiderhaken'] },
+        fackel: { aus: [{ lang: 2 }, { deckend: 1 }, { entzuendend: 1 }], verbrauch: [0, 1], e: { licht: 2, entzuendend: 1 }, modell: ['besen', 'brechstange'] }
+    };
     var GEGENSTAENDE = {
         hammer:       { e: { schwer: 2, stumpf: 2, laut: 1 } },
         brechstange:  { e: { schwer: 2, lang: 2, stumpf: 1, laut: 1 } },
@@ -1183,7 +1235,7 @@ var Katalog = (function () {
     // Raetsel mit Ton. takt (an einer Faehigkeit zahl): Die Ziffern erklingen als Schlaege zum Mitzaehlen, darum ohne Null (R28).
     // KLOPF_AUS: wann ein Versteck zu klopfen beginnt (R26). STAEBE: Klangstaebe an einem Schloss mit Melodie (R27).
     var KLOPF_AUS = ['stille', 'licht_aus', 'laerm'], STAEBE = 5;
-    var KLEIN = ['kreide', 'messer', 'schere', 'saeurehaltig', 'feuerzeug', 'streichhoelzer', 'taschenlampe', 'tuch', 'handspiegel', 'kleiderhaken',
+    var KLEIN = ['phiole', 'kreide', 'messer', 'schere', 'saeurehaltig', 'feuerzeug', 'streichhoelzer', 'taschenlampe', 'tuch', 'handspiegel', 'kleiderhaken',
         'schnur', 'wecker', 'schluessel', 'notiz', 'plaettchen'];
 
     // Text der Eigenschaften fuer das Protokoll
@@ -1239,6 +1291,8 @@ var Katalog = (function () {
     };
     // Verwitterte Inschrift (Traeger eines Code-Teils): Wege, sie lesbar zu machen
     var INSCHRIFT = [{ b: { licht: 1 } }, { b: { saugfaehig: 1 } }, { b: { scharf: 1 } }];
+    // Unsichtbare Tinte (R43): Waerme (Flamme) oder Naesse (etwas Saugfaehiges) holt sie hervor
+    var TINTE = [{ b: { entzuendend: 1 } }, { b: { saugfaehig: 1 } }];
     // Fallgitter vor dem letzten Raum (Opfer, RAETSEL.md R150): einer haelt die Kette und bleibt zurueck, oder man bindet
     // sie fest. opfer markiert den Weg, bei dem der Haltende nicht mitkommt.
     var FALLGITTER = [{ h: 2, opfer: true }, { b: { reissfest: 1 } }];
@@ -1318,8 +1372,33 @@ var Katalog = (function () {
     uebernimm({}, S.waage, ['b', 'stand', 'auf', 'ab', 'keine', 'lege', 'leicht', 'offen', 'schon'], 'waage');
     if (!S.schluessel.paar || S.schluessel.paar.length !== 2 || !S.schluessel.passtNicht) fehlt('schluessel.paar');
     for (i = 0; i < (S.schluessel.paar || []).length; i++) if (!S.schluessel.paar[i].b || !S.schluessel.paar[i].schloss || S.schluessel.paar[i].schloss.length !== 3) fehlt('schluessel.paar[' + i + ']');
+    if (!S.orakel) fehlt('orakel'); else uebernimm({}, S.orakel, ['name', 'nom', 'akk', 'b', 'schrift', 'frage', 'antwort', 'ja', 'nein', 'stumm', 'wie'], 'orakel');
+    if (!S.notizen) fehlt('notizen');
+    else {
+        if (!S.notizen.namen || S.notizen.namen.length < 2) fehlt('notizen.namen (mindestens 2)');
+        uebernimm({}, S.notizen.zettel || {}, ['name', 'nom', 'akk', 'b'], 'notizen.zettel');
+        uebernimm({}, S.notizen.buch || {}, ['name', 'nom', 'akk', 'b'], 'notizen.buch');
+        uebernimm({}, S.notizen, ['faehrte'], 'notizen');
+    }
+    if (!S.traenke) fehlt('traenke');
+    else {
+        if (!S.traenke.stoffe || S.traenke.stoffe.length < 4) fehlt('traenke.stoffe (mindestens 4)');
+        if (!S.traenke.farben || S.traenke.farben.length < 6) fehlt('traenke.farben (mindestens 6, je Paar eine)');
+        uebernimm({}, S.traenke, ['giesst', 'faerbt', 'raucht', 'auf', 'nicht', 'fertig'], 'traenke');
+        uebernimm({}, S.traenke.kessel || {}, ['name', 'nom', 'akk', 'b', 'schrift', 'farbe'], 'traenke.kessel');
+        uebernimm({}, S.traenke.rezept || {}, ['name', 'nom', 'akk', 'b', 'zeile'], 'traenke.rezept');
+        uebernimm({}, S.traenke.phiole || {}, ['name', 'b'], 'traenke.phiole');
+    }
+    if (!S.bauen) fehlt('bauen');
+    else {
+        for (k in BAUEN) if (BAUEN.hasOwnProperty(k)) { if (!S.bauen[k]) fehlt('bauen.' + k); else uebernimm(BAUEN[k], S.bauen[k], ['name', 'nom', 'akk', 'b', 'satz'], 'bauen.' + k); }
+        uebernimm({}, S.bauen, ['nichts', 'wenig'], 'bauen');
+    }
     if (!S.hebelreihe) fehlt('hebelreihe');
     else uebernimm({}, S.hebelreihe, ['name', 'nom', 'akk', 'verb', 'b', 'schrift', 'stand', 'an', 'aus', 'umgelegt', 'auf', 'fest', 'falsch'], 'hebelreihe');
+    var TINTE_K = null;
+    if (!S.tinte) fehlt('tinte');
+    else { TINTE_K = { alt: TINTE }; uebernimm(TINTE_K, S.tinte, ['name', 'nom', 'akk', 'b', 'offen'], 'tinte'); alternativen(TINTE, S.tinte.alt, 'tinte'); }
     if (!S.balkenwaage) fehlt('balkenwaage');
     else uebernimm({}, S.balkenwaage, ['name', 'nom', 'akk', 'verb', 'b', 'schrift', 'zeichen', 'schon', 'wiegt', 'links', 'rechts', 'gleich', 'klemmt', 'wie', 'voll', 'doppelt'], 'balkenwaage');
     if (!S.regal) fehlt('regal');
@@ -1364,6 +1443,9 @@ var Katalog = (function () {
     uebernimm({}, S.wort.chiffre, ['name', 'nom', 'akk', 'b', 'verschiebung', 'beispiel', 'hinten'], 'wort.chiffre');
     uebernimm({}, S.wort.anagramm, ['name', 'nom', 'akk', 'b'], 'wort.anagramm');
     uebernimm({}, S.wort.anfang || {}, ['name', 'nom', 'akk', 'b', 'hinweis'], 'wort.anfang');
+    uebernimm({}, S.wort.reihe || {}, ['name', 'nom', 'akk', 'b', 'vor', 'direkt', 'erst', 'nicht', 'und'], 'wort.reihe');
+    if (!S.wort.reihe || !S.wort.reihe.namen || S.wort.reihe.namen.length < 4) fehlt('wort.reihe.namen (mindestens 4)');
+    else for (i = 0; i < S.wort.reihe.namen.length; i++) if (!/^[A-Z][a-z]{3,7}$/.test(S.wort.reihe.namen[i])) fehlt('wort.reihe.namen[' + i + '] (4 bis 8 Buchstaben, ohne Umlaut)');
     uebernimm({}, S.wort.raetsel || {}, ['name', 'nom', 'akk', 'b'], 'wort.raetsel');
     if (!S.wort.fragen || S.wort.fragen.length < 6) fehlt('wort.fragen');
     for (i = 0; i < S.wort.fragen.length; i++) if (!/^[A-Z]{3,10}$/.test(S.wort.fragen[i][0]) || !S.wort.fragen[i][1]) fehlt('wort.fragen[' + i + '] (Antwort in Grossbuchstaben, Frage)');
@@ -1413,7 +1495,7 @@ var Katalog = (function () {
         version: 3, SETTING: S.id, ARTEN: ARTEN, AUSLOESER: AUSLOESER, ELEMENTE: ELEMENTE, GEGENSTAENDE: GEGENSTAENDE,
         EIGENSCHAFT_TEXT: EIGENSCHAFT_TEXT, ZU_WENIG: S.zuWenig, HINDERNISSE: HINDERNISSE, SCHLOESSER: SCHLOESSER, GEGENMITTEL: GEGENMITTEL,
         VERSTECKE: S.verstecke, SCHLICHT: S.schlicht, AUSSTATTUNG: S.ausstattung, LICHT: S.licht, WASSER: WASSER, SCHLUESSEL: S.schluessel, NOTIZ: S.notiz, STORIES: S.stories,
-        VERWANDLUNGEN: S.verwandlungen, ZAEHL: S.zaehl, LOGIK: S.logik, LUEGNER: S.luegner, HANDBUCH: S.handbuch, REGAL: S.regal, ZIFFER_JE_KOPF: S.zifferJeKopf, KLEIN: KLEIN, BEWEGLICH: BEWEGLICH, VERRUECKT: S.verrueckt, KLANG: S.klang, KLOPF_AUS: KLOPF_AUS, STAEBE: STAEBE, DURCHREICHE: S.durchreiche, HAUSORDNUNG: S.hausordnung, GEDENKTAFEL: S.gedenktafel, STANDPUNKT: S.standpunkt, STRAHL: S.strahl, WORT: S.wort, WACHE: S.wache, KRUEGE: S.kruege, KERBSTEIN: S.kerbstein, BALKENWAAGE: S.balkenwaage, KAEFIG: KAEFIG, PAKT: S.pakt, KREIDE: S.kreide, NOTSCHACHT: NOTSCHACHT, SPIEGEL: S.spiegel, HEBELREIHE: S.hebelreihe, GABEN: S.gaben, GABEN_REIHE: ['nachtauge', 'gehoer', 'schrift'], WAAGE: S.waage, WAAGE_SCHWER: WAAGE_SCHWER, FALLGITTER: FALLGITTER_K, ZEICHEN: S.zeichen, FETZEN: S.fetzen, UHR: S.uhr, ZWISCHENTUER: S.zwischentuer, TAFEL: S.tafel, INSCHRIFT: INSCHRIFT_K,
+        VERWANDLUNGEN: S.verwandlungen, ZAEHL: S.zaehl, LOGIK: S.logik, LUEGNER: S.luegner, HANDBUCH: S.handbuch, REGAL: S.regal, ZIFFER_JE_KOPF: S.zifferJeKopf, KLEIN: KLEIN, BEWEGLICH: BEWEGLICH, VERRUECKT: S.verrueckt, KLANG: S.klang, KLOPF_AUS: KLOPF_AUS, STAEBE: STAEBE, DURCHREICHE: S.durchreiche, HAUSORDNUNG: S.hausordnung, GEDENKTAFEL: S.gedenktafel, STANDPUNKT: S.standpunkt, STRAHL: S.strahl, WORT: S.wort, WACHE: S.wache, KRUEGE: S.kruege, KERBSTEIN: S.kerbstein, BALKENWAAGE: S.balkenwaage, KAEFIG: KAEFIG, PAKT: S.pakt, KREIDE: S.kreide, NOTSCHACHT: NOTSCHACHT, SPIEGEL: S.spiegel, HEBELREIHE: S.hebelreihe, ORAKEL: S.orakel, NOTIZEN: S.notizen, TRAENKE: S.traenke, BAUEN: BAUEN, BAUEN_TEXT: S.bauen, GABEN: S.gaben, GABEN_REIHE: ['nachtauge', 'gehoer', 'schrift'], WAAGE: S.waage, WAAGE_SCHWER: WAAGE_SCHWER, FALLGITTER: FALLGITTER_K, ZEICHEN: S.zeichen, FETZEN: S.fetzen, TINTE: TINTE_K, UHR: S.uhr, ZWISCHENTUER: S.zwischentuer, TAFEL: S.tafel, INSCHRIFT: INSCHRIFT_K,
         SCHLOSSTEXT: S.schlosstext,
         HELL: S.hell, DUNKEL: S.dunkel
     };
@@ -1937,7 +2019,8 @@ var Generator = (function () {
     // Noch ohne Bild: Raetsel, die es im Kern schon gibt, deren Dinge die Oberflaeche aber noch aus Kaesten baut. Mit
     // opt.bild (Server, Spielseite, Probeseite) kommen sie in keiner Partie vor; ohne (Tests, zeige.js) in jeder. Die
     // PC-Sitzung streicht hier einen Eintrag, sobald das Raetsel Modelle und ein Bild hat (ARBEITSTEILUNG.md 3.1f).
-    var NOCH_OHNE_BILD = { drehlade: 1, spiegel: 1, kaefig: 1, notschacht: 1, pakt: 1, kreide: 1, nachschlagen: 1, waegen: 1, hebelreihe: 1 };
+    var NOCH_OHNE_BILD = { drehlade: 1, spiegel: 1, kaefig: 1, notschacht: 1, pakt: 1, kreide: 1, nachschlagen: 1, waegen: 1, hebelreihe: 1,
+        bauen: 1, traenke: 1, notizen: 1, faehrte: 1, orakel: 1, reihe: 1, tinte: 1 };      // R64, R62, R112, R115, R106, R110, R43
     function Bau(seed, spieler, stufe, versuch, stil, bild) {
         this.aus = bild ? NOCH_OHNE_BILD : {};
         this.r = Zufall.strom(String(seed), 'partie:' + spieler + ':' + stufe + ':' + versuch);
@@ -1958,6 +2041,11 @@ var Generator = (function () {
         if (this.aus.hebelreihe) this.fixtur.hebelreihe = true;
         if (this.aus.pakt) this.fixtur.pakt = true;
         if (this.aus.waegen) this.fixtur.balkenwaage = true;
+        if (this.aus.traenke) this.fixtur.traenke = true;
+        if (this.aus.notizen) this.fixtur.notizen = true;
+        if (this.aus.orakel) this.fixtur.orakel = true;
+        if (this.aus.tinte) this.fixtur.tinte = true;
+        if (this.aus.reihe) this.fixtur['wortform:reihe'] = true;
     }
 
     Bau.prototype.id = function (vor) { this.n++; return vor + this.n; };
@@ -2144,6 +2232,7 @@ var Generator = (function () {
         if (tiefe > 0 && this.r.chance(0.2) && this.werkzeug(b, tiefe, opt)) return true;
         if (this.r.chance(0.3) && this.zweitLeben(b, tiefe, opt)) return true;
         if (tiefe > 0 && this.r.chance(0.3) && this.verwandler(b, tiefe, opt)) return true;
+        if (tiefe > 0 && this.r.chance(0.25) && this.bauen(b, tiefe, opt)) return true;
         var i, k, vorhanden = [];
         for (k in this.p.dinge) {
             if (this.p.dinge.hasOwnProperty(k) && this.p.dinge[k].e && Pruefer.deckt(this.p.dinge[k].e, b) &&
@@ -2232,6 +2321,45 @@ var Generator = (function () {
     };
 
     // Zwei Gegenstaende, die zusammen die Bedingung erfuellen, plus etwas Reissfestes zum Verbinden
+    // Bauen (R64): Was gebraucht wird, entsteht in der Tasche aus Zutaten, die einzeln nicht reichen (keine deckt b allein).
+    // Jedes Rezept hoechstens einmal je Partie; nicht beim getrennten Start (dort zaehlt jedes Ding je Raum).
+    Bau.prototype.bauen = function (b, tiefe, opt) {
+        var BA = this.K.BAUEN, keys = sortiert(BA), wahl = [], i, j, k, self = this;
+        if (!BA || this.aus.bauen || this.p.aufbau === 'getrennt' || this.nurRaum) return false;
+        for (i = 0; i < keys.length; i++) {
+            var R = BA[keys[i]];
+            if (this.fixtur['bau:' + keys[i]] || !Pruefer.deckt(R.e, b)) continue;
+            var zut = [], frei = this.gegenstaendeFrei.slice(), ok = true;
+            for (j = 0; j < R.aus.length && ok; j++) {
+                var passt = frei.filter(function (g) { return Pruefer.deckt(self.K.GEGENSTAENDE[g].e, R.aus[j]) && !Pruefer.deckt(self.K.GEGENSTAENDE[g].e, b); });
+                if (!passt.length) { ok = false; break; }
+                zut.push(passt);
+                frei = frei.filter(function (g) { return passt.indexOf(g) < 0 || g !== passt[0]; });
+            }
+            if (ok) wahl.push(keys[i]);
+        }
+        if (!wahl.length) return false;
+        var key = this.r.waehle(wahl), RZ = BA[key], gs = [], belegt = [];
+        for (j = 0; j < RZ.aus.length; j++) {
+            var kand = this.gegenstaendeFrei.filter(function (g) { return belegt.indexOf(g) < 0 && Pruefer.deckt(self.K.GEGENSTAENDE[g].e, RZ.aus[j]) && !Pruefer.deckt(self.K.GEGENSTAENDE[g].e, b); });
+            if (!kand.length) return false;
+            belegt.push(this.r.waehle(kand));
+        }
+        this.fixtur['bau:' + key] = true;
+        for (j = 0; j < belegt.length; j++) gs.push(this.reserviere(belegt[j]));
+        for (j = 0; j < gs.length; j++) this.platziere(gs[j], tiefe - 1, opt);
+        var mod = RZ.modell.filter(function (m) { return !!self.K.GEGENSTAENDE[m]; })[0] || RZ.modell[0];
+        var y = this.ding('gegenstand', RZ.name, null, { vorlage: 'bau_' + key, modell: mod, e: kopiere(RZ.e), nom: RZ.nom, akk: RZ.akk, b: RZ.b,
+            lage: 'wird gebaut aus ' + gs.map(function (g) { return g.name; }).join(', ') });
+        var gibt = ['hat:' + y.id];
+        for (j = 0; j < RZ.verbrauch.length; j++) gibt.push('weg:' + gs[RZ.verbrauch[j]].id);
+        var a = this.aktion({ text: RZ.name + ' bauen aus ' + gs.map(function (g) { return g.name; }).join(' + '), art: 'bauen', raum: gs[0].raum,
+            braucht: gs.map(function (g) { return 'hat:' + g.id; }), gibt: gibt });
+        a.zutaten = gs.map(function (g) { return g.id; });
+        a.satz = RZ.satz.replace('{a}', gs[0].akk).replace('{b}', gs[1].akk);
+        return true;
+    };
+
     Bau.prototype.zweiteilig = function (b, tiefe, opt) {
         var frei = this.gegenstaendeFrei, i, j, k, ea, eb, u, paare = [];
         for (i = 0; i < frei.length; i++) {
@@ -2293,7 +2421,7 @@ var Generator = (function () {
         g.raum = g.raum || this.raum();
         g.zone = this.zoneFuer(g.raum, opt);
         var arten = tiefe <= 0 ? ['frei'] : this.r.mischen(['frei', 'hindernis', 'hindernis', 'hindernis', 'behaelter', 'behaelter',
-            'traeger', 'richtung', 'richtung', 'zweitfach', 'luegner', 'hausordnung', 'verrueckt', 'klopfen', 'losung', 'kruege', 'strahl', 'flut', 'spiegel', 'hebelreihe']);
+            'traeger', 'richtung', 'richtung', 'zweitfach', 'luegner', 'hausordnung', 'verrueckt', 'klopfen', 'losung', 'kruege', 'strahl', 'flut', 'spiegel', 'hebelreihe', 'traenke', 'notizen', 'orakel']);
         var i;
         if (tiefe > 0 && arten[0] === 'frei' && this.r.chance(0.6)) arten.push(arten.shift());
         for (i = 0; i < arten.length; i++) {
@@ -2387,6 +2515,36 @@ var Generator = (function () {
         }
     };
 
+    // Falsche Faehrte (R115): Ab Stufe 2 manchmal ein Element, das wie ein Hinweis auf ein Versteck weist, aber auf ein leeres.
+    // Ein Zettel eines frueheren Gefangenen warnt vorher davor (offen im Raum, also immer zu erreichen). Nur Ausloeser ohne
+    // eigenen Bedarf: Die Faehrte soll den Raum nicht um weitere Dinge vergroessern. Nie noetig, kostet nur den, der ihr folgt.
+    Bau.prototype.falscheFaehrte = function () {
+        var NZ = this.K.NOTIZEN, self = this, leere = [], k;
+        for (k in this.p.dinge) if (this.p.dinge.hasOwnProperty(k) && this.p.dinge[k].typ === 'versteck' && this.p.dinge[k].leer) leere.push(this.p.dinge[k]);
+        if (!NZ || !NZ.faehrte || this.aus.faehrte || this.p.stufe < 2 || !leere.length || !this.r.chance(0.15)) return;
+        var ohneBedarf = function (a) { return (!self.K.AUSLOESER[a].bedarf || self.K.AUSLOESER[a].bedarf === 'nichts') && a !== 'anzahl' && a !== 'abwesenheit' && a !== 'licht_nebenan' && a !== 'laerm_nebenan'; };
+        var el = this.nimmElement('richtung', function (f) { return f.aus.some(ohneBedarf); });
+        if (!el) return;
+        var w = this.r.waehle(leere), d = this.elementDing(el.key, w.raum, {}), aus = this.r.waehle(el.f.aus.filter(ohneBedarf));
+        var rg = this.regel(d, el.f, aus, w);
+        rg.enthuellung = { art: 'vorfuehrung' };
+        rg.faehrte = true;
+        this.aktion({ text: d.name + ' beobachten', art: 'vorfuehrung', raum: d.raum, ding: d.id, gibt: ['kennt:' + rg.id], sicher: true });
+        this.aktion({ text: 'falsche Faehrte: ' + d.name + ' weist auf ' + w.name + ' (leer)', art: 'ereignis', ausloeser: aus, raum: d.raum, ding: d.id, kennt: [rg.id],
+            gibt: ['faehrte:' + w.id], sicher: aus !== 'beruehrung' });
+        var namen = NZ.namen.filter(function (x) { return !self.fixtur['gefangener:' + x]; });
+        if (!namen.length) return;
+        var wer = this.r.waehle(namen), Z = NZ.zettel, zn = Z.name.replace('{wer}', wer);
+        this.fixtur['gefangener:' + wer] = true;
+        var zt = this.ding('gegenstand', zn, null, { vorlage: 'notiz', e: {}, nom: Z.nom.replace('{wer}', wer), akk: Z.akk.replace('{wer}', wer),
+            b: NZ.faehrte.replace('{zeigt}', d.nom.charAt(0).toUpperCase() + d.nom.slice(1)).replace('{wer}', wer) });
+        zt.raum = d.raum;
+        this.lege_frei(zt);
+        var la = this.aktion({ text: zn + ' lesen', art: 'lesen', raum: zt.raum, braucht: ['hat:' + zt.id], gibt: ['gelesen:' + zt.id], sicher: true });
+        la.zettel = true;
+        this.p.faehrte = { element: d.id, versteck: w.id, zettel: zt.id };
+    };
+
     Bau.prototype.lege_elementregel = function (art, g, tiefe, opt) {
         var el = this.nimmElement(art);
         if (!el) return false;
@@ -2460,6 +2618,107 @@ var Generator = (function () {
         a.gegen = { raum: dort, ding: bank.id };
         return true;
     };
+    // Sprechende Gegenstaende (R106): Der Gegenstand steckt in einem von vier freien Verstecken eines Raums (drei sind leer).
+    // Das Orakelbuch beantwortet drei Ja/Nein-Fragen "Ist X das Versteck?"; drei genuegen immer. Steht das Versteck danach
+    // fest, ist sein Fach entdeckt. Ohne Buch bleibt das Durchsuchen. Nur mit dem Buchmodell des Stils.
+    var ORAKEL_FRAGEN = 3;
+    Bau.prototype.lege_orakel = function (g, tiefe, opt) {
+        var OR = this.K.ORAKEL, VN = this.K.VERSTECKE, frei = [], i, self = this;
+        if (!OR || tiefe < 1 || this.fixtur.orakel || !this.K.ELEMENTE.radio || !this.r.chance(0.3)) return false;
+        for (i = 0; i < VN.length; i++) if (!this.fixtur['name:' + VN[i][0]]) frei.push(VN[i]);
+        if (frei.length < 4) return false;
+        this.fixtur.orakel = true;
+        var vier = this.r.mischen(frei).slice(0, 4), vs = [];
+        vier.forEach(function (x, n) {
+            self.fixtur['name:' + x[0]] = true;
+            var v = self.ding('versteck', x[0], g.raum, { verborgen: true, nom: x[1], akk: x[2], modell: 'v_' + x[3] });
+            if (n > 0) v.leer = true;
+            v.zone = self.zoneFuer(g.raum, opt);
+            self.aktion({ text: v.name + ' durchsuchen', art: 'durchsuchen', raum: g.raum, ding: v.id, gibt: [n ? 'durchsucht:' + v.id : 'versteck:' + v.id], kosten: SUCHKOSTEN });
+            vs.push(v);
+        });
+        this.aktion({ text: vs[0].name + ' \u00f6ffnen', art: 'oeffnen', raum: g.raum, ding: vs[0].id, braucht: ['versteck:' + vs[0].id], gibt: ['hat:' + g.id] });
+        var fragen = this.r.mischen(vs.map(function (v) { return v.id; }));
+        var buch = this.ding('fixtur', OR.name, g.raum, { vorlage: 'orakel', modell: 'radio', nom: OR.nom, akk: OR.akk, fragen: fragen, wahr: vs[0].id });
+        buch.zone = false;
+        g.lage = vs[0].name + ' (eins von vier, das Orakelbuch beantwortet drei Fragen)';
+        var a = this.aktion({ text: OR.name + ' dreimal fragen, das Versteck steht fest', art: 'fragen', raum: g.raum, ding: buch.id, gibt: ['versteck:' + vs[0].id],
+            kosten: ORAKEL_FRAGEN, sicher: true });
+        a.eingaben = ['1', '2', '3'];
+        return true;
+    };
+
+    // Luegende Notizen (R112): Der Gegenstand steckt in einem freien Versteck. Zwei Zettel frueherer Gefangener nennen je ein
+    // Versteck; einer luegt und nennt ein leeres. Das Kerkerbuch der Wache sagt, wer luegt. Lesen verraet nichts von selbst:
+    // Wer einem Zettel glaubt, durchsucht das genannte Versteck (das kostet Zeit wie jede Suche). Die Luege widerlegen das
+    // Kerkerbuch und das leere Versteck selbst.
+    Bau.prototype.lege_notizen = function (g, tiefe, opt) {
+        var NZ = this.K.NOTIZEN, VN = this.K.VERSTECKE, frei = [], i, self = this;
+        if (!NZ || tiefe < 1 || this.fixtur.notizen || !this.r.chance(0.35)) return false;
+        for (i = 0; i < VN.length; i++) if (!this.fixtur['name:' + VN[i][0]]) frei.push(VN[i]);
+        var namen = NZ.namen.filter(function (x) { return !self.fixtur['gefangener:' + x]; });
+        if (frei.length < 2 || namen.length < 2) return false;
+        this.fixtur.notizen = true;
+        var zwei = this.r.mischen(frei).slice(0, 2), wer = this.r.mischen(namen).slice(0, 2);
+        wer.forEach(function (x) { self.fixtur['gefangener:' + x] = true; });
+        zwei.forEach(function (x) { self.fixtur['name:' + x[0]] = true; });
+        var v = this.ding('versteck', zwei[0][0], g.raum, { verborgen: true, nom: zwei[0][1], akk: zwei[0][2], modell: 'v_' + zwei[0][3] });
+        v.zone = this.zoneFuer(g.raum, opt);
+        var w = this.ding('versteck', zwei[1][0], this.raum(), { verborgen: true, leer: true, nom: zwei[1][1], akk: zwei[1][2], modell: 'v_' + zwei[1][3] });
+        this.aktion({ text: w.name + ' durchsuchen', art: 'durchsuchen', raum: w.raum, ding: w.id, gibt: ['durchsucht:' + w.id], kosten: SUCHKOSTEN });
+        this.aktion({ text: v.name + ' durchsuchen', art: 'durchsuchen', raum: v.raum, ding: v.id, gibt: ['versteck:' + v.id], kosten: SUCHKOSTEN });
+        this.aktion({ text: v.name + ' \u00f6ffnen', art: 'oeffnen', raum: v.raum, ding: v.id, braucht: ['versteck:' + v.id], gibt: ['hat:' + g.id] });
+        g.lage = v.name + ' (der Zettel von ' + wer[0] + ' sagt es, ' + wer[1] + ' luegt: ' + w.name + ')';
+        var gross1 = function (t) { return t.charAt(0).toUpperCase() + t.slice(1); }, Z = NZ.zettel;
+        var zettel = function (p, ort) {
+            return self.ding('gegenstand', Z.name.replace('{wer}', p), null, { vorlage: 'notiz', e: {}, nom: Z.nom.replace('{wer}', p), akk: Z.akk.replace('{wer}', p),
+                b: Z.b.replace('{versteck}', gross1(ort.nom)).split('{wer}').join(p) });
+        };
+        var BU = NZ.buch, liste = [zettel(wer[0], v), zettel(wer[1], w),
+            this.ding('gegenstand', BU.name, null, { vorlage: 'notiz', e: {}, nom: BU.nom, akk: BU.akk, b: BU.b.replace('{wer}', wer[1]).replace('{ehrlich}', wer[0]) })];
+        liste.forEach(function (n) {
+            self.platziere(n, 0, opt);
+            var la = self.aktion({ text: n.name + ' lesen', art: 'lesen', raum: n.raum, braucht: ['hat:' + n.id], gibt: ['gelesen:' + n.id], sicher: true });
+            la.zettel = true;
+        });
+        return true;
+    };
+
+    // Traenke mischen (R62): Der Gegenstand liegt im Alchemistenkessel. Vier Phiolen mit je einem Stoff; jedes Paar faerbt den
+    // Kessel anders, die Inschrift nennt die verlangte Farbe, ein Rezeptblatt drei Paare (darunter das richtige). Falsch
+    // gemischt zeigt der Kessel seine Farbe, raucht und kostet Zeit; die Phiolen bleiben. Nur mit Modellen fuer Phiole
+    // und Kessel im Stil.
+    Bau.prototype.lege_traenke = function (g, tiefe, opt) {
+        var TR = this.K.TRAENKE, i, j, self = this;
+        if (!TR || tiefe < 1 || this.fixtur.traenke || !this.K.GEGENSTAENDE.saeurehaltig || !this.K.ELEMENTE.becken || !this.r.chance(0.3)) return false;
+        this.fixtur.traenke = true;
+        var stoffe = this.r.mischen(TR.stoffe.map(function (x, n) { return n; })).slice(0, 4), paare = [], farben = this.r.mischen(TR.farben.map(function (x, n) { return n; }));
+        for (i = 0; i < 4; i++) for (j = i + 1; j < 4; j++) paare.push(Math.min(stoffe[i], stoffe[j]) + '-' + Math.max(stoffe[i], stoffe[j]));
+        var faerbt = {};
+        for (i = 0; i < paare.length; i++) faerbt[paare[i]] = farben[i];
+        var ziel = this.r.waehle(paare), zs = ziel.split('-').map(Number), KS = TR.kessel;
+        var kessel = this.ding('fixtur', KS.name, g.raum, { vorlage: 'mischkessel', modell: 'becken', nom: KS.nom, akk: KS.akk, farben: faerbt, ziel: ziel });
+        kessel.zone = this.zoneFuer(g.raum, opt);
+        var ph = {};
+        stoffe.forEach(function (st) {
+            var nm = TR.phiole.name.replace('{stoff}', TR.stoffe[st]);
+            ph[st] = self.ding('gegenstand', nm, null, { vorlage: 'phiole', modell: 'saeurehaltig', e: {}, stoff: st, nom: 'die ' + nm, akk: 'die ' + nm, b: TR.phiole.b.replace('{stoff}', TR.stoffe[st]) });
+        });
+        stoffe.forEach(function (st) { self.platziere(ph[st], zs.indexOf(st) >= 0 ? tiefe - 1 : 0, opt); });
+        // das Rezeptblatt: das richtige Paar und zwei andere, gemischt
+        var zeilen = [ziel].concat(this.r.mischen(paare.filter(function (x) { return x !== ziel; })).slice(0, 2)), RZ = TR.rezept;
+        zeilen = this.r.mischen(zeilen).map(function (pk) { var ab = pk.split('-').map(Number); return RZ.zeile.replace('{a}', TR.stoffe[ab[0]]).replace('{b}', TR.stoffe[ab[1]]).replace('{farbe}', TR.farben[faerbt[pk]]); });
+        var blatt = this.ding('gegenstand', RZ.name, null, { vorlage: 'notiz', e: {}, nom: RZ.nom, akk: RZ.akk, b: RZ.b + ' ' + zeilen.join(' ') });
+        this.platziere(blatt, tiefe - 1, opt);
+        var la = this.aktion({ text: RZ.name + ' lesen', art: 'lesen', raum: blatt.raum, braucht: ['hat:' + blatt.id], gibt: ['rezept:' + kessel.id], sicher: true });
+        la.zettel = true;
+        g.lage = 'im ' + KS.name + ' (' + TR.stoffe[zs[0]] + ' und ' + TR.stoffe[zs[1]] + ', ' + TR.farben[faerbt[ziel]] + ')';
+        var a = this.aktion({ text: TR.stoffe[zs[0]] + ' und ' + TR.stoffe[zs[1]] + ' in den Kessel giessen, er faerbt sich ' + TR.farben[faerbt[ziel]], art: 'mischen', raum: g.raum, ding: kessel.id,
+            braucht: ['rezept:' + kessel.id, 'hat:' + ph[zs[0]].id, 'hat:' + ph[zs[1]].id], gibt: ['hat:' + g.id], kosten: 2, sicher: true });
+        a.mischung = [ph[zs[0]].id, ph[zs[1]].id];
+        return true;
+    };
+
     // Lichter aus (R15): Der Gegenstand liegt im Fach einer Hebelreihe. Jeder Hebel kippt sich und seine Nachbarn; alle
     // Lampen muessen brennen (alle Hebel oben). Verwuerfelt vom geloesten Stand aus: Die Hebel der Loesung sind genau die,
     // mit denen verwuerfelt wurde. Bei 4 und 6 Hebeln ist das eindeutig (bei 2, 5, 8 ... gaebe es unloesbare Staende).
@@ -3166,8 +3425,8 @@ var Generator = (function () {
             for (j = 0; j < W.woerter.length; j++) if (buchstabenVon(W.woerter[j]) === buchstabenVon(W.woerter[i])) gleich++;
             if (gleich === 1 && !this.fixtur['wort:' + W.woerter[i]]) eindeutig.push(W.woerter[i]);
         }
-        var x = this.r.zahl(), form = x < 0.3 ? 'chiffre' : x < 0.55 ? 'anagramm' : x < 0.75 ? 'anfang' : 'raetsel', T, wort, text, fx = this.fixtur;
-        var alle = ['chiffre', 'anagramm', 'anfang', 'raetsel'], reihe = alle.slice(alle.indexOf(form)).concat(alle.slice(0, alle.indexOf(form)));
+        var x = this.r.zahl(), form = x < 0.25 ? 'chiffre' : x < 0.45 ? 'anagramm' : x < 0.62 ? 'anfang' : x < 0.8 ? 'raetsel' : 'reihe', T, wort, text, fx = this.fixtur;
+        var alle = ['chiffre', 'anagramm', 'anfang', 'raetsel', 'reihe'], reihe = alle.slice(alle.indexOf(form)).concat(alle.slice(0, alle.indexOf(form)));
         reihe = reihe.filter(function (f) { return !fx['wortform:' + f]; });
         if (!reihe.length) throw new Fehlschlag('kein Wortraetsel mehr frei');
         form = reihe[0]; T = W[form];
@@ -3179,8 +3438,15 @@ var Generator = (function () {
             wort = frage[0];
             text = T.b.replace('{frage}', frage[1]);
         }
+        var reihe = null;
+        if (form === 'reihe') {
+            // Was ist hier passiert? (R110): der Name dessen, der zuletzt kam
+            reihe = this.reiheRaetsel(T);
+            wort = reihe.wort;
+            text = reihe.text;
+        }
         this.fixtur['wort:' + wort] = true;
-        if (form === 'raetsel') {
+        if (form === 'raetsel' || form === 'reihe') {
             // Text steht schon
         } else if (form === 'chiffre') {
             var n = 1 + this.r.bis(5), hinten = this.p.stufe >= 3, kodiere = function (w) { var v = verschiebe(w, n); return hinten ? umgedreht(v) : v; };
@@ -3207,9 +3473,59 @@ var Generator = (function () {
             text = T.b.replace('{buchstaben}', l.join(', '));
         }
         var g = this.ding('gegenstand', T.name, null, { vorlage: 'notiz', e: {}, nom: T.nom, akk: T.akk, b: text });
+        if (reihe) g.reihe = { namen: reihe.namen, aussagen: reihe.aussagen };
         g.raum = raum;
         this.platziere(g, tiefe - 1, {});
         return { wort: wort, form: form, notiz: g };
+    };
+
+    // Was ist hier passiert? (R110): Vier kamen nacheinander; Aussagen ueber die Reihenfolge (vor, gleich nach, zuerst, nicht
+    // zuletzt), gewuerfelt aus den wahren, bis der Letzte feststeht, dann ohne die entbehrlichen. Nie "X kam zuletzt".
+    function reiheGilt(a, pos) {
+        switch (a.art) {
+            case 'vor': return pos[a.a] < pos[a.b];
+            case 'direkt': return pos[a.b] === pos[a.a] + 1;
+            case 'erst': return pos[a.a] === 0;
+            case 'nicht': return pos[a.a] !== 3;
+        }
+        return false;
+    }
+    function reiheLetzte(namen, aussagen) {
+        var letzte = {}, perms = [[]], i, j, k, n;
+        for (i = 0; i < namen.length; i++) {
+            var neu = [];
+            for (j = 0; j < perms.length; j++) for (k = 0; k < namen.length; k++) if (perms[j].indexOf(namen[k]) < 0) neu.push(perms[j].concat([namen[k]]));
+            perms = neu;
+        }
+        for (j = 0; j < perms.length; j++) {
+            var pos = {};
+            for (n = 0; n < perms[j].length; n++) pos[perms[j][n]] = n;
+            if (aussagen.every(function (a) { return reiheGilt(a, pos); })) letzte[perms[j][3]] = true;
+        }
+        return sortiert(letzte);
+    }
+    Bau.prototype.reiheRaetsel = function (T) {
+        var frei = T.namen.filter(function (n) { return !this.fixtur['wort:' + n.toUpperCase()]; }, this);
+        var folge = this.r.mischen(frei).slice(0, 4), namen = folge.slice().sort(), pool = [], i, j;
+        if (folge.length < 4) throw new Fehlschlag('zu wenig Namen fuer die Reihenfolge');
+        for (i = 0; i < 4; i++) for (j = i + 1; j < 4; j++) pool.push({ art: 'vor', a: folge[i], b: folge[j] });
+        for (i = 0; i < 3; i++) pool.push({ art: 'direkt', a: folge[i], b: folge[i + 1] });
+        pool.push({ art: 'erst', a: folge[0] });
+        pool = this.r.mischen(pool);
+        // "nicht zuletzt" schliesst nur aus; es kommt erst dran, wenn die Reihenfolge allein nicht reicht
+        var nicht = [];
+        for (i = 0; i < 3; i++) nicht.push({ art: 'nicht', a: folge[i] });
+        pool = pool.concat(this.r.mischen(nicht));
+        var aussagen = [];
+        for (i = 0; i < pool.length && reiheLetzte(namen, aussagen).length > 1; i++) aussagen.push(pool[i]);
+        for (i = aussagen.length - 1; i >= 0; i--) {
+            var ohne = aussagen.slice(0, i).concat(aussagen.slice(i + 1));
+            if (reiheLetzte(namen, ohne).length === 1) aussagen = ohne;
+        }
+        aussagen = this.r.mischen(aussagen);
+        var saetze = aussagen.map(function (a) { return T[a.art].replace('{a}', a.a).replace('{b}', a.b || ''); });
+        var liste = namen.slice(0, 3).join(', ') + ' ' + T.und + ' ' + namen[3];
+        return { wort: folge[3].toUpperCase(), namen: namen, aussagen: aussagen, text: T.b.replace('{namen}', liste).replace('{saetze}', saetze.join(' ')) };
     };
 
     // Losung (R104) und der Raum hoert mit (R103): Ein Waechterbild gibt frei, was es verbirgt, sobald jemand im Raum die
@@ -3322,6 +3638,7 @@ var Generator = (function () {
                 this.enthuelle(rg, tiefe - 1, {});
             } else {
                 var F = this.K.FETZEN, zn = this.K.ZEICHEN[t.zeichen][0];
+                if (this.K.TINTE && !this.fixtur.tinte && this.r.chance(TINTE_ANTEIL)) { this.tinte(t, fakt, schloss, tiefe); continue; }
                 var g = this.ding('gegenstand', F.name + ' mit ' + zn, null, { vorlage: 'notiz', e: {}, fetzen: true, zeichenText: this.K.ZEICHEN[t.zeichen][1],
                     nom: F.nom + ' mit ' + zn, akk: F.akk + ' mit ' + zn, b: F.b + ' ' + this.teilText(t) });
                 g.raum = this.teilRaum(schloss);
@@ -3334,6 +3651,22 @@ var Generator = (function () {
         schloss.braucht = braucht;
         if (laengen.length > 1) schloss.gruppen = gruppen;
         schloss.form = 'teile';
+    };
+
+    // Unsichtbare Tinte (R43): statt eines Fetzens ein leeres Blatt. Ueber eine Flamme gehalten oder befeuchtet zeigt es Zeichen
+    // und Ziffern des Teils. Das Blatt ist das Ding, an dem man benutzt (in der Tasche: zusammen benutzen).
+    var TINTE_ANTEIL = 0.3;
+    Bau.prototype.tinte = function (t, fakt, schloss, tiefe) {
+        var TI = this.K.TINTE;
+        this.fixtur.tinte = true;
+        var g = this.ding('gegenstand', TI.name, null, { vorlage: 'notiz', e: {}, nom: TI.nom, akk: TI.akk, b: TI.b, tinte: TI.offen + ' ' + this.teilText(t) });
+        g.raum = this.teilRaum(schloss);
+        this.platziere(g, tiefe - 1, {});
+        var m = this.anforderung(TI.name, TI.alt), alt = this.p.anforderungen[m].alt;
+        this.liefere(alt[this.r.bis(alt.length)].b, tiefe - 1, {});
+        var a = this.aktion({ text: TI.name + ' lesbar machen', art: 'benutzen', raum: g.raum, ding: g.id, braucht: ['hat:' + g.id], mittel: m, gibt: [fakt] });
+        a.teil = t;
+        a.tinte = true;
     };
 
     // Zaehlbare Dinge: eine Reihe im Modell eines Gegenstands, der in dieser Partie sonst nicht vorkommt (sonst zaehlt
@@ -3754,6 +4087,7 @@ var Generator = (function () {
         for (i = 0; i < p.raeume.length; i++) this.hahn(p.raeume[i].id, 0, { zoneFrei: true });
 
         this.leereVerstecke();
+        this.falscheFaehrte();
         // Ablenkungen: Elemente, die sich verhalten, aber nichts bedeuten
         for (i = 0; i < cfg.ablenkung; i++) {
             var el = this.nimmElement('keine');
@@ -4049,7 +4383,7 @@ if (typeof module !== 'undefined' && module.exports) {
 var Spiel = (function () {
     'use strict';
 
-    var ZEIT = { ansehen: 0, anfassen: 1, nehmen: 1, benutzen: 1, krach: 1, eingeben: 1, warten: 3, gehen: 1, verlassen: 0, geben: 0, ablegen: 0, verwandeln: 1, absteigen: 0, schieben: 0 };
+    var ZEIT = { bauen: 1, ansehen: 0, anfassen: 1, nehmen: 1, benutzen: 1, krach: 1, eingeben: 1, warten: 3, gehen: 1, verlassen: 0, geben: 0, ablegen: 0, verwandeln: 1, absteigen: 0, schieben: 0 };
     var LAERM_STRAFE = 5;
     // Zu dritt kostet eine Handlung ein Drittel: Die Summe driftet sonst (4.999999999999999 statt 5), und Anzeige und
     // Fristen kippen an der Grenze. Anteile fuer 1 bis 4 Spieler sind alle Zwoelftel, also dort einrasten.
@@ -4245,6 +4579,7 @@ var Spiel = (function () {
 
     function beschreibung(d, s, nr) {
         if (d.fetzen && s) return fetzenText(s, d, nr);
+        if (d.tinte && s && aktionenAn(s, d.id, ['benutzen']).some(function (a) { return a.tinte && erledigt(s, a); })) return d.tinte;   // R43: hervorgetreten
         if (d.vorlage === 'krug' && s) return d.b + ' ' + (s.krug && s.krug[d.id] ? KAT.KRUEGE.stand.replace('{x}', String(s.krug[d.id])) : KAT.KRUEGE.leer);
         if (d.b) return d.b;                    // Pergamentfetzen tragen ihren Text selbst (Teil eines Codes)
         if (d.vorlage === 'schluessel' && KAT.SCHLUESSEL.b) return KAT.SCHLUESSEL.b;
@@ -4368,6 +4703,78 @@ var Spiel = (function () {
         }
         var zl = RG.zeile.replace('{titel}', d.titel[buch - 1]).replace('{seite}', String(seite)).replace('{zeile}', String(zeile)).replace('{text}', text);
         return [gelesen(m(zl), zl)];                                        // was im Buch steht, liest man
+    }
+    // Sprechende Gegenstaende (R106): Frage n (1 bis 4) heisst "Ist X das Versteck?"; drei Fragen fuer alle zusammen. Die
+    // Antwort steht auf der Seite (zu lesen). Bleibt danach nur ein Versteck moeglich, ist sein Fach entdeckt.
+    function orakel(s, d, code) {
+        var OR = KAT.ORAKEL, n = parseInt(String(code || ''), 10), a = aktionenAn(s, d.id, ['fragen'])[0];
+        if (!(n >= 1 && n <= d.fragen.length)) return [m(OR.wie)];
+        if (!s.orakel) s.orakel = {};
+        var o = s.orakel[d.id] || (s.orakel[d.id] = { n: 0, moegl: d.fragen.slice() });
+        if (o.n >= 3) return [m(OR.stumm)];
+        o.n++;
+        var vid = d.fragen[n - 1], ja = vid === d.wahr, t = ja ? OR.ja : OR.nein;
+        o.moegl = o.moegl.filter(function (x) { return ja ? x === vid : x !== vid; });
+        if (a && o.moegl.length === 1 && !erledigt(s, a)) fuehreAus(s, a, null);
+        return [gelesen(m(OR.antwort.replace('{antwort}', t)), t)];
+    }
+    // Traenke mischen (R62): Jede Phiole gibt ihren Stoff in den Kessel; bei zwei Stoffen faerbt er sich. Das richtige Paar
+    // gibt frei, was er huetet (es liegt danach im Kessel), jedes andere raucht, kostet Zeit und versickert.
+    var MISCH_STRAFE = 2;
+    function mischen(s, d, items) {
+        var TR = KAT.TRAENKE, aus = [], i, a = aktionenAn(s, d.id, ['mischen'])[0];
+        if (a && erledigt(s, a)) return [nein(m(TR.fertig))];
+        if (!items.length || items.some(function (x) { return x.vorlage !== 'phiole'; })) return [nein(m(TR.nicht))];
+        if (!s.kessel) s.kessel = {};
+        var k = s.kessel[d.id] || (s.kessel[d.id] = { stoffe: [], farbe: null });
+        for (i = 0; i < items.length; i++) {
+            if (k.stoffe.indexOf(items[i].stoff) >= 0) continue;
+            k.stoffe.push(items[i].stoff);
+            k.farbe = null;
+            aus.push(zeigt(m(TR.giesst.replace('{stoff}', TR.stoffe[items[i].stoff]))));
+            if (k.stoffe.length < 2) continue;
+            var pk = Math.min(k.stoffe[0], k.stoffe[1]) + '-' + Math.max(k.stoffe[0], k.stoffe[1]), farbe = TR.farben[d.farben[pk]];
+            k.farbe = d.farben[pk];
+            if (a && pk === d.ziel) {
+                fuehreAus(s, a, null);
+                var g = s.partie.dinge[a.gibt[0].slice(4)];
+                s.wer[g.id] = { raum: d.raum, x: null, z: null, an: d.id };       // liegt im Kessel
+                aus.push(zeigt(m(TR.auf.replace('{farbe}', farbe).replace('{was}', nom(g)), 'erfolg')));
+                return aus;
+            }
+            s.zeit = zwoelftel(s.zeit + MISCH_STRAFE / aktive(s));
+            aus.push(zeigt(m(TR.faerbt.replace('{farbe}', farbe))));
+            aus.push(m(TR.raucht));                                           // Grund: Zeit verloren
+            k.stoffe = [];
+        }
+        return aus;
+    }
+    // Bauen (R64): genau die Zutaten eines Rezepts dieser Partie in der Hand; das Gebaute traegt, wer gebaut hat, was darin
+    // aufgeht, ist fort
+    function bauen(s, nr, items) {
+        var T = KAT.BAUEN_TEXT, ids = items.map(function (x) { return x.id; }).sort().join('|'), i, a;
+        if (items.length < 2) return [m(T.wenig)];
+        for (i = 0; i < s.partie.aktionen.length; i++) {
+            a = s.partie.aktionen[i];
+            if (a.art !== 'bauen' || erledigt(s, a) || a.zutaten.slice().sort().join('|') !== ids) continue;
+            fuehreAus(s, a, null);
+            s.wer[a.gibt[0].slice(4)] = nr;
+            return [zeigt(m(a.satz))];                                        // man sieht es in der Tasche
+        }
+        // zwei Dinge in der Tasche zusammen benutzt: das eine ist das Ziel einer Handlung, das andere das Mittel (R43: das leere
+        // Blatt ueber die Flamme halten)
+        if (items.length === 2) for (i = 0; i < s.partie.aktionen.length; i++) {
+            a = s.partie.aktionen[i];
+            if (a.art !== 'benutzen' || !a.mittel || erledigt(s, a) || !brauchtErfuellt(s, a)) continue;
+            var ziel = items[0].id === a.ding ? items[0] : items[1].id === a.ding ? items[1] : null;
+            if (!ziel) continue;
+            var w = waehleAlternative(s, s.partie.anforderungen[a.mittel], [items[0] === ziel ? items[1] : items[0]], s.raum[nr]);
+            if (!w.alt) continue;
+            var aus = [erg(s, a, w.alt)].concat(fuehreAus(s, a, w.alt));
+            if (a.tinte) aus.push(gelesen(m(gross(nom(ziel)) + ': ' + ziel.tinte), ziel.tinte));
+            return aus;
+        }
+        return [nein(m(T.nichts))];
     }
     function zahl(v) { return typeof v === 'number' && isFinite(v) ? Math.round(v * 100) / 100 : null; }
     function legeAb(s, id, raum, x, z) { s.wer[id] = { raum: raum, x: zahl(x), z: zahl(z) }; }
@@ -4773,7 +5180,9 @@ var Spiel = (function () {
     function schriftAn(s, d) {
         if (d.vorlage === 'kerbstein') return KAT.KERBSTEIN.schrift;
         if (d.vorlage === 'pakt' && !(aktionenAn(s, d.id, ['pakt'])[0] && s.f['hat:' + d.gibt])) return KAT.PAKT.schrift;   // R152, solange die Hand etwas haelt
-        if (d.vorlage === 'hebelreihe') return KAT.HEBELREIHE.schrift;                                                    // R15
+        if (d.vorlage === 'hebelreihe') return KAT.HEBELREIHE.schrift;
+        if (d.vorlage === 'orakel') return KAT.ORAKEL.schrift.replace('{fragen}', d.fragen.map(function (id, n) { var v = s.partie.dinge[id]; return KAT.ORAKEL.frage.replace('{n}', String(n + 1)).replace('{versteck}', v.nom); }).join(' '));   // R106
+        if (d.vorlage === 'mischkessel') return KAT.TRAENKE.kessel.schrift.replace('{farbe}', KAT.TRAENKE.farben[d.farben[d.ziel]]);   // R62                                                    // R15
         if (d.vorlage === 'balkenwaage') return KAT.BALKENWAAGE.schrift.replace('{zeichen}', d.zeichenText ? KAT.BALKENWAAGE.zeichen.replace('{zeichen}', d.zeichenText) : '');   // R4
         if (d.vorlage === 'buecherregal') return d.titel.map(function (x, n) { return (n + 1) + ' ' + x; }).join(' \u00b7 ');   // R12: die Ruecken
         if (d.vorlage === 'waage') return KAT.WAAGE.schrift;
@@ -5006,6 +5415,8 @@ var Spiel = (function () {
         if (d.vorlage === 'messbecken') return d.b;
         if (d.vorlage === 'kerbstein') return KAT.KERBSTEIN.b;
         if (d.vorlage === 'hebelreihe') return KAT.HEBELREIHE.b.replace('{n}', String(d.stellen)) + ' ' + KAT.HEBELREIHE.stand.replace('{stand}', reiheStand(s, d).split('').map(function (c) { return c === '1' ? KAT.HEBELREIHE.aus : KAT.HEBELREIHE.an; }).join(', '));
+        if (d.vorlage === 'orakel') return KAT.ORAKEL.b;
+        if (d.vorlage === 'mischkessel') return KAT.TRAENKE.kessel.b + (s.kessel && s.kessel[d.id] && s.kessel[d.id].farbe !== null ? ' ' + KAT.TRAENKE.kessel.farbe.replace('{farbe}', KAT.TRAENKE.farben[s.kessel[d.id].farbe]) : '');
         if (d.vorlage === 'balkenwaage') return KAT.BALKENWAAGE.b.replace('{zeichen}', d.zeichenText ? KAT.BALKENWAAGE.zeichen.replace('{zeichen}', d.zeichenText) : '') +
             (s.wiegen && s.wiegen[d.id] ? ' ' + KAT.BALKENWAAGE.schon.replace('{n}', String(s.wiegen[d.id].n)) : '');
         if (d.vorlage === 'buecherregal') return KAT.REGAL.b + ' ' + d.titel.map(function (x, n) { return (n + 1) + ' ' + x; }).join(', ') + '.';
@@ -5275,6 +5686,7 @@ var Spiel = (function () {
 
             case 'benutzen':
                 if (d.vorlage === 'durchreiche') { aus = aus.concat(durchreichen(s, d, b.mit, nr)); break; }
+                if (d.vorlage === 'mischkessel') { aus = aus.concat(mischen(s, d, itemsAus(s, b.mit, nr))); break; }   // R62: vor den Kruegen, Wasser gehoert nicht hinein
                 if (itemsAus(s, b.mit, nr).some(function (x) { return x.vorlage === 'krug'; })) { aus = aus.concat(kruege(s, d, itemsAus(s, b.mit, nr), nr)); break; }
                 if (d.vorlage === 'hebelpaar') { aus = aus.concat(kette(s, d, nr, itemsAus(s, b.mit, nr))); break; }
                 if (d.vorlage === 'hausordnung') { aus = aus.concat(einsetzen(s, d, nr, itemsAus(s, b.mit, nr))); break; }
@@ -5304,6 +5716,7 @@ var Spiel = (function () {
                     var ergIdx = aus.length;
                     aus.push(erg(s, a, w.alt));
                     aus = aus.concat(fuehreAus(s, a, w.alt));
+                    if (a.tinte) aus.push(gelesen(m(gross(nom(d)) + ': ' + d.tinte), d.tinte));    // R43: die Schrift ist zu lesen
                     // verwandelt am Element: was hineinkam, ist weg; was entsteht, traegt der Handelnde
                     if (a.verbrauchtMittel) {
                         for (var vm = 0; vm < items.length; vm++) s.f['weg:' + items[vm].id] = true;
@@ -5340,6 +5753,7 @@ var Spiel = (function () {
                 if (d.vorlage === 'hebelreihe') { aus = aus.concat(reiheHebel(s, d, b.code)); break; }
                 if (d.vorlage === 'buecherregal') { aus = aus.concat(nachschlagen(s, d, b.code)); break; }
                 if (d.vorlage === 'balkenwaage') { aus = aus.concat(wiegen(s, d, b.code)); break; }
+                if (d.vorlage === 'orakel') { aus = aus.concat(orakel(s, d, b.code)); break; }
                 l = aktionenAn(s, d.id, ['eingeben']);
                 var code = null;
                 for (i = 0; i < schloesserAlle(s.partie).length; i++) if (schloesserAlle(s.partie)[i].id === d.id) code = schloesserAlle(s.partie)[i].code;
@@ -5353,6 +5767,10 @@ var Spiel = (function () {
                     if (rueckmeldung(s, d.id)) falsch.l = kugeln(code, String(b.code));
                     aus.push(falsch);
                 }
+                break;
+
+            case 'bauen':
+                aus = aus.concat(bauen(s, nr, itemsAus(s, b.mit, nr)));
                 break;
 
             case 'geben':
@@ -5561,6 +5979,7 @@ var Spiel = (function () {
             for (k = 0; k < alleS.length; k++) if (alleS[k].id === d.id && alleS[k].code) code = true;
             if (d.vorlage === 'buecherregal') code = true;                     // R12: Buch, Seite, Zeile eingeben
             if (d.vorlage === 'balkenwaage') code = true;                      // R4: Kugeln links und rechts eingeben
+            if (d.vorlage === 'orakel') code = true;                           // R106: Nummer der Frage
             // R86: Wer das Klopfen nicht hoert, erkennt das Fach daran auch nicht. Fuer ihn bleibt es, was man sieht (und
             // heisst auch so), bis es offen ist; sonst verriete der Name am Fadenkreuz, was nur das feine Ohr findet.
             if (!suchen && d.klopft && d.verborgen && !offen && s.f['klopft:' + d.id] &&
@@ -5587,6 +6006,7 @@ var Spiel = (function () {
             if (d.vorlage === 'notschacht' && s.f['eingestuerzt:' + d.id]) eintrag.eingestuerzt = true;   // R157
             if (d.vorlage === 'spiegelbank') eintrag.hebel = hebelStand(s, d);
             if (d.vorlage === 'hebelreihe') eintrag.hebel = reiheStand(s, d);     // R15: '1' = unten, die Lampe ist aus
+            if (d.vorlage === 'mischkessel' && s.kessel && s.kessel[d.id]) { eintrag.farbe = s.kessel[d.id].farbe; eintrag.stoffe = s.kessel[d.id].stoffe.length; }   // R62: Farbe (Index) und Stoffe im Kessel
             if (d.vorlage === 'balkenwaage' && s.wiegen && s.wiegen[d.id]) eintrag.wiegen = s.wiegen[d.id].letzt;   // R4: [links, rechts, -1 links sinkt / 0 / 1]
             if (s.kreuz && s.kreuz[d.id]) eintrag.kreuz = s.kreuz[d.id].x !== null && s.kreuz[d.id].z !== null ? [s.kreuz[d.id].x, s.kreuz[d.id].z] : true;   // R41: alle sehen es, [x, z] = von dort gemalt
             if (d.vorlage === 'spiegelbild') { eintrag.hebel = gespiegelt(hebelStand(s, s.partie.dinge[d.partner])); eintrag.ziel = d.ziel; }
@@ -5711,6 +6131,12 @@ var Spiel = (function () {
         var aus = { setting: partie.setting, stil: partie.stil, titel: partie.story.titel, hell: KAT.HELL, dunkel: KAT.DUNKEL, ausstattung: KAT.AUSSTATTUNG }, g;
         // Verteilte Sinne (R86): Name und Satz jeder Gabe der Partie; wer welche hat, steht in der Sicht (gaben)
         if (partie.gaben) { aus.gaben = {}; for (g in partie.gaben) if (partie.gaben.hasOwnProperty(g)) aus.gaben[g] = { name: KAT.GABEN[g].name, satz: KAT.GABEN[g].start }; }
+        // gibt es in dieser Partie etwas, das man in der Tasche zusammen benutzt (R64 Bauen, R43 Blatt und Flamme)? Sonst
+        // zeigt die Oberflaeche den Knopf dafuer nicht: Er taete nie etwas.
+        for (g = 0; g < partie.aktionen.length; g++) {
+            var az = partie.aktionen[g];
+            if (az.art === 'bauen' || (az.art === 'benutzen' && az.mittel && partie.dinge[az.ding] && partie.dinge[az.ding].typ === 'gegenstand')) aus.zusammen = true;
+        }
         return aus;
     }
 
