@@ -750,6 +750,8 @@ var Setting = (function () {
             voll: 'Mit einer Hand tr\u00e4gst du nur eines. Leg erst etwas ab.', fallen: '{was} gleitet dir aus der Hand: Du tr\u00e4gst nur noch eines.',
             gebenVoll: 'Wer den Pakt geschlossen hat, hat nur eine Hand, und die ist voll.' },
         // Kreide (R41): Wer sie tr\u00e4gt, malt Kreuze auf Dinge im Raum, die alle sehen; noch einmal wischt es weg. {was} = das Ding
+        // Hinaufsteigen (R71): der Grund, wenn man von unten nach dem Gegenstand oben auf dem Wandbord greift
+        hoch: { zuHoch: 'Zu hoch. Von unten kommst du nicht heran.' },
         kreide: { name: 'Kreide', nom: 'die Kreide', akk: 'die Kreide',
             b: 'Ein St\u00fcck wei\u00dfe Kreide. Damit l\u00e4sst sich ein Kreuz auf etwas malen, das alle sehen.',
             kreuz: 'Du malst ein Kreidekreuz auf {was}.', weg: 'Du wischst das Kreidekreuz wieder weg.',
@@ -1500,6 +1502,7 @@ var Katalog = (function () {
         if (!S.regal.treffer || !S.regal.treffer.length) fehlt('regal.treffer'); else S.regal.treffer.forEach(function (t) { if (t.indexOf('{code}') < 0) fehlt('regal.treffer ohne {code}'); });
         if (!S.regal.fueller || S.regal.fueller.length < 6) fehlt('regal.fueller (mindestens 6)');
     }
+    if (!S.hoch || !S.hoch.zuHoch) fehlt('hoch.zuHoch');
     if (!S.kreide) fehlt('kreide'); else uebernimm({}, S.kreide, ['name', 'nom', 'akk', 'b', 'kreuz', 'weg', 'sicht'], 'kreide');
     if (!S.pakt) fehlt('pakt'); else uebernimm({}, S.pakt, ['name', 'nom', 'akk', 'verb', 'b', 'schrift', 'leer', 'frage', 'satz', 'voll', 'fallen', 'gebenVoll'], 'pakt');
     if (!S.notschacht) fehlt('notschacht');
@@ -1595,7 +1598,7 @@ var Katalog = (function () {
         version: 3, SETTING: S.id, ARTEN: ARTEN, AUSLOESER: AUSLOESER, ELEMENTE: ELEMENTE, GEGENSTAENDE: GEGENSTAENDE,
         EIGENSCHAFT_TEXT: EIGENSCHAFT_TEXT, ZU_WENIG: S.zuWenig, HINDERNISSE: HINDERNISSE, SCHLOESSER: SCHLOESSER, GEGENMITTEL: GEGENMITTEL,
         VERSTECKE: S.verstecke, SCHLICHT: S.schlicht, AUSSTATTUNG: S.ausstattung, LICHT: S.licht, WASSER: WASSER, SCHLUESSEL: S.schluessel, NOTIZ: S.notiz, STORIES: S.stories,
-        VERWANDLUNGEN: S.verwandlungen, ZAEHL: S.zaehl, LOGIK: S.logik, LUEGNER: S.luegner, HANDBUCH: S.handbuch, REGAL: S.regal, ZIFFER_JE_KOPF: S.zifferJeKopf, KLEIN: KLEIN, BEWEGLICH: BEWEGLICH, VERRUECKT: S.verrueckt, KLANG: S.klang, KLOPF_AUS: KLOPF_AUS, STAEBE: STAEBE, DURCHREICHE: S.durchreiche, HAUSORDNUNG: S.hausordnung, GEDENKTAFEL: S.gedenktafel, STANDPUNKT: S.standpunkt, STRAHL: S.strahl, WORT: WORT, WACHE: S.wache, KRUEGE: S.kruege, KERBSTEIN: S.kerbstein, BALKENWAAGE: S.balkenwaage, KAEFIG: KAEFIG, PAKT: S.pakt, KREIDE: S.kreide, NOTSCHACHT: NOTSCHACHT, SPIEGEL: S.spiegel, HEBELREIHE: S.hebelreihe, ORAKEL: S.orakel, NOTIZEN: S.notizen, TRAENKE: S.traenke, BAUEN: BAUEN, BAUEN_TEXT: S.bauen, GABEN: S.gaben, GABEN_REIHE: ['nachtauge', 'gehoer', 'schrift'], WAAGE: S.waage, WAAGE_SCHWER: WAAGE_SCHWER, FALLGITTER: FALLGITTER_K, ZEICHEN: S.zeichen, FETZEN: S.fetzen, TINTE: TINTE_K, UHR: S.uhr, ZWISCHENTUER: S.zwischentuer, TAFEL: S.tafel, INSCHRIFT: INSCHRIFT_K,
+        VERWANDLUNGEN: S.verwandlungen, ZAEHL: S.zaehl, LOGIK: S.logik, LUEGNER: S.luegner, HANDBUCH: S.handbuch, REGAL: S.regal, ZIFFER_JE_KOPF: S.zifferJeKopf, KLEIN: KLEIN, BEWEGLICH: BEWEGLICH, VERRUECKT: S.verrueckt, KLANG: S.klang, KLOPF_AUS: KLOPF_AUS, STAEBE: STAEBE, DURCHREICHE: S.durchreiche, HAUSORDNUNG: S.hausordnung, GEDENKTAFEL: S.gedenktafel, STANDPUNKT: S.standpunkt, STRAHL: S.strahl, WORT: WORT, WACHE: S.wache, KRUEGE: S.kruege, KERBSTEIN: S.kerbstein, BALKENWAAGE: S.balkenwaage, KAEFIG: KAEFIG, PAKT: S.pakt, KREIDE: S.kreide, HOCH: S.hoch, NOTSCHACHT: NOTSCHACHT, SPIEGEL: S.spiegel, HEBELREIHE: S.hebelreihe, ORAKEL: S.orakel, NOTIZEN: S.notizen, TRAENKE: S.traenke, BAUEN: BAUEN, BAUEN_TEXT: S.bauen, GABEN: S.gaben, GABEN_REIHE: ['nachtauge', 'gehoer', 'schrift'], WAAGE: S.waage, WAAGE_SCHWER: WAAGE_SCHWER, FALLGITTER: FALLGITTER_K, ZEICHEN: S.zeichen, FETZEN: S.fetzen, TINTE: TINTE_K, UHR: S.uhr, ZWISCHENTUER: S.zwischentuer, TAFEL: S.tafel, INSCHRIFT: INSCHRIFT_K,
         SCHLOSSTEXT: S.schlosstext,
         HELL: S.hell, DUNKEL: S.dunkel
     };
@@ -2086,7 +2089,8 @@ var Generator = (function () {
     var UHR_ANTEIL = 0.4;
     var NOTSCHACHT_ANTEIL = 0.2;          // Das Rettungsboot (R157): Anteil der Mehrspieler-Partien mit Notschacht
     var GEFANGEN_ANTEIL = 0.25;           // Der Gefangene (R154): Anteil der Mehrspieler-Partien mit Kaefig
-    var KREIDE_ANTEIL = 0.5;              // Kreide (R41): Anteil der Partien mit einem Stueck Kreide im Startraum
+    var KREIDE_ANTEIL = 0.5;
+    var HOCH_ANTEIL = 0.3;                // Hinaufsteigen (R71): Anteil der Partien, in denen ein Gegenstand oben auf einem hohen Wandbord liegt              // Kreide (R41): Anteil der Partien mit einem Stueck Kreide im Startraum
     var GABEN_ANTEIL = 0.7;               // Verteilte Sinne (R86): Anteil der Mehrspieler-Partien mit Gaben
     // Zwei Raeume: offen (Durchgang von Anfang an frei, beide Raeume zugleich) oder linear (erst Raum 1, eine
     // verschlossene Zwischentuer, dahinter Raum 2 mit dem Ausgang). Anteil der linearen Partien mit zwei Raeumen:
@@ -2120,7 +2124,7 @@ var Generator = (function () {
     // opt.bild (Server, Spielseite, Probeseite) kommen sie in keiner Partie vor; ohne (Tests, zeige.js) in jeder. Die
     // PC-Sitzung streicht hier einen Eintrag, sobald das Raetsel Modelle und ein Bild hat (ARBEITSTEILUNG.md 3.1f).
     var NOCH_OHNE_BILD = { pakt: 1, waegen: 1,
-        bauen: 1, traenke: 1, notizen: 1, faehrte: 1, orakel: 1, reihe: 1, tinte: 1 };      // R64, R62, R112, R115, R106, R110, R43
+        bauen: 1, traenke: 1, notizen: 1, faehrte: 1, orakel: 1, reihe: 1, tinte: 1, hoch: 1 };      // R64, R62, R112, R115, R106, R110, R43, R71
     function Bau(seed, spieler, stufe, versuch, stil, bild) {
         this.aus = bild ? NOCH_OHNE_BILD : {};
         this.r = Zufall.strom(String(seed), 'partie:' + spieler + ':' + stufe + ':' + versuch);
@@ -4231,6 +4235,16 @@ var Generator = (function () {
             this.lege_frei(kd);
             p.kreide = kd.id;
         }
+        // Hinaufsteigen (R71): Einer der offen liegenden Gegenstaende liegt oben auf einem hohen Wandbord. Den Platz und
+        // den Schemel davor setzt der Raumplan; mit Bild sperrt die Engine den Gegenstand, bis etwas Steigbares darunter
+        // steht. Logik und Pruefer aendert das nicht (ohne Bild gibt es kein Oben). Eigener Zufallsstrom wie bei der Kreide.
+        if (!this.aus.hoch) {
+            var zh = Zufall.strom(String(p.seed), 'hoch:' + p.spieler + ':' + p.stufe + ':' + p.versuch);
+            if (zh.chance(HOCH_ANTEIL)) {
+                var hk = sortiert(p.dinge).filter(function (k) { var x = p.dinge[k]; return x.typ === 'gegenstand' && x.lage === 'liegt offen herum' && x.vorlage !== 'kreide'; });
+                if (hk.length) p.hoch = zh.waehle(hk);
+            }
+        }
         return p;
     };
 
@@ -4483,6 +4497,7 @@ if (typeof module !== 'undefined' && module.exports) {
 var Spiel = (function () {
     'use strict';
 
+    var HOCH_NAH = 0.55;      // R71: so nah (Mitte) muss etwas Steigbares an der Stelle unter dem hohen Wandbord stehen
     var ZEIT = { bauen: 1, ansehen: 0, anfassen: 1, nehmen: 1, benutzen: 1, krach: 1, eingeben: 1, warten: 3, gehen: 1, verlassen: 0, geben: 0, ablegen: 0, verwandeln: 1, absteigen: 0, schieben: 0 };
     var LAERM_STRAFE = 5;
     // Zu dritt kostet eine Handlung ein Drittel: Die Summe driftet sonst (4.999999999999999 statt 5), und Anzeige und
@@ -5432,6 +5447,41 @@ var Spiel = (function () {
         if (!c) return false;
         return Math.abs((o ? o[0] : c.x) - q.x) < c.h[0] + 0.1 && Math.abs((o ? o[1] : c.z) - q.z) < c.h[1] + 0.1;
     }
+    // Hinaufsteigen (R71): Was oben auf dem hohen Wandbord liegt, erreicht nur, wer auf etwas steigt, das darunter steht
+    // (Schemel, Fass, Kisten, Truhe, wo auch immer es herkam). Nur mit Bild; ohne gibt es kein Oben (Probeseite, Pruefer).
+    function hochStelle(s, id) {
+        if (!s.koerper || s.f['hat:' + id]) return null;
+        var plan = planVon(s), q = plan.plaetze.hasOwnProperty(id) ? plan.plaetze[id] : null;
+        return q && q.hoch ? { q: q, plan: plan } : null;
+    }
+    function steigbar(s, plan, raum) {
+        var l = [], i, k, d, ids = Object.keys(plan.plaetze).sort();
+        for (i = 0; i < plan.deko.length; i++) if (plan.deko[i].raum === raum && plan.deko[i].schieb && Raumplan.STEIG[plan.deko[i].modell]) l.push('deko:' + i);
+        for (i = 0; i < ids.length; i++) {
+            k = ids[i]; d = s.partie.dinge[k];
+            if (d && plan.plaetze[k].raum === raum && plan.plaetze[k].schieb && Raumplan.STEIG[d.typ === 'versteck' || d.leihStand ? d.modell : d.vorlage]) l.push(k);
+        }
+        return l;
+    }
+    function oben(s, id) {
+        var h = hochStelle(s, id), i;
+        if (!h) return true;
+        var l = steigbar(s, h.plan, h.q.raum);
+        for (i = 0; i < l.length; i++) {
+            var c = schubPlatz(h.plan, l[i]), o = s.ort[l[i]], x = o ? o[0] : c.x, z = o ? o[1] : c.z;
+            if ((x - h.q.hoch.x) * (x - h.q.hoch.x) + (z - h.q.hoch.z) * (z - h.q.hoch.z) < HOCH_NAH * HOCH_NAH) return true;
+        }
+        return false;
+    }
+    // fuer Treiber: welches Steigbare unter das Wandbord geschoben werden kann (der Schemel davor) und wohin
+    function hinauf(s, id) {
+        if (oben(s, id)) return null;
+        var h = hochStelle(s, id), i, key = null;
+        for (i = 0; i < h.plan.deko.length && !key; i++) if (h.plan.deko[i].steig === id) key = 'deko:' + i;
+        if (!key) return null;
+        var c = schubPlatz(h.plan, key), hq = h.q.hoch, weg = c.h[1] + 0.02 - 0.3;
+        return { art: 'schieben', ding: key, x: Math.floor((hq.x + hq.nx * weg) * 100 + 0.5) / 100, z: Math.floor((hq.z + hq.nz * weg) * 100 + 0.5) / 100 };
+    }
     // fuer Treiber: was auf einem Ding steht und wohin es sich sicher schieben laesst
     function deckel(s, id) {
         if (!verdeckt(s, id)) return null;
@@ -5691,6 +5741,7 @@ var Spiel = (function () {
         if ((b.art === 'geben' || b.art === 'ablegen') && !traegt(s, d.id, nr)) return [m('Das tr\u00e4gst du nicht bei dir.', 'system')];
         if (d && dort !== s.raum[nr] && b.art !== 'gehen') return [m('Das ist nicht hier.', 'system')];
         if (d && b.art !== 'gehen' && verdeckt(s, d.id)) return [nein(m('Da steht etwas darauf.'))];
+        if (d && b.art !== 'gehen' && !oben(s, d.id)) return [nein(m(KAT.HOCH.zuHoch))];
         for (i = 0; i < mitIds.length; i++) {
             if (s.partie.dinge[mitIds[i]] && s.f['hat:' + mitIds[i]] && !traegt(s, mitIds[i], nr)) return [m('Das tr\u00e4gst du nicht bei dir. Lass es dir geben.', 'system')];
         }
@@ -6091,6 +6142,7 @@ var Spiel = (function () {
             // offen heisst es anders: Eine offene Truhe ist keine verschlossene mehr
             if (offen && d.typ === 'versteck' && KAT.HINDERNISSE[d.vorlage] && KAT.HINDERNISSE[d.vorlage].offen) eintrag.name = KAT.HINDERNISSE[d.vorlage].offen;
             if (verdeckt(s, d.id)) eintrag.verdeckt = true;         // liegt unter etwas: da, aber nicht zu erreichen
+            if (hochStelle(s, d.id)) eintrag.hoch = !oben(s, d.id) ? 1 : 2;      // R71: oben auf dem Wandbord; 1 = von unten nicht zu erreichen, 2 = es steht etwas darunter
             if (d.vorlage === 'krug') eintrag.krug = [(s.krug && s.krug[d.id]) || 0, d.fasst];
             if (d.vorlage === 'drehspiegel') eintrag.dreh = (s.spiegel && s.spiegel[d.id]) || 0;      // R20: Vierteldrehungen seit Beginn
             if (suchen) {
@@ -6244,7 +6296,7 @@ var Spiel = (function () {
         return aus;
     }
 
-    return { version: 4, neu: neu, befehl: befehl, sicht: sicht, namen: namen, rahmen: rahmen, hoert: hoert, verdeckt: verdeckt, deckel: deckel };
+    return { version: 4, neu: neu, befehl: befehl, sicht: sicht, namen: namen, rahmen: rahmen, hoert: hoert, verdeckt: verdeckt, deckel: deckel, oben: oben, hinauf: hinauf };
 })();
 
 if (typeof module !== 'undefined' && module.exports) { module.exports = Spiel; }
