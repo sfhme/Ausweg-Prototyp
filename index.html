@@ -986,6 +986,23 @@ var Setting = (function () {
                 // ganze Textbloecke, die in diesem Stil anders lauten (werden ueber den Block des Settings gelegt)
                 block: {
                     AUSSTATTUNG: { kisten: 'Kiste' },
+                    // Das Paket hat keinen Hebel: Lichter aus (R15) und Spiegelr\u00e4ume (R88) sind hier Reihen kleiner Fackelk\u00f6rbe,
+                    // die brennen oder dunkel sind (oben = brennt, unten = dunkel)
+                    HEBELREIHE: { name: 'Fackelreihe', nom: 'die Fackelreihe', akk: 'die Fackelreihe', verb: 'Ber\u00fchren',
+                        b: 'Eine Steintafel, darunter {n} kleine Fackelk\u00f6rbe in einer Reihe und ein verschlossenes Fach. Eingemei\u00dfelt: Brennen alle Lichter, gibt der Stein frei, was er h\u00fctet.',
+                        stand: 'Die Fackeln, von links: {stand}.',
+                        umgelegt: 'Du ber\u00fchrst den Korb. Sein Licht springt um, und das der Nachbarn springt mit.',
+                        auf: 'Alle Fackeln brennen. Das Fach unter der Tafel springt auf: {was} liegt darin.',
+                        fest: 'Alle Fackeln brennen und bleiben an.', falsch: 'Ber\u00fchr einen Korb nach dem anderen.' },
+                    SPIEGEL: {
+                        bank: { name: 'vier Fackelk\u00f6rbe', nom: 'die vier Fackelk\u00f6rbe', akk: 'die vier Fackelk\u00f6rbe', verb: 'Korb ber\u00fchren',
+                            b: 'Vier kleine Fackelk\u00f6rbe nebeneinander an der Wand, jeder brennt oder ist dunkel. Wenn man einen ber\u00fchrt, klackt es in der Mauer zum Nebenraum.' },
+                        bild: { name: 'Fackelk\u00f6rbe hinter Gittern', nom: 'die Fackelk\u00f6rbe hinter Gittern', akk: 'die Fackelk\u00f6rbe hinter Gittern',
+                            b: 'Hinter einem Gitter vier kleine Fackelk\u00f6rbe, die man nicht erreicht; sie entz\u00fcnden und l\u00f6schen sich von selbst. Dar\u00fcber eine Tafel: {ziel}. Darunter ein verschlossenes Fach.' },
+                        oben: 'brennt', unten: 'dunkel', pfeil: ['Flamme', 'leerer Ring'],
+                        umgelegt: 'Du ber\u00fchrst einen Korb, sein Licht springt um. In der Mauer klackt es.', drueben: 'Hinter dem Gitter springt ein Licht von selbst um.',
+                        auf: 'Die Fackeln hinter dem Gitter brennen wie auf der Tafel. Das Fach darunter springt auf: {was}.',
+                        falsch: 'So lassen sich die Fackeln nicht stellen.' },
                     STRAHL: {
                         spiegel: { b: 'Ein blank polierter Zinnteller, der hochkant an einem Seil von der Decke h\u00e4ngt. Er spiegelt auf beiden Seiten und l\u00e4sst sich drehen.',
                             namen: [['erster Spiegelteller', 'der erste Spiegelteller', 'den ersten Spiegelteller'], ['zweiter Spiegelteller', 'der zweite Spiegelteller', 'den zweiten Spiegelteller'],
@@ -2102,7 +2119,7 @@ var Generator = (function () {
     // Noch ohne Bild: Raetsel, die es im Kern schon gibt, deren Dinge die Oberflaeche aber noch aus Kaesten baut. Mit
     // opt.bild (Server, Spielseite, Probeseite) kommen sie in keiner Partie vor; ohne (Tests, zeige.js) in jeder. Die
     // PC-Sitzung streicht hier einen Eintrag, sobald das Raetsel Modelle und ein Bild hat (ARBEITSTEILUNG.md 3.1f).
-    var NOCH_OHNE_BILD = { spiegel: 1, kaefig: 1, pakt: 1, waegen: 1, hebelreihe: 1,
+    var NOCH_OHNE_BILD = { kaefig: 1, pakt: 1, waegen: 1,
         bauen: 1, traenke: 1, notizen: 1, faehrte: 1, orakel: 1, reihe: 1, tinte: 1 };      // R64, R62, R112, R115, R106, R110, R43
     function Bau(seed, spieler, stufe, versuch, stil, bild) {
         this.aus = bild ? NOCH_OHNE_BILD : {};
@@ -5297,6 +5314,9 @@ var Spiel = (function () {
             for (i = 0; i < s.partie.aktionen.length; i++) {
                 var a = s.partie.aktionen[i];
                 if ((a.art !== 'ereignis' && a.art !== 'lesen') || erledigt(s, a) || !brauchtErfuellt(s, a)) continue;
+                // Liegt das Blatt noch, wo ein Raetsel es freigegeben hat (im Fach drueben, R88), liest es erst, wer in dem Raum ist
+                var lw = a.art === 'lesen' && a.braucht.length && String(a.braucht[0]).indexOf('hat:') === 0 ? s.wer[a.braucht[0].slice(4)] : null;
+                if (lw && typeof lw === 'object' && lw.raum && lw.raum !== s.raum[nr]) continue;
                 if (a.art === 'lesen' && (a.teil || a.zettel)) {
                     s.f[a.gibt[0]] = true;
                     // den Fetzen liest, wer ihn traegt; die anderen sehen den Text erst, wenn er ihn weitergibt
