@@ -989,6 +989,12 @@ var Setting = (function () {
                 // ganze Textbloecke, die in diesem Stil anders lauten (werden ueber den Block des Settings gelegt)
                 block: {
                     AUSSTATTUNG: { kisten: 'Kiste' },
+                    // Das Paket hat keine Kugel: Gewogen werden hier neun Lederbeutel (R4, Modell waaggewicht)
+                    BALKENWAAGE: {
+                        schrift: 'Ein Beutel ist schwerer. Seine Zahl geh\u00f6rt in den Code{zeichen}. Zweimal l\u00f6st sich der Stift.',
+                        b: 'Eine Balkenwaage mit zwei Schalen, daneben neun gleiche Lederbeutel mit den Zahlen 1 bis 9. Einer ist schwerer als die anderen; seine Zahl geh\u00f6rt in den Code{zeichen}. Ein Stift sperrt den Balken, er l\u00f6st sich zweimal leicht.',
+                        wie: 'Gib an, welche Beutel links und welche rechts liegen, zum Beispiel 1 2 3 und 4 5 6.',
+                        voll: 'Auf eine Schale passen h\u00f6chstens drei Beutel.', doppelt: 'Jeder Beutel kann nur auf einer Schale liegen.' },
                     // Das Paket hat keinen Hebel: Lichter aus (R15) und Spiegelr\u00e4ume (R88) sind hier Reihen kleiner Fackelk\u00f6rbe,
                     // die brennen oder dunkel sind (oben = brennt, unten = dunkel)
                     HEBELREIHE: { name: 'Fackelreihe', nom: 'die Fackelreihe', akk: 'die Fackelreihe', verb: 'Ber\u00fchren',
@@ -2126,7 +2132,7 @@ var Generator = (function () {
     // Noch ohne Bild: Raetsel, die es im Kern schon gibt, deren Dinge die Oberflaeche aber noch aus Kaesten baut. Mit
     // opt.bild (Server, Spielseite, Probeseite) kommen sie in keiner Partie vor; ohne (Tests, zeige.js) in jeder. Die
     // PC-Sitzung streicht hier einen Eintrag, sobald das Raetsel Modelle und ein Bild hat (ARBEITSTEILUNG.md 3.1f).
-    var NOCH_OHNE_BILD = { waegen: 1 };
+    var NOCH_OHNE_BILD = {};
     function Bau(seed, spieler, stufe, versuch, stil, bild) {
         this.aus = bild ? NOCH_OHNE_BILD : {};
         this.r = Zufall.strom(String(seed), 'partie:' + spieler + ':' + stufe + ':' + versuch);
