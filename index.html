@@ -920,7 +920,8 @@ var Setting = (function () {
         stile: {
             kaykit: {
                 name: 'KayKit',
-                ohne: ['ventilator', 'katze', 'vitrine', 'wecker', 'v_laterne', 'v_urne'],
+                // pakt: Die Figuren dieses Herstellers haben nur runde F\u00e4uste, keine offene Hand (R152 gibt es hier nicht)
+                ohne: ['ventilator', 'katze', 'vitrine', 'wecker', 'v_laterne', 'v_urne', 'pakt'],
                 anders: {
                     // die \u00dcbungspuppe ist hier ein Gerippe: kein Stroh, kein Sackleinen, kein aufgemaltes Gesicht
                     puppe: { ersetze: [['Auf dem Sackleinen der', 'Auf dem Umhang der'], ['Eine Naht im R\u00fccken der \u00dcbungspuppe platzt auf. Im Stroh steckt', 'Der Umhang der \u00dcbungspuppe rutscht zur Seite. Zwischen den Rippen steckt'], ['den Kopf', 'den Sch\u00e4del']],
@@ -1688,6 +1689,8 @@ var Katalog = (function () {
             r = st.ohne[i];
             for (k = 0; k < tabellen.length; k++) delete tabellen[k][r];
         }
+        // Pakt der Hand (R152): Ein Stil ohne Hand-Modell bietet ihn nicht an (PC-Sitzung, 2026-10-11)
+        if ((st.ohne || []).indexOf('pakt') >= 0) K.PAKT = null;
         var bleiben = [];
         for (i = 0; i < K.VERSTECKE.length; i++) if ((st.ohne || []).indexOf('v_' + K.VERSTECKE[i][3]) < 0) bleiben.push(K.VERSTECKE[i]);
         K.VERSTECKE = bleiben;
@@ -2123,7 +2126,7 @@ var Generator = (function () {
     // Noch ohne Bild: Raetsel, die es im Kern schon gibt, deren Dinge die Oberflaeche aber noch aus Kaesten baut. Mit
     // opt.bild (Server, Spielseite, Probeseite) kommen sie in keiner Partie vor; ohne (Tests, zeige.js) in jeder. Die
     // PC-Sitzung streicht hier einen Eintrag, sobald das Raetsel Modelle und ein Bild hat (ARBEITSTEILUNG.md 3.1f).
-    var NOCH_OHNE_BILD = { pakt: 1, waegen: 1 };
+    var NOCH_OHNE_BILD = { waegen: 1 };
     function Bau(seed, spieler, stufe, versuch, stil, bild) {
         this.aus = bild ? NOCH_OHNE_BILD : {};
         this.r = Zufall.strom(String(seed), 'partie:' + spieler + ':' + stufe + ':' + versuch);
@@ -2528,7 +2531,8 @@ var Generator = (function () {
         var i;
         if (tiefe > 0 && arten[0] === 'frei' && this.r.chance(0.6)) arten.push(arten.shift());
         for (i = 0; i < arten.length; i++) {
-            if (this['lege_' + arten[i]](g, tiefe, opt)) { this.paktAngebot(g, tiefe); return; }
+            // was ohnehin frei im Raum liegt, bietet die Steinhand nicht an (PC-Sitzung 2026-10-11: sonst liegt es zweimal da)
+            if (this['lege_' + arten[i]](g, tiefe, opt)) { if (arten[i] !== 'frei') this.paktAngebot(g, tiefe); return; }
         }
         this.lege_frei(g, tiefe, opt);
     };
@@ -6159,6 +6163,7 @@ var Spiel = (function () {
             // Spiegelraeume (R88): wie die Hebel stehen (drueben gespiegelt), dort auch die Tafel
             if (d.vorlage === 'notschacht' && s.f['eingestuerzt:' + d.id]) eintrag.eingestuerzt = true;   // R157
             if (d.vorlage === 'spiegelbank') eintrag.hebel = hebelStand(s, d);
+            if (d.vorlage === 'pakt' && aktionenAn(s, d.id, ['pakt'])[0] && !s.f['hat:' + d.gibt]) eintrag.haelt = d.gibt;   // R152: was in der Steinhand liegt (PC-Sitzung: die Oberflaeche zeigt es dort)
             if (d.vorlage === 'hebelreihe') eintrag.hebel = reiheStand(s, d);     // R15: '1' = unten, die Lampe ist aus
             if (d.vorlage === 'mischkessel' && s.kessel && s.kessel[d.id]) { eintrag.farbe = s.kessel[d.id].farbe; eintrag.stoffe = s.kessel[d.id].stoffe.length; }   // R62: Farbe (Index) und Stoffe im Kessel
             if (d.vorlage === 'balkenwaage' && s.wiegen && s.wiegen[d.id]) eintrag.wiegen = s.wiegen[d.id].letzt;   // R4: [links, rechts, -1 links sinkt / 0 / 1]
