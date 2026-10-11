@@ -499,6 +499,11 @@ var Setting = (function () {
             { name: 'Gedenktafel', nom: 'die Gedenktafel', akk: 'die Gedenktafel', b: 'Eine Gedenktafel aus Stein. Die Namen darauf sind verblasst, gro\u00df lesbar ist nur noch eines:' },
             { name: 'Bauinschrift', nom: 'die Bauinschrift', akk: 'die Bauinschrift', b: 'Eine Steintafel, die der Baumeister in die Mauer setzen lie\u00df. Darauf steht:' }
         ],
+        // Der richtige Standpunkt (R22): Farbkleckse im Raum ergeben nur von einer Stelle aus Ziffern. {zeichen} = "eine Krone",
+        // {ziffern} = "der Ziffer 4" oder "den Ziffern 4 7"
+        standpunkt: { name: 'Fu\u00dfspuren', nom: 'die Fu\u00dfspuren', akk: 'die Fu\u00dfspuren', verb: 'Hineinstellen',
+            b: 'Zwei Fu\u00dfabdr\u00fccke in blauer Farbe am Boden, daneben ist {zeichen} gemalt. \u00dcberall im Raum kleben Kleckse derselben Farbe, an W\u00e4nden, Boden und M\u00f6beln, scheinbar ohne Sinn.',
+            hier: 'Du stellst dich in die Fu\u00dfspuren und siehst dorthin, wohin sie zeigen. Von hier aus f\u00fcgen sich die Kleckse zu {ziffern} zusammen. Neben den Fu\u00dfspuren ist {zeichen} gemalt.' },
         // Wortr\u00e4tsel am Buchstabenschloss: Geheimschrift (R6) oder Anagramm (R102); W\u00f6rter ohne Umlaute, in Gro\u00dfbuchstaben
         wort: {
             woerter: ['KRONE', 'SCHILD', 'TURM', 'RITTER', 'FACKEL', 'KERKER', 'WACHE', 'KELCH', 'LANZE', 'MAUER', 'GRUFT', 'ZINNE',
@@ -1042,6 +1047,7 @@ var Katalog = (function () {
     // Logikgitter (R8): Zeichen brauchen bestimmte Artikel, die Saetze alle Arten des Generators
     if (!S.zifferJeKopf || S.zifferJeKopf.indexOf('{teile}') < 0) fehlt('zifferJeKopf');
     if (!S.gedenktafel || !S.gedenktafel.length) fehlt('gedenktafel');
+    if (!S.standpunkt) fehlt('standpunkt'); else uebernimm({}, S.standpunkt, ['name', 'nom', 'akk', 'verb', 'b', 'hier'], 'standpunkt');
     if (!S.wache || !S.wache.bild || !S.wache.buch || !S.wache.schon) fehlt('wache');
     uebernimm({}, S.wache.bild, ['name', 'nom', 'akk', 'b', 'auf'], 'wache.bild');
     uebernimm({}, S.wache.buch, ['name', 'nom', 'akk', 'b', 'auf'], 'wache.buch');
@@ -1091,7 +1097,7 @@ var Katalog = (function () {
         version: 3, SETTING: S.id, ARTEN: ARTEN, AUSLOESER: AUSLOESER, ELEMENTE: ELEMENTE, GEGENSTAENDE: GEGENSTAENDE,
         EIGENSCHAFT_TEXT: EIGENSCHAFT_TEXT, ZU_WENIG: S.zuWenig, HINDERNISSE: HINDERNISSE, SCHLOESSER: SCHLOESSER, GEGENMITTEL: GEGENMITTEL,
         VERSTECKE: S.verstecke, LICHT: S.licht, WASSER: WASSER, SCHLUESSEL: S.schluessel, NOTIZ: S.notiz, STORIES: S.stories,
-        VERWANDLUNGEN: S.verwandlungen, ZAEHL: S.zaehl, LOGIK: S.logik, LUEGNER: S.luegner, HANDBUCH: S.handbuch, ZIFFER_JE_KOPF: S.zifferJeKopf, KLEIN: KLEIN, BEWEGLICH: BEWEGLICH, VERRUECKT: S.verrueckt, KLANG: S.klang, KLOPF_AUS: KLOPF_AUS, STAEBE: STAEBE, DURCHREICHE: S.durchreiche, HAUSORDNUNG: S.hausordnung, GEDENKTAFEL: S.gedenktafel, WORT: S.wort, WACHE: S.wache, FALLGITTER: FALLGITTER_K, ZEICHEN: S.zeichen, FETZEN: S.fetzen, UHR: S.uhr, ZWISCHENTUER: S.zwischentuer, TAFEL: S.tafel, INSCHRIFT: INSCHRIFT_K,
+        VERWANDLUNGEN: S.verwandlungen, ZAEHL: S.zaehl, LOGIK: S.logik, LUEGNER: S.luegner, HANDBUCH: S.handbuch, ZIFFER_JE_KOPF: S.zifferJeKopf, KLEIN: KLEIN, BEWEGLICH: BEWEGLICH, VERRUECKT: S.verrueckt, KLANG: S.klang, KLOPF_AUS: KLOPF_AUS, STAEBE: STAEBE, DURCHREICHE: S.durchreiche, HAUSORDNUNG: S.hausordnung, GEDENKTAFEL: S.gedenktafel, STANDPUNKT: S.standpunkt, WORT: S.wort, WACHE: S.wache, FALLGITTER: FALLGITTER_K, ZEICHEN: S.zeichen, FETZEN: S.fetzen, UHR: S.uhr, ZWISCHENTUER: S.zwischentuer, TAFEL: S.tafel, INSCHRIFT: INSCHRIFT_K,
         SCHLOSSTEXT: S.schlosstext,
         HELL: S.hell, DUNKEL: S.dunkel
     };
@@ -2646,6 +2652,8 @@ var Generator = (function () {
                 this.inschrift(t, fakt, tiefe);
             } else if (!el && j !== uhrBei && wahl >= 0.62 && wahl < 0.7 && !this.fixtur.gedenktafel) {
                 this.gedenktafel(t, fakt, schloss);
+            } else if (!el && j !== uhrBei && wahl >= 0.7 && wahl < 0.77 && !this.fixtur.standpunkt) {
+                this.standpunkt(t, fakt, schloss);
             } else if (el) {
                 var d = this.elementDing(el.key, this.teilRaum(schloss), {}), aus = this.ausWahl(el.f);
                 var rg = this.regel(d, el.f, aus, null);
@@ -2697,6 +2705,19 @@ var Generator = (function () {
         var d = this.ding('fixtur', G.name, raum, { vorlage: 'gedenktafel', modell: 'inschrift', nom: G.nom, akk: G.akk, b: G.b, teilText: this.teilText(t) });
         d.zone = this.zoneFuer(raum, {});
         var a = this.aktion({ text: G.name + ' lesen', art: 'ablesen', raum: raum, ding: d.id, gibt: [fakt], sicher: true });
+        a.teil = t;
+    };
+
+    // Der richtige Standpunkt (R22): Farbkleckse an Waenden, Boden und Moebeln ergeben nur von einer Stelle aus die
+    // Ziffern des Teils. Die Stelle zeigen zwei Fussabdruecke am Boden, daneben das Zeichen. Die Oberflaeche meldet das
+    // Anfassen erst, wenn man dort steht und hinsieht; ohne 3D (Liste, Probeseite) stellt man sich mit Anfassen hinein.
+    Bau.prototype.standpunkt = function (t, fakt, schloss) {
+        var SP = this.K.STANDPUNKT, raum = this.teilRaum(schloss), zn = this.K.ZEICHEN[t.zeichen][1];
+        this.fixtur.standpunkt = true;
+        var d = this.ding('fixtur', SP.name, raum, { vorlage: 'standpunkt', nom: SP.nom, akk: SP.akk, b: SP.b.replace('{zeichen}', zn),
+            hier: SP.hier.replace('{ziffern}', (t.ziffern.length === 1 ? 'der Ziffer ' : 'den Ziffern ') + t.ziffern.split('').join(' ')).replace('{zeichen}', zn) });
+        d.zone = this.zoneFuer(raum, {});
+        var a = this.aktion({ text: 'sich in die ' + SP.name + ' stellen', art: 'bedienen', raum: raum, ding: d.id, gibt: [fakt], sicher: true });
         a.teil = t;
     };
 
@@ -3663,6 +3684,7 @@ var Spiel = (function () {
         if (d.vorlage === 'licht') return KAT.LICHT.b + ' ' + (s.f['licht_aus:' + d.raum] ? KAT.LICHT.aus : KAT.LICHT.an);
         if (d.vorlage === 'zaehl') return KAT.ZAEHL[d.modell].b + ' ' + d.zeichenText;
         if (d.vorlage === 'gedenktafel') return d.b + ' ' + d.teilText;
+        if (d.vorlage === 'standpunkt') return d.b;
         if (d.vorlage === 'waechter') return (KAT.WACHE[d.modell === 'gemaelde' ? 'bild' : 'buch']).b + (aktionenAn(s, d.id, ['losung']).some(function (a) { return erledigt(s, a); }) ? ' ' + KAT.WACHE.schon : '');
         if (d.vorlage === 'inschrift') {
             for (i = 0; i < s.partie.aktionen.length; i++) {
@@ -3838,6 +3860,13 @@ var Spiel = (function () {
                 if (d.vorlage === 'zaehl' || d.vorlage === 'gedenktafel') {
                     aus.push(m(ansehenText(s, d)));
                     l = aktionenAn(s, d.id, ['zaehlen', 'ablesen']);
+                    for (i = 0; i < l.length; i++) fuehreAus(s, l[i], null);
+                    break;
+                }
+                // Standpunkt (R22): Die Oberflaeche schickt das erst, wenn man in den Fussspuren steht und hinsieht
+                if (d.vorlage === 'standpunkt') {
+                    aus.push(m(d.hier));
+                    l = aktionenAn(s, d.id, ['bedienen']);
                     for (i = 0; i < l.length; i++) fuehreAus(s, l[i], null);
                     break;
                 }
@@ -4138,12 +4167,12 @@ var Spiel = (function () {
             // Hausordnung: die drei Plaettchen, wie sie gerade auf der Tafel stehen
             if (d.vorlage === 'hausordnung') eintrag.tafel = ordnungZeile(s, d).split(' \u00b7 ');
             // Inschrift: einmal lesbar gemacht, steht ihr Teil fuer alle sichtbar im Stein
-            if (d.vorlage === 'inschrift' || d.vorlage === 'gedenktafel') {
+            if (d.vorlage === 'inschrift' || d.vorlage === 'gedenktafel' || d.vorlage === 'standpunkt') {
                 for (k = 0; k < s.partie.aktionen.length; k++) {
                     var ain = s.partie.aktionen[k];
                     if (ain.ding !== d.id || !ain.teil) continue;
-                    // die Gedenktafel ist von Anfang an lesbar (R44)
-                    eintrag.w = [{ art: 'teil', aus: '', gezeigt: false, an: d.vorlage === 'gedenktafel' || erledigt(s, ain) }];
+                    // die Gedenktafel ist von Anfang an lesbar (R44), die Kleckse des Standpunkts kleben von Anfang an im Raum (R22)
+                    eintrag.w = [{ art: 'teil', aus: '', gezeigt: false, an: d.vorlage !== 'inschrift' || erledigt(s, ain) }];
                     if (eintrag.w[0].an) { eintrag.w[0].code = ain.teil.ziffern; if (ain.teil.zeichen !== null) eintrag.w[0].zeichen = KAT.ZEICHEN[ain.teil.zeichen][0]; }
                 }
             }
@@ -4174,6 +4203,7 @@ var Spiel = (function () {
             else if (v === 'hebelpaar') verb = KAT.SCHLOESSER.hebelpaar.verb;
             else if (v === 'hausordnung') verb = KAT.HAUSORDNUNG.verb;
             else if (v === 'gedenktafel') verb = 'Lesen';
+            else if (v === 'standpunkt') verb = KAT.STANDPUNKT.verb;
             else if (v === 'waechter') verb = 'Ansehen';
             else if (v === 'durchreiche') verb = d.einwurf ? KAT.DURCHREICHE[partie.durchreiche.richtung].verb : 'Ansehen';
             // nur gesetzte Felder: Das Partie-Ereignis muss unter der Groessengrenze von Knuddels bleiben
@@ -4185,7 +4215,7 @@ var Spiel = (function () {
             if (d.verborgen) aus[k].verborgen = true;
             if (verb) aus[k].verb = verb;
             // Zaehlreihe: das Zeichen, das daran steht
-            if (v === 'zaehl') {
+            if (v === 'zaehl' || v === 'standpunkt') {       // auch das Zeichen neben den Fussspuren (R22)
                 for (i = 0; i < partie.aktionen.length; i++) {
                     var az = partie.aktionen[i];
                     if (az.ding === k && az.teil && az.teil.zeichen !== null) aus[k].zeichen = KAT.ZEICHEN[az.teil.zeichen][0];
