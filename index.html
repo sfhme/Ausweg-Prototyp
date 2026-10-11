@@ -4902,6 +4902,10 @@ var Spiel = (function () {
     }
     function zahl(v) { return typeof v === 'number' && isFinite(v) ? Math.round(v * 100) / 100 : null; }
     function legeAb(s, id, raum, x, z) { s.wer[id] = { raum: raum, x: zahl(x), z: zahl(z) }; }
+    // Stapeln (PC-Sitzung, 2026-10-11, Wunsch des Projektinhabers): Was getragen und abgestellt wird, kann auf etwas anderem
+    // stehen oder liegen. Die Engine merkt sich nur die Hoehe der Unterkante in Metern (0 = am Boden); wie hoch die
+    // Dinge sind, wissen die Modelle der Oberflaeche. Fuer die Raetsel zaehlt weiter nur die Lage am Boden (x, z).
+    function hoehe(v) { return typeof v === 'number' && isFinite(v) && v > 0.005 && v < 4 ? Math.round(v * 100) / 100 : 0; }
 
     // Durchreiche (R83, R99): Kleines faellt auf der anderen Seite heraus und liegt dort; die drueben erfahren es
     // ein Ding wechselt durch die Mauer die Seite: liegt drueben vor der Oeffnung; fuer den Pruefer ab diesem Spielstand
@@ -5526,11 +5530,12 @@ var Spiel = (function () {
             var lg = liegt(s, key);
             if (!lg || lg.raum !== raum || lg.auf) return nix;
             lg.x = x; lg.z = z; delete lg.an;
+            if (hoehe(b.y)) lg.y = hoehe(b.y); else delete lg.y;
             return [];
         }
         // alles andere: nur, was der Raumplan als schiebbar ausweist, im eigenen Raum
         if (!q || !q.schieb || q.raum !== raum) return nix;
-        s.ort[key] = [x, z];
+        s.ort[key] = hoehe(b.y) ? [x, z, hoehe(b.y)] : [x, z];      // dritte Zahl: steht so hoch auf etwas anderem
         return [];
     }
 
@@ -5984,6 +5989,7 @@ var Spiel = (function () {
                     break;
                 }
                 legeAb(s, d.id, s.raum[nr], b.x, b.z);
+                if (hoehe(b.y)) s.wer[d.id].y = hoehe(b.y);          // auf etwas abgelegt
                 aus.push(zeigt(m('Du legst ' + akk(d) + ' ab.')));
                 break;
 
@@ -6126,6 +6132,7 @@ var Spiel = (function () {
                 else if (w0 && w0.raum === raum) {
                     var lg = { id: d.id, name: d.name, typ: d.typ, offen: false, code: false, liegt: { x: w0.x, z: w0.z } };
                     if (w0.an) lg.liegt.an = w0.an;                  // durchgereicht: liegt vor dieser Oeffnung
+                    if (w0.y) lg.liegt.y = w0.y;                     // liegt so hoch auf etwas
                     if (d.vorlage === 'krug') lg.krug = [(s.krug && s.krug[d.id]) || 0, d.fasst];
                     if (w0.auf) lg.liegt.auf = w0.auf;              // liegt auf einer Trittplatte (R85)
                     dinge.push(lg);
