@@ -2019,7 +2019,7 @@ var Generator = (function () {
     // Noch ohne Bild: Raetsel, die es im Kern schon gibt, deren Dinge die Oberflaeche aber noch aus Kaesten baut. Mit
     // opt.bild (Server, Spielseite, Probeseite) kommen sie in keiner Partie vor; ohne (Tests, zeige.js) in jeder. Die
     // PC-Sitzung streicht hier einen Eintrag, sobald das Raetsel Modelle und ein Bild hat (ARBEITSTEILUNG.md 3.1f).
-    var NOCH_OHNE_BILD = { spiegel: 1, kaefig: 1, pakt: 1, kreide: 1, nachschlagen: 1, waegen: 1, hebelreihe: 1,
+    var NOCH_OHNE_BILD = { spiegel: 1, kaefig: 1, pakt: 1, kreide: 1, waegen: 1, hebelreihe: 1,
         bauen: 1, traenke: 1, notizen: 1, faehrte: 1, orakel: 1, reihe: 1, tinte: 1 };      // R64, R62, R112, R115, R106, R110, R43
     function Bau(seed, spieler, stufe, versuch, stil, bild) {
         this.aus = bild ? NOCH_OHNE_BILD : {};
@@ -6087,6 +6087,7 @@ var Spiel = (function () {
             if (d.fasst) aus[k].fasst = d.fasst;                     // Krug (R18): so viel Mass fasst er, die Oberflaeche zeigt ihn so gross
             if (d.vorlage === 'waage') { aus[k].soll = d.soll; aus[k].seite = d.seite; }     // Trittplatte (R85): eingemeisselte Fussspuren
             if (d.vorlage === 'durchreiche' && partie.durchreiche.richtung === 'tausch') aus[k].drehlade = true;   // R93: Holztrommel im Mauerloch
+            if (d.vorlage === 'buecherregal') aus[k].titel = d.titel;                 // R12: was auf den Ruecken steht (am Fadenkreuz je Band)
             if (d.vorlage === 'spiegelbank' || d.vorlage === 'spiegelbild') { aus[k].hebel = d.stellen; if (d.vorlage === 'spiegelbank') aus[k].bank = true; }   // R88
             if (d.vorlage === 'hebelreihe') { aus[k].hebel = d.stellen; aus[k].bank = true; aus[k].lampen = true; }   // R15: Hebel mit Lampen
             if (d.verborgen) aus[k].verborgen = true;
@@ -6223,7 +6224,8 @@ if (typeof module !== 'undefined' && module.exports) { module.exports = Spiel; }
     });
     $("codereihe").hidden = !(d && d.code);
     var wort = !!(d && (namen[d.id] || {}).vorlage === "buchstabenschloss");
-    $("codelabel").textContent = wort ? "Wort" : "Code";
+    var stelle = !!(d && (namen[d.id] || {}).vorlage === "buecherregal");     // Nachschlagen: Buch, Seite, Zeile
+    $("codelabel").textContent = wort ? "Wort" : stelle ? "Buch Seite Zeile" : "Code";
     $("codefeld").setAttribute("inputmode", wort ? "text" : "numeric");
     $("sagreihe").hidden = !(d && !d.offen && (namen[d.id] || {}).vorlage === "waechter");
     var wt = d ? wahrnehmung(d) : "";
@@ -6278,7 +6280,10 @@ if (typeof module !== 'undefined' && module.exports) { module.exports = Spiel; }
     else if (art === "benutzen") tue({ art: "benutzen", ding: gewaehlt, mit: auswahl.slice() }, mitText + " an " + name);
     else if (art === "krach") tue({ art: "krach", mit: auswahl.slice() }, "Krach mit " + mitText);
     else if (art === "warten") tue({ art: "warten" }, "Warten");
-    else if (art === "eingeben") { var c = $("codefeld").value.replace(/[^0-9A-Za-z]/g, "").toUpperCase(); tue({ art: "eingeben", ding: gewaehlt, code: c }, "Code " + c + " an " + name); $("codefeld").value = ""; }
+    else if (art === "eingeben") { var c = $("codefeld").value.replace(/[^0-9A-Za-z]/g, "").toUpperCase();
+      // Nachschlagen: "3 47 2" wird zu "3S47Z2" (Buch, Seite, Zeile)
+      if ((namen[gewaehlt] || {}).vorlage === "buecherregal") { var sz = $("codefeld").value.match(/[0-9]+/g) || []; c = sz.length >= 3 ? sz[0] + "S" + sz[1] + "Z" + sz[2] : ""; }
+      tue({ art: "eingeben", ding: gewaehlt, code: c }, "Code " + c + " an " + name); $("codefeld").value = ""; }
   });
   $("codefeld").addEventListener("keydown", function (e) { if (e.key === "Enter") document.querySelector('[data-b="eingeben"]').click(); });
   // Losung: Im Spiel schreibt man sie in den Chat, und der Raum hoert mit
