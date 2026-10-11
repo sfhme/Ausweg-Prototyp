@@ -623,21 +623,36 @@ var Setting = (function () {
                 vor: '{a} kam vor {b}.', direkt: '{b} kam gleich nach {a}.', erst: '{a} war zuerst da.', nicht: '{a} kam nicht zuletzt.', und: 'und' },
             raetsel: { name: 'Pergament mit einer R\u00e4tselfrage', nom: 'das Pergament mit einer R\u00e4tselfrage', akk: 'das Pergament mit einer R\u00e4tselfrage',
                 b: 'Ein Pergament mit einer R\u00e4tselfrage: \u00bb{frage}\u00ab Darunter: Die Antwort ist der Schl\u00fcssel.' },
+            // Raetselfragen nur fuer dieses Setting; dazu kommen die allgemeinen (gemeinsam.fragen unten)
             fragen: [
-                ['NADEL', 'Ich habe ein Auge und sehe nichts, und durch mein Auge zieht man einen Faden.'],
-                ['LOCH', 'Je mehr man von mir wegnimmt, desto gr\u00f6\u00dfer werde ich.'],
-                ['UHR', 'Ich habe Zeiger, aber keine Finger, ein Gesicht, aber keine Augen.'],
-                ['KAMM', 'Ich habe Z\u00e4hne und bei\u00dfe nie, aber ich fahre dir durchs Haar.'],
-                ['FLASCHE', 'Ich habe einen Hals, aber keinen Kopf, und trage einen Korken als Hut.'],
-                ['KIRSCHE', 'Erst wei\u00df wie Schnee, dann gr\u00fcn wie Klee, dann rot wie Blut, schmeckt allen gut.'],
-                ['SCHRITTE', 'Je mehr man davon macht, desto mehr bleibt hinter einem zur\u00fcck.'],
-                ['KARTE', 'Ich habe St\u00e4dte, aber keine H\u00e4user, W\u00e4lder, aber keine B\u00e4ume, Meere, aber kein Wasser.'],
-                ['KERZE', 'Je l\u00e4nger ich lebe, desto k\u00fcrzer werde ich.'],
-                ['SCHATTEN', 'Am Tag folge ich dir \u00fcberallhin, in der Nacht bin ich fort.'],
-                ['ECHO', 'Ich spreche ohne Mund und antworte, ohne gefragt zu werden.'],
-                ['FEUER', 'Gibt man mir zu essen, wachse ich. Gibt man mir zu trinken, sterbe ich.'],
-                ['STILLE', 'Wer meinen Namen ausspricht, zerbricht mich.'],
-                ['ZUKUNFT', 'Ich bin immer vor dir, und doch hast du mich nie gesehen.']
+                ['SCHLOSS', 'Ich kann ein Haus voller K\u00f6nige sein oder ein kleines Ding an einer T\u00fcr.'],
+                ['GLOCKE', 'Ich habe eine Zunge und spreche nicht, und doch h\u00f6rt man mich \u00fcbers ganze Land.'],
+                ['BRUNNEN', 'Ich bin ein tiefes Loch voller Wasser mit einer Mauer rundherum, und wer aus mir trinken will, l\u00e4sst einen Eimer hinab.'],
+                ['KETTE', 'Ich bestehe aus lauter Ringen und stecke doch an keinem Finger.'],
+                ['TINTE', 'Ich bin schwarz und fl\u00fcssig, und wo ich hinflie\u00dfe, bleiben Worte zur\u00fcck.'],
+                ['SIEGEL', 'Ich bin aus Wachs, und erst wer mich bricht, darf den Brief lesen.'],
+                ['FACKEL', 'Ich lebe von Pech und Feuer, und wo ich brenne, weichen die Schatten.'],
+                ['TURM', 'Ich stehe Tag und Nacht und schlafe nie, und von mir aus sieht der W\u00e4chter am weitesten.'],
+                ['HELM', 'Ich bin ein Hut aus Eisen, und unter mir denkt ein Ritter.'],
+                ['SCHILD', 'Ich fange Schl\u00e4ge, die nicht mir gelten, und mein Herr steht hinter mir.'],
+                ['PFEIL', 'Ich fliege ohne Fl\u00fcgel und treffe ohne Hand, und einmal fort, komme ich nie zur\u00fcck.'],
+                ['BOGEN', 'Ich bin krumm und gespannt, und erst wenn man mich losl\u00e4sst, fliegt etwas davon.'],
+                ['RIEGEL', 'Ich schiebe mich vor die T\u00fcr, und keiner kommt herein, und doch habe ich keine H\u00e4nde.'],
+                ['KERKER', 'Wer in mir wohnt, will nicht bleiben, und wer mich bewacht, will nicht hinein.'],
+                ['WAAGE', 'Ich habe zwei Schalen und esse nie daraus, und ich l\u00fcge nie \u00fcber das, was man mir auflegt.'],
+                ['SCHWERT', 'Ich wohne in einer Scheide und h\u00e4nge am G\u00fcrtel des Ritters, und wer mich zieht, meint es ernst.'],
+                ['WEIN', 'Erst h\u00e4nge ich am Stock, dann tritt man mich mit F\u00fc\u00dfen, dann ruhe ich im Keller, und wer zu viel von mir trinkt, lallt.'],
+                ['FASS', 'Ich habe einen dicken Bauch und keinen Magen, und im Keller h\u00fcte ich, was andere trinken.'],
+                ['KORKEN', 'Ich stecke im Hals und ersticke doch niemanden, und zieht man mich heraus, flie\u00dft der Wein.'],
+                ['LATERNE', 'Ich trage ein Licht in einem Haus aus Glas und gehe nur, wenn man mich tr\u00e4gt.'],
+                ['MAUER', 'Ich bin aus vielen Steinen, die zusammenhalten, und trenne, die drau\u00dfen sind, von denen drinnen.'],
+                ['TOR', 'Ich bin eine gro\u00dfe T\u00fcr, durch die der Ritter reitet, und bei Nacht bleibe ich zu.'],
+                ['GOLD', 'Ich gl\u00e4nze gelb und roste nie, und um mich ist schon mancher Krieg gef\u00fchrt worden.'],
+                ['SCHATZ', 'Man vergr\u00e4bt mich, damit mich keiner findet, und malt dann eine Karte, damit man mich findet.'],
+                ['SARG', 'Ich bin eine Kiste aus Holz: Wer mich zimmert, braucht mich nicht, wer mich kauft, will mich nicht, und wer mich braucht, wei\u00df nichts davon.'],
+                ['AMBOSS', 'Den ganzen Tag schl\u00e4gt man auf mich ein, und nie schlage ich zur\u00fcck.'],
+                ['KRONE', 'Ich sitze auf dem Kopf und bin kein Hut, und wer mich tr\u00e4gt, dem geh\u00f6rt das Land.'],
+                ['THRON', 'Ich bin ein Stuhl, auf dem nur einer sitzen darf, und wer mich verliert, verliert sein Reich.']
             ],
             // Anfangsbuchstaben (R101): Namen untereinander, ihre Anfaenge ergeben das Wort
             anfang: { name: 'Liste der Gefangenen', nom: 'die Liste der Gefangenen', akk: 'die Liste der Gefangenen',
@@ -1028,7 +1043,66 @@ var Setting = (function () {
         ]
     };
 
-    return { version: 1, aktiv: 'gewoelbe', gewoelbe: gewoelbe };
+    // Was in jedes Setting passt. Raetselfragen (R100): Antwort aus 3 bis 8 Buchstaben ohne Umlaut (die Tafel am
+    // Buchstabenschloss hat hoechstens acht Felder); der Katalog haengt die Fragen des Settings an (Setting.wort.fragen).
+    var gemeinsam = {
+        fragen: [
+            ['NADEL', 'Ich habe ein Auge und sehe nichts, und durch mein Auge zieht man einen Faden.'],
+            ['LOCH', 'Je mehr man von mir wegnimmt, desto gr\u00f6\u00dfer werde ich.'],
+            ['UHR', 'Ich habe Zeiger, aber keine Finger, ein Gesicht, aber keine Augen.'],
+            ['KAMM', 'Ich habe Z\u00e4hne und bei\u00dfe nie, aber ich fahre dir durchs Haar.'],
+            ['FLASCHE', 'Ich habe einen Hals, aber keinen Kopf, und trage einen Korken als Hut.'],
+            ['KIRSCHE', 'Erst wei\u00df wie Schnee, dann gr\u00fcn wie Klee, dann rot wie Blut, schmeckt allen gut.'],
+            ['SCHRITTE', 'Je mehr man davon macht, desto mehr bleibt hinter einem zur\u00fcck.'],
+            ['KARTE', 'Ich habe St\u00e4dte, aber keine H\u00e4user, W\u00e4lder, aber keine B\u00e4ume, Meere, aber kein Wasser.'],
+            ['KERZE', 'Je l\u00e4nger ich lebe, desto k\u00fcrzer werde ich.'],
+            ['SCHATTEN', 'Am Tag folge ich dir \u00fcberallhin, in der Nacht bin ich fort.'],
+            ['ECHO', 'Ich spreche ohne Mund und antworte, ohne gefragt zu werden.'],
+            ['FEUER', 'Gibt man mir zu essen, wachse ich. Gibt man mir zu trinken, sterbe ich.'],
+            ['STILLE', 'Wer meinen Namen ausspricht, zerbricht mich.'],
+            ['ZUKUNFT', 'Ich bin immer vor dir, und doch hast du mich nie gesehen.'],
+            ['NEBEL', 'Ich verh\u00fclle Berg und Tal, doch greifst du nach mir, bleibt deine Hand leer.'],
+            ['SCHNEE', 'Wei\u00df komme ich vom Himmel, still decke ich alles zu, und im Fr\u00fchling bin ich fort.'],
+            ['WIND', 'Ich habe keine Fl\u00fcgel und fliege doch, keinen Mund und heule doch.'],
+            ['ZEIT', 'Jeder hat mich, keiner kann mich behalten, und wer mich totschl\u00e4gt, wird nicht bestraft.'],
+            ['NAME', 'Ich geh\u00f6re dir, und doch benutzen mich die anderen viel \u00f6fter als du.'],
+            ['SPIEGEL', 'Sieh mich an, und du siehst dich selbst. Zerbrich mich, und du hast sieben Jahre Pech.'],
+            ['REGEN', 'Ich falle vom Himmel und breche mir nie etwas, und ohne Beine laufe ich die Scheiben hinab.'],
+            ['TREPPE', 'Ich f\u00fchre hinauf und hinunter und r\u00fchre mich nie von der Stelle, und forttragen kann mich keiner.'],
+            ['BUCH', 'Ich habe Bl\u00e4tter und bin kein Baum, einen R\u00fccken und bin kein Tier.'],
+            ['FLUSS', 'Ich habe ein Bett und schlafe nie, einen Mund und esse nie, und ich laufe immer, ohne Beine.'],
+            ['SCHERE', 'Ich habe zwei Augen und sehe nichts, zwei Schneiden und bin kein Schwert, und wo ich zubei\u00dfe, f\u00e4llt etwas auseinander.'],
+            ['SCHWAMM', 'Ich bin voller L\u00f6cher und halte doch das Wasser.'],
+            ['NAGEL', 'Ich habe einen Kopf und kein Gehirn, und je mehr man mir draufschl\u00e4gt, desto fester halte ich.'],
+            ['MOND', 'Ich nehme ab und nehme zu und esse doch nie etwas.'],
+            ['SONNE', 'Jeden Morgen gehe ich auf, jeden Abend gehe ich unter, und nie werde ich nass dabei.'],
+            ['NACHT', 'Ich komme jeden Abend ohne F\u00fc\u00dfe und gehe jeden Morgen ohne Schritt, und mit mir kommen die Sterne.'],
+            ['WOLKE', 'Ich fliege ohne Fl\u00fcgel und weine ohne Augen, und wohin ich ziehe, wird es dunkel.'],
+            ['SALZ', 'Ohne mich schmeckt die Suppe fade, zu viel von mir verdirbt sie, und ich komme aus dem Meer.'],
+            ['EIS', 'Ich bin Wasser, auf dem man gehen kann, und W\u00e4rme macht mich wieder zu Wasser.'],
+            ['ZWIEBEL', 'Ich trage viele H\u00e4ute \u00fcbereinander, und wer mich auszieht, muss weinen.'],
+            ['NUSS', 'Ein Haus aus Holz ohne T\u00fcr und Fenster, und drinnen wohnt ein s\u00fc\u00dfer Kern.'],
+            ['SPINNE', 'Ich webe ohne Webstuhl, und mein Tuch f\u00e4ngt, was fliegt.'],
+            ['SCHNECKE', 'Ich trage mein Haus immer bei mir und ziehe eine Spur aus Silber hinter mir her.'],
+            ['HONIG', 'Ich bin s\u00fc\u00df und golden, und tausend kleine Fl\u00fcgel haben mich gemacht.'],
+            ['BROT', 'Erst bin ich Korn, dann Mehl, dann Teig, und zuletzt holt man mich warm aus dem Ofen.'],
+            ['ASCHE', 'Ich bin, was vom Feuer \u00fcbrig bleibt, grau und leicht, und ein Hauch tr\u00e4gt mich fort.'],
+            ['RAUCH', 'Ich steige aus dem Feuer auf ohne Treppe und vergehe, bevor ich oben bin.'],
+            ['SAND', 'Ich rinne durch ein enges Glas und z\u00e4hle so die Stunden.'],
+            ['ATEM', 'Ich gehe ein und aus und bin doch kein Gast. H\u00e4ltst du mich an, muss ich bald wieder heraus.'],
+            ['HERZ', 'Ich schlage ohne Hand und ruhe nie, solange du lebst.'],
+            ['AUGE', 'Ich habe ein Lid und bin keine Kiste, und gehe ich zu, wird es dunkel.'],
+            ['NICHTS', 'Der Arme hat es, der Reiche braucht es, und wer es isst, verhungert.'],
+            ['TRAUM', 'Ich komme nachts, wenn du schl\u00e4fst, zeige dir, was es nicht gibt, und am Morgen bin ich fort.'],
+            ['GESTERN', 'Ich war schon da, aber ich komme nie wieder.'],
+            ['EIMER', 'Leer gehe ich hinab, voll komme ich herauf.'],
+            ['LEITER', 'Ich habe viele Sprossen und wachse doch nie, und wer auf mich steigt, kommt h\u00f6her.'],
+            ['BESEN', 'Ich tanze durch die Stube, und wo ich war, ist es sauber.'],
+            ['HAHN', 'Ich trage einen roten Kamm und k\u00e4mme mich nie, und jeden Morgen wecke ich das Haus.']
+        ]
+    };
+
+    return { version: 1, aktiv: 'gewoelbe', gemeinsam: gemeinsam, gewoelbe: gewoelbe };
 })();
 
 if (typeof module !== 'undefined' && module.exports) { module.exports = Setting; }
@@ -1447,8 +1521,17 @@ var Katalog = (function () {
     if (!S.wort.reihe || !S.wort.reihe.namen || S.wort.reihe.namen.length < 4) fehlt('wort.reihe.namen (mindestens 4)');
     else for (i = 0; i < S.wort.reihe.namen.length; i++) if (!/^[A-Z][a-z]{3,7}$/.test(S.wort.reihe.namen[i])) fehlt('wort.reihe.namen[' + i + '] (4 bis 8 Buchstaben, ohne Umlaut)');
     uebernimm({}, S.wort.raetsel || {}, ['name', 'nom', 'akk', 'b'], 'wort.raetsel');
-    if (!S.wort.fragen || S.wort.fragen.length < 6) fehlt('wort.fragen');
-    for (i = 0; i < S.wort.fragen.length; i++) if (!/^[A-Z]{3,10}$/.test(S.wort.fragen[i][0]) || !S.wort.fragen[i][1]) fehlt('wort.fragen[' + i + '] (Antwort in Grossbuchstaben, Frage)');
+    // Raetselfragen: die allgemeinen (Setting.gemeinsam) und die des Settings; jede Antwort nur einmal
+    var FRAGEN = ((Setting.gemeinsam && Setting.gemeinsam.fragen) || []).concat(S.wort.fragen || []), fragAnt = {};
+    if (FRAGEN.length < 6) fehlt('wort.fragen (mindestens 6 mit den allgemeinen)');
+    for (i = 0; i < FRAGEN.length; i++) {
+        if (!/^[A-Z]{3,8}$/.test(FRAGEN[i][0]) || !FRAGEN[i][1]) fehlt('wort.fragen[' + i + '] (Antwort aus 3 bis 8 Grossbuchstaben, Frage)');
+        if (fragAnt[FRAGEN[i][0]]) fehlt('wort.fragen: Antwort ' + FRAGEN[i][0] + ' doppelt');
+        fragAnt[FRAGEN[i][0]] = true;
+    }
+    var WORT = {};
+    for (k in S.wort) if (S.wort.hasOwnProperty(k)) WORT[k] = S.wort[k];
+    WORT.fragen = FRAGEN;
     // jeder Buchstabe der Woerter braucht Namen (Anfangsbuchstaben, R101)
     for (i = 0; i < S.wort.woerter.length; i++) for (k = 0; k < S.wort.woerter[i].length; k++) if (!S.wort.namen || !S.wort.namen[S.wort.woerter[i].charAt(k)]) fehlt('wort.namen.' + S.wort.woerter[i].charAt(k));
     for (i = 0; i < S.gedenktafel.length; i++) uebernimm({}, S.gedenktafel[i], ['name', 'nom', 'akk', 'b'], 'gedenktafel[' + i + ']');
@@ -1495,7 +1578,7 @@ var Katalog = (function () {
         version: 3, SETTING: S.id, ARTEN: ARTEN, AUSLOESER: AUSLOESER, ELEMENTE: ELEMENTE, GEGENSTAENDE: GEGENSTAENDE,
         EIGENSCHAFT_TEXT: EIGENSCHAFT_TEXT, ZU_WENIG: S.zuWenig, HINDERNISSE: HINDERNISSE, SCHLOESSER: SCHLOESSER, GEGENMITTEL: GEGENMITTEL,
         VERSTECKE: S.verstecke, SCHLICHT: S.schlicht, AUSSTATTUNG: S.ausstattung, LICHT: S.licht, WASSER: WASSER, SCHLUESSEL: S.schluessel, NOTIZ: S.notiz, STORIES: S.stories,
-        VERWANDLUNGEN: S.verwandlungen, ZAEHL: S.zaehl, LOGIK: S.logik, LUEGNER: S.luegner, HANDBUCH: S.handbuch, REGAL: S.regal, ZIFFER_JE_KOPF: S.zifferJeKopf, KLEIN: KLEIN, BEWEGLICH: BEWEGLICH, VERRUECKT: S.verrueckt, KLANG: S.klang, KLOPF_AUS: KLOPF_AUS, STAEBE: STAEBE, DURCHREICHE: S.durchreiche, HAUSORDNUNG: S.hausordnung, GEDENKTAFEL: S.gedenktafel, STANDPUNKT: S.standpunkt, STRAHL: S.strahl, WORT: S.wort, WACHE: S.wache, KRUEGE: S.kruege, KERBSTEIN: S.kerbstein, BALKENWAAGE: S.balkenwaage, KAEFIG: KAEFIG, PAKT: S.pakt, KREIDE: S.kreide, NOTSCHACHT: NOTSCHACHT, SPIEGEL: S.spiegel, HEBELREIHE: S.hebelreihe, ORAKEL: S.orakel, NOTIZEN: S.notizen, TRAENKE: S.traenke, BAUEN: BAUEN, BAUEN_TEXT: S.bauen, GABEN: S.gaben, GABEN_REIHE: ['nachtauge', 'gehoer', 'schrift'], WAAGE: S.waage, WAAGE_SCHWER: WAAGE_SCHWER, FALLGITTER: FALLGITTER_K, ZEICHEN: S.zeichen, FETZEN: S.fetzen, TINTE: TINTE_K, UHR: S.uhr, ZWISCHENTUER: S.zwischentuer, TAFEL: S.tafel, INSCHRIFT: INSCHRIFT_K,
+        VERWANDLUNGEN: S.verwandlungen, ZAEHL: S.zaehl, LOGIK: S.logik, LUEGNER: S.luegner, HANDBUCH: S.handbuch, REGAL: S.regal, ZIFFER_JE_KOPF: S.zifferJeKopf, KLEIN: KLEIN, BEWEGLICH: BEWEGLICH, VERRUECKT: S.verrueckt, KLANG: S.klang, KLOPF_AUS: KLOPF_AUS, STAEBE: STAEBE, DURCHREICHE: S.durchreiche, HAUSORDNUNG: S.hausordnung, GEDENKTAFEL: S.gedenktafel, STANDPUNKT: S.standpunkt, STRAHL: S.strahl, WORT: WORT, WACHE: S.wache, KRUEGE: S.kruege, KERBSTEIN: S.kerbstein, BALKENWAAGE: S.balkenwaage, KAEFIG: KAEFIG, PAKT: S.pakt, KREIDE: S.kreide, NOTSCHACHT: NOTSCHACHT, SPIEGEL: S.spiegel, HEBELREIHE: S.hebelreihe, ORAKEL: S.orakel, NOTIZEN: S.notizen, TRAENKE: S.traenke, BAUEN: BAUEN, BAUEN_TEXT: S.bauen, GABEN: S.gaben, GABEN_REIHE: ['nachtauge', 'gehoer', 'schrift'], WAAGE: S.waage, WAAGE_SCHWER: WAAGE_SCHWER, FALLGITTER: FALLGITTER_K, ZEICHEN: S.zeichen, FETZEN: S.fetzen, TINTE: TINTE_K, UHR: S.uhr, ZWISCHENTUER: S.zwischentuer, TAFEL: S.tafel, INSCHRIFT: INSCHRIFT_K,
         SCHLOSSTEXT: S.schlosstext,
         HELL: S.hell, DUNKEL: S.dunkel
     };
