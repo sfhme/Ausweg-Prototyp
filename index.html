@@ -5308,11 +5308,26 @@ var Spiel = (function () {
         if (d.vorlage === 'waechter') return KAT.WACHE[d.modell === 'gemaelde' ? 'bild' : 'buch'].schrift;
         return null;
     }
-    // Hinsehen: Die Beschreibung steht im Notizbuch (mit den Spuren, die eine Regel verraten), im Bild nur die Schrift
+    // Schlicht ist eine Beschreibung, die nur sagt, was man ohnehin sieht: der blosse Name, der Katalogtext eines Elements
+    // ohne Spur, Frist oder Fund, der Katalogtext eines Gegenstands. Alles andere traegt etwas zum Merken (PC-Sitzung,
+    // 2026-10-11, Vorgabe des Projektinhabers: Das Notizbuch zeigt nur wichtige Hinweise, kein Ereignislog).
+    function schlicht(s, d, text) {
+        if (text === gross(d.name) + '.') return true;
+        if (d.typ === 'element') return !!KAT.ELEMENTE[d.vorlage] && text === KAT.ELEMENTE[d.vorlage].b;
+        if (d.typ === 'gegenstand') {
+            if (d.fetzen || d.tinte || d.b || d.vorlage === 'krug') return false;
+            var g = KAT.GEGENSTAENDE[d.vorlage];
+            return text === (d.vorlage === 'schluessel' && KAT.SCHLUESSEL.b ? KAT.SCHLUESSEL.b : (g && g.b ? g.b : d.name + '.'));
+        }
+        return false;
+    }
+    // Hinsehen: Die Beschreibung steht im Notizbuch (mit den Spuren, die eine Regel verraten), im Bild nur die Schrift.
+    // h = sie traegt einen Hinweis (nur dann gehoert sie ins Notizbuch)
     function sieh(s, d, nr) {
-        var x = zeigt(m(ansehenText(s, d, nr) + (s.kreuz && s.kreuz[d.id] ? ' ' + KAT.KREIDE.sicht : ''))), sch = schriftAn(s, d);   // R41: das Kreuz sieht man
+        var basis = ansehenText(s, d, nr), x = zeigt(m(basis + (s.kreuz && s.kreuz[d.id] ? ' ' + KAT.KREIDE.sicht : ''))), sch = schriftAn(s, d);   // R41: das Kreuz sieht man
         x.w = 1;
         if (sch) x.l = sch;
+        if (sch || !schlicht(s, d, basis)) x.h = 1;
         return x;
     }
 
