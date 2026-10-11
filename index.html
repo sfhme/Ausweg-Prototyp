@@ -672,6 +672,11 @@ var Setting = (function () {
         // freie Verstecke, die erst ein Hinweis verraet: name, Nominativ, Akkusativ
         // Name, Nominativ, Akkusativ, Platz. Der Platz ist ein Ding, das von Anfang an im Raum steht (Modell v_<platz>);
         // dass darin ein Fach ist, verraet erst der Hinweis. Wo ein Platz steht, legt kern/raumplan.js fest (FREI).
+        // Am Fadenkreuz steht der Name dessen, was man ansieht. Ein freies Versteck heisst dort schlicht nach dem, was man
+        // sieht, bis sein Fach entdeckt ist (ein Fass ist ein Fass); die Ausstattung hat nur diesen Namen.
+        schlicht: { mauerstein: 'Mauerstein', wandbehang: 'Wandbehang', fass: 'Fass', balken: 'Baumstamm', laterne: 'Wandlaterne', urne: 'Urne',
+            bodenplatte: 'Bodenplatte', wappen: 'Wappenschild', schemel: 'Schemel' },
+        ausstattung: { tisch: 'Tisch', regal: 'Wandbord', fass: 'Fass', kisten: 'Kistenstapel', banner: 'Banner', stuhl: 'Schemel' },
         verstecke: [
             ['lockerer Mauerstein', 'der lockere Mauerstein', 'den lockeren Mauerstein', 'mauerstein'],
             ['Spalt hinter dem Wandbehang', 'der Spalt hinter dem Wandbehang', 'den Spalt hinter dem Wandbehang', 'wandbehang'],
@@ -777,6 +782,7 @@ var Setting = (function () {
                 },
                 // ganze Textbloecke, die in diesem Stil anders lauten (werden ueber den Block des Settings gelegt)
                 block: {
+                    AUSSTATTUNG: { kisten: 'Kiste' },
                     STRAHL: {
                         spiegel: { b: 'Ein blank polierter Zinnteller, der hochkant an einem Seil von der Decke h\u00e4ngt. Er spiegelt auf beiden Seiten und l\u00e4sst sich drehen.',
                             namen: [['erster Spiegelteller', 'der erste Spiegelteller', 'den ersten Spiegelteller'], ['zweiter Spiegelteller', 'der zweite Spiegelteller', 'den zweiten Spiegelteller'],
@@ -1214,7 +1220,7 @@ var Katalog = (function () {
     var BASIS = {
         version: 3, SETTING: S.id, ARTEN: ARTEN, AUSLOESER: AUSLOESER, ELEMENTE: ELEMENTE, GEGENSTAENDE: GEGENSTAENDE,
         EIGENSCHAFT_TEXT: EIGENSCHAFT_TEXT, ZU_WENIG: S.zuWenig, HINDERNISSE: HINDERNISSE, SCHLOESSER: SCHLOESSER, GEGENMITTEL: GEGENMITTEL,
-        VERSTECKE: S.verstecke, LICHT: S.licht, WASSER: WASSER, SCHLUESSEL: S.schluessel, NOTIZ: S.notiz, STORIES: S.stories,
+        VERSTECKE: S.verstecke, SCHLICHT: S.schlicht, AUSSTATTUNG: S.ausstattung, LICHT: S.licht, WASSER: WASSER, SCHLUESSEL: S.schluessel, NOTIZ: S.notiz, STORIES: S.stories,
         VERWANDLUNGEN: S.verwandlungen, ZAEHL: S.zaehl, LOGIK: S.logik, LUEGNER: S.luegner, HANDBUCH: S.handbuch, ZIFFER_JE_KOPF: S.zifferJeKopf, KLEIN: KLEIN, BEWEGLICH: BEWEGLICH, VERRUECKT: S.verrueckt, KLANG: S.klang, KLOPF_AUS: KLOPF_AUS, STAEBE: STAEBE, DURCHREICHE: S.durchreiche, HAUSORDNUNG: S.hausordnung, GEDENKTAFEL: S.gedenktafel, STANDPUNKT: S.standpunkt, STRAHL: S.strahl, WORT: S.wort, WACHE: S.wache, KRUEGE: S.kruege, KERBSTEIN: S.kerbstein, WAAGE: S.waage, WAAGE_SCHWER: WAAGE_SCHWER, FALLGITTER: FALLGITTER_K, ZEICHEN: S.zeichen, FETZEN: S.fetzen, UHR: S.uhr, ZWISCHENTUER: S.zwischentuer, TAFEL: S.tafel, INSCHRIFT: INSCHRIFT_K,
         SCHLOSSTEXT: S.schlosstext,
         HELL: S.hell, DUNKEL: S.dunkel
@@ -3511,26 +3517,29 @@ if (typeof module !== 'undefined' && module.exports) { module.exports = Protokol
 // Spiel-Engine fuer Ausweg. Streng ES5, deterministisch. Laeuft im Browser (Solo-Prototyp) und spaeter unveraendert
 // auf dem Knuddels-Server: Die Oberflaeche schickt Befehle, die Engine antwortet mit Meldungen und einer Sicht.
 //
-// Spiel.neu(partie)                         -> Sitzung
+// Spiel.neu(partie, opt)                    -> Sitzung      opt.koerper: Die Oberflaeche zeigt den Raum (Dinge lassen
+//                                                           sich wegstossen, was darunter liegt, ist verdeckt)
 // Spiel.befehl(sitzung, spielerNr, befehl)  -> [Meldung]   Meldung: { text, art: 'erzaehler'|'ereignis'|'system'|'warnung'|'erfolg', an? }
 // Spiel.sicht(sitzung, spielerNr)           -> was dieser Spieler sieht (Raum, Dinge, Inventar, Zeit, Status)
 //
 // Befehle: { art: 'ansehen', ding }, { art: 'anfassen', ding }, { art: 'nehmen', ding }, { art: 'benutzen', ding, mit: [ids] },
 //          { art: 'geben', ding, an: spielerNr } (an jemanden im selben Raum), { art: 'ablegen', ding, x, z } (auf den Boden),
 //          { art: 'krach', mit: [id] }, { art: 'eingeben', ding, code }, { art: 'warten' }, { art: 'gehen', raum },
-//          { art: 'verlassen' } (Spieler steigt aus; er zaehlt danach in keinem Raum mehr, seine Befehle werden abgewiesen)
+//          { art: 'verlassen' } (Spieler steigt aus; er zaehlt danach in keinem Raum mehr, seine Befehle werden abgewiesen),
+//          { art: 'schieben', ding, x, z } (nur mit opt.koerper: ding ist eine Ding-Id oder 'deko:<i>' aus dem Raumplan)
 //
 // Die Engine kennt dieselben Fakten und Aktionen wie der Pruefer. Anders als der Pruefer verlangt sie kein Wissen
 // ('kennt'): Was Spieler wissen, steht in ihren Koepfen. Bedrohungen und Fristen wirken wie im Pruefer.
 if (typeof module !== 'undefined' && module.exports) {
     var Katalog = require('./katalog.js');
     var Pruefer = require('./pruefer.js');
+    var Raumplan = require('./raumplan.js');
 }
 
 var Spiel = (function () {
     'use strict';
 
-    var ZEIT = { ansehen: 0, anfassen: 1, nehmen: 1, benutzen: 1, krach: 1, eingeben: 1, warten: 3, gehen: 1, verlassen: 0, geben: 0, ablegen: 0, verwandeln: 1, absteigen: 0 };
+    var ZEIT = { ansehen: 0, anfassen: 1, nehmen: 1, benutzen: 1, krach: 1, eingeben: 1, warten: 3, gehen: 1, verlassen: 0, geben: 0, ablegen: 0, verwandeln: 1, absteigen: 0, schieben: 0 };
     var LAERM_STRAFE = 5;
     // Zu dritt kostet eine Handlung ein Drittel: Die Summe driftet sonst (4.999999999999999 statt 5), und Anzeige und
     // Fristen kippen an der Grenze. Anteile fuer 1 bis 4 Spieler sind alle Zwoelftel, also dort einrasten.
@@ -4129,9 +4138,64 @@ var Spiel = (function () {
         return [];
     }
 
-    function neu(partie) {
+    // ---- Wegstossen (nur mit Bild, s.koerper). Der Raumplan sagt, was sich schieben laesst (schieb) und was worunter
+    // liegt (unter). Die Oberflaeche schiebt und meldet die neue Lage; die Engine merkt sie sich fuer alle und haelt
+    // verschlossen, worauf noch etwas steht. Seiten ohne Bild (Probeseite, Treiber der Tests) kennen das nicht.
+    var PLAENE = [];
+    function planVon(s) {
+        var i;
+        for (i = 0; i < PLAENE.length; i++) if (PLAENE[i].p === s.partie) return PLAENE[i].plan;
+        var plan = Raumplan.plane(s.partie);
+        PLAENE.push({ p: s.partie, plan: plan });
+        if (PLAENE.length > 12) PLAENE.shift();
+        return plan;
+    }
+    function schubPlatz(plan, key) {
+        key = String(key);
+        if (key.indexOf('deko:') === 0) return plan.deko[parseInt(key.slice(5), 10)] || null;
+        return plan.plaetze.hasOwnProperty(key) ? plan.plaetze[key] : null;
+    }
+    // liegt das Ding unter etwas, das noch darauf steht?
+    function verdeckt(s, id) {
+        if (!s.koerper) return false;
+        var plan = planVon(s), q = plan.plaetze.hasOwnProperty(id) ? plan.plaetze[id] : null;
+        if (!q || !q.unter) return false;
+        var c = schubPlatz(plan, q.unter), o = s.ort[q.unter];
+        if (!c) return false;
+        return Math.abs((o ? o[0] : c.x) - q.x) < c.h[0] + 0.1 && Math.abs((o ? o[1] : c.z) - q.z) < c.h[1] + 0.1;
+    }
+    // fuer Treiber: was auf einem Ding steht und wohin es sich sicher schieben laesst
+    function deckel(s, id) {
+        if (!verdeckt(s, id)) return null;
+        var plan = planVon(s), key = plan.plaetze[id].unter, c = schubPlatz(plan, key);
+        return { art: 'schieben', ding: key, x: c.alt.x, z: c.alt.z };
+    }
+    function schiebe(s, nr, b) {
+        var nix = [m('Das geht nicht.', 'system')];
+        if (!s.koerper || typeof b.x !== 'number' || typeof b.z !== 'number' || !(b.x === b.x) || !(b.z === b.z)) return nix;
+        var plan = planVon(s), key = String(b.ding), q = schubPlatz(plan, key), i, info = null, raum = s.raum[nr];
+        var x = Math.floor(b.x * 100 + 0.5) / 100, z = Math.floor(b.z * 100 + 0.5) / 100;
+        for (i = 0; i < plan.raeume.length; i++) if (plan.raeume[i].id === raum) info = plan.raeume[i];
+        // es bleibt im Raum: die Mitte liegt auf einer begehbaren Kachel
+        if (!info || !Raumplan.begehbar(info.boden, Math.floor(x / plan.zelle), Math.floor(z / plan.zelle))) return nix;
+        // ein Gegenstand, den jemand abgelegt hat: Die Engine weiss, wo er liegt (nicht von der Trittplatte herunter)
+        var g = s.partie.dinge.hasOwnProperty(key) ? s.partie.dinge[key] : null;
+        if (g && g.typ === 'gegenstand' && s.f['hat:' + key]) {
+            var lg = liegt(s, key);
+            if (!lg || lg.raum !== raum || lg.auf) return nix;
+            lg.x = x; lg.z = z; delete lg.an;
+            return [];
+        }
+        // alles andere: nur, was der Raumplan als schiebbar ausweist, im eigenen Raum
+        if (!q || !q.schieb || q.raum !== raum) return nix;
+        s.ort[key] = [x, z];
+        return [];
+    }
+
+    function neu(partie, opt) {
         kat(partie);
-        var s = { partie: partie, f: {}, zeit: 0, raum: {}, gesehen: {}, status: 'laeuft', fristGemeldet: {}, log: [], vorfuehrungen: [], wer: {}, steht: {} }, i;
+        var s = { partie: partie, f: {}, zeit: 0, raum: {}, gesehen: {}, status: 'laeuft', fristGemeldet: {}, log: [], vorfuehrungen: [], wer: {}, steht: {},
+            koerper: !!(opt && opt.koerper), ort: {} }, i;
         for (i = 0; i < partie.start.length; i++) s.f[partie.start[i]] = true;
         verteile(s, 1);
         var start1 = partie.getrennt && partie.getrennt.r2.indexOf(1) >= 0 ? 'r2' : 'r1';
@@ -4308,6 +4372,7 @@ var Spiel = (function () {
         // Wer geht? (R151): Hoelzchen ziehen vor dem Fallgitter. Das Los zeigt nur auf jemanden; bleiben muss nur, wer
         // selbst die Kette nimmt (nie zwingt die Gruppe einen Einzelnen hinaus). Bestimmt aus Seed und Zahl der Lose.
         if (b.art === 'lose') return lose(s, nr);
+        if (b.art === 'schieben') return schiebe(s, nr, b);
         if (b.art === 'sagen') return sagen(s, nr, b.text);
         if (b.art === 'verlassen') {
             // was er traegt, bleibt im Raum liegen, sonst waere es fuer die anderen verloren
@@ -4335,6 +4400,7 @@ var Spiel = (function () {
         if (d && d.typ === 'gegenstand' && s.f['hat:' + d.id]) dort = liegt(s, d.id) ? liegt(s, d.id).raum : (traegt(s, d.id, nr) ? s.raum[nr] : null);
         if ((b.art === 'geben' || b.art === 'ablegen') && !traegt(s, d.id, nr)) return [m('Das tr\u00e4gst du nicht bei dir.', 'system')];
         if (d && dort !== s.raum[nr] && b.art !== 'gehen') return [m('Das ist nicht hier.', 'system')];
+        if (d && b.art !== 'gehen' && verdeckt(s, d.id)) return [nein(m('Da steht etwas darauf.'))];
         for (i = 0; i < mitIds.length; i++) {
             if (s.partie.dinge[mitIds[i]] && s.f['hat:' + mitIds[i]] && !traegt(s, mitIds[i], nr)) return [m('Das tr\u00e4gst du nicht bei dir. Lass es dir geben.', 'system')];
         }
@@ -4687,9 +4753,15 @@ var Spiel = (function () {
             var code = false, alleS = schloesserAlle(s.partie);
             for (k = 0; k < alleS.length; k++) if (alleS[k].id === d.id && alleS[k].code) code = true;
             var eintrag = { id: d.id, name: d.name, typ: d.typ, offen: offen, code: code };
+            if (verdeckt(s, d.id)) eintrag.verdeckt = true;         // liegt unter etwas: da, aber nicht zu erreichen
             if (d.vorlage === 'krug') eintrag.krug = [(s.krug && s.krug[d.id]) || 0, d.fasst];
             if (d.vorlage === 'drehspiegel') eintrag.dreh = (s.spiegel && s.spiegel[d.id]) || 0;      // R20: Vierteldrehungen seit Beginn
-            if (suchen) eintrag.suchen = true;
+            if (suchen) {
+                eintrag.suchen = true;
+                // solange das Fach nicht entdeckt ist, heisst es schlicht nach dem, was man sieht (ein Fass ist ein Fass)
+                var schlicht = d.modell && KAT.SCHLICHT ? KAT.SCHLICHT[d.modell.replace(/^v_/, '')] : null;
+                if (schlicht) eintrag.name = schlicht;
+            }
             if (d.verrueckt || d.klopft) eintrag.w = wirkungen(s, d, nr);       // R24: art verrueckt, an = steht am zweiten Platz; R26: art klopfen, an = es klopft
             if (d.typ === 'element') { eintrag.w = wirkungen(s, d, nr); if (s.f['waerme:' + d.id]) eintrag.warm = true; }
             // Hausordnung: die drei Plaettchen, wie sie gerade auf der Tafel stehen
@@ -4710,8 +4782,20 @@ var Spiel = (function () {
         }
         var raeume = [];
         for (i = 0; i < s.partie.raeume.length; i++) raeume.push({ id: s.partie.raeume[i].id, name: s.partie.raeume[i].name, hier: s.partie.raeume[i].id === raum, zu: zugangZu(s, s.partie.raeume[i].id, nr) });
-        return { raum: raum, raeume: raeume, dinge: dinge, inventar: inventar, zeit: Math.ceil(s.zeit), licht: !s.f['licht_aus:' + raum],
+        var ansicht = { raum: raum, raeume: raeume, dinge: dinge, inventar: inventar, zeit: Math.ceil(s.zeit), licht: !s.f['licht_aus:' + raum],
             wasser: !!s.f['wasser:' + raum], status: s.status, tragen: tragen, laerm: (s.laut && s.laut[raum]) || 0 };
+        // Weggestossenes in diesem Raum: wo es jetzt steht
+        if (s.koerper) {
+            var planS = planVon(s), gk;
+            for (gk in s.ort) {
+                if (!s.ort.hasOwnProperty(gk)) continue;
+                var gq = schubPlatz(planS, gk);
+                if (!gq || gq.raum !== raum) continue;
+                if (!ansicht.geschoben) ansicht.geschoben = {};
+                ansicht.geschoben[gk] = s.ort[gk];
+            }
+        }
+        return ansicht;
     }
 
     // Was die Oberflaeche ueber die Dinge wissen muss: Name, Art, Rolle (fuer das Modell) und die Handlung unter dem
@@ -4790,10 +4874,10 @@ var Spiel = (function () {
     // Rahmen der Partie fuer die Oberflaeche: Setting, Story-Titel, wie Hell und Dunkel hier heissen
     function rahmen(partie) {
         kat(partie);
-        return { setting: partie.setting, stil: partie.stil, titel: partie.story.titel, hell: KAT.HELL, dunkel: KAT.DUNKEL };
+        return { setting: partie.setting, stil: partie.stil, titel: partie.story.titel, hell: KAT.HELL, dunkel: KAT.DUNKEL, ausstattung: KAT.AUSSTATTUNG };
     }
 
-    return { version: 4, neu: neu, befehl: befehl, sicht: sicht, namen: namen, rahmen: rahmen, hoert: hoert };
+    return { version: 4, neu: neu, befehl: befehl, sicht: sicht, namen: namen, rahmen: rahmen, hoert: hoert, verdeckt: verdeckt, deckel: deckel };
 })();
 
 if (typeof module !== 'undefined' && module.exports) { module.exports = Spiel; }
