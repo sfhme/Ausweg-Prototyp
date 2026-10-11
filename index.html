@@ -304,8 +304,8 @@ var Setting = (function () {
                 ['keine', 'Der Kessel gluckert.'],
                 ['teil', 'Auf der Wasseroberfl\u00e4che spiegelt sich etwas von der Decke. {teil}'],
                 ['richtung', 'Dampf steigt auf und riecht nach Schwefel. Der Geruch zieht zu einer Stelle hin: {ziel}.']] },
-            grammophon: { name: 'Spieluhr', nom: 'die Spieluhr', akk: 'die Spieluhr', verb: 'Kurbeln',
-                b: 'Ein K\u00e4stchen mit Kurbel und Messingwalze: eine Spieluhr.', f: [
+            grammophon: { name: 'Spieluhr', nom: 'die Spieluhr', akk: 'die Spieluhr', verb: 'Aufziehen',
+                b: 'Ein kleines, beschlagenes K\u00e4stchen: eine Spieluhr. Das Werk mit der Messingwalze sitzt unter dem Deckel.', f: [
                 ['zahl', 'Die Spieluhr spielt. Die Zahl der T\u00f6ne je Takt ergibt die Ziffern.'],
                 ['richtung', 'Die Walze der Spieluhr bleibt stehen, und ihr Zeiger weist auf eine Stelle: {ziel}.'],
                 ['behaelter', 'Am Ende der Melodie springt ein Fach im Sockel auf. Darin: {ziel}.'],
@@ -313,14 +313,14 @@ var Setting = (function () {
                 ['teil', 'Die Walze der Spieluhr bleibt stehen, und auf ihrem Messing ist etwas eingeritzt. {teil}'],
                 ['melodie', 'Die Spieluhr spielt eine kurze Folge von T\u00f6nen, immer dieselbe.']] },
             standuhr: { name: 'R\u00e4derwerk', nom: 'das R\u00e4derwerk', akk: 'das R\u00e4derwerk', verb: 'Anhalten',
-                b: 'Ein R\u00e4derwerk aus Eisenzahnr\u00e4dern, das ein Gewicht an einer Kette hebt und wieder fallen l\u00e4sst.', f: [
-                ['zahl', 'Das R\u00e4derwerk schl\u00e4gt einen Hammer an. Die Schl\u00e4ge, mit Pausen dazwischen, ergeben die Ziffern.'],
-                ['behaelter', 'Nach einer vollen Umdrehung klappt eine Lade am R\u00e4derwerk auf. Darin: {ziel}.'],
-                ['richtung', 'Das Gewicht bleibt schr\u00e4g h\u00e4ngen und zeigt auf eine Stelle: {ziel}.'],
+                b: 'Ein Haufen eiserner Zahnr\u00e4der am Boden, ineinander verhakt. Trotzdem greifen sie, drehen sich und ticken.', f: [
+                ['zahl', 'Im R\u00e4derwerk schl\u00e4gt ein Zahn hart an. Die Schl\u00e4ge, mit Pausen dazwischen, ergeben die Ziffern.'],
+                ['behaelter', 'Nach einer vollen Umdrehung geben die Zahnr\u00e4der frei, was zwischen ihnen klemmte: {ziel}.'],
+                ['richtung', 'Die R\u00e4der bleiben stehen, und eine lose Achse rollt heraus. Sie bleibt liegen und zeigt auf eine Stelle: {ziel}.'],
                 ['bedrohung', 'Bei jedem Schlag senkt sich die Decke ein St\u00fcck.'],
                 ['keine', 'Das R\u00e4derwerk tickt laut.'],
-                ['teil', 'Am R\u00e4derwerk springt die Klappe vor einem kleinen Zifferblatt auf. {teil}'],
-                ['zeitgeber', 'Das Gewicht am R\u00e4derwerk sinkt Glied um Glied. Ist es unten, ist es zu sp\u00e4t.']] },
+                ['teil', 'Zwischen den R\u00e4dern dreht sich ein kleines Zifferblatt nach oben. {teil}'],
+                ['zeitgeber', 'Die R\u00e4der laufen immer langsamer. Stehen sie still, ist es zu sp\u00e4t.']] },
             spiegel: { name: 'blanker Schild', nom: 'der blanke Schild', akk: 'den blanken Schild', verb: 'Zur Seite klappen',
                 b: 'Ein blank polierter Schild an der Wand. Man sieht sich darin wie in einem Spiegel.', f: [
                 ['zahl', 'Der blanke Schild beschl\u00e4gt, und im Beschlag erscheinen Ziffern.'],
@@ -340,14 +340,14 @@ var Setting = (function () {
                 ['werkzeug', 'Die Kerzen brennen jetzt. Man kann sie mitnehmen.'],
                 ['zeitgeber', 'Die Kerzen brennen herunter, eine Kerbe nach der anderen. Sind sie aus, ist es zu sp\u00e4t.'],
                 ['verwandler', 'Die Kerzen brennen jetzt hell. Daran lie\u00dfe sich etwas anz\u00fcnden.']] },
-            gemaelde: { name: 'Portr\u00e4t', nom: 'das Portr\u00e4t', akk: 'das Portr\u00e4t', verb: 'Abtasten',
-                b: 'Das Portr\u00e4t eines Burgherrn mit harten Augen.', f: [
-                ['richtung', 'Die Augen im Portr\u00e4t wandern zu einer Stelle: {ziel}.'],
-                ['zahl', 'Im Hintergrund des Portr\u00e4ts leuchten Ziffern.'],
+            gemaelde: { name: 'leere Leinwand', nom: 'die leere Leinwand', akk: 'die leere Leinwand', verb: 'Abtasten',
+                b: 'Ein schwerer Rahmen an der Wand. Die Leinwand darin ist leer, und doch f\u00fchlt man sich von ihr angesehen.', f: [
+                ['richtung', 'Auf der leeren Leinwand erscheinen zwei Augen. Sie wandern zu einer Stelle: {ziel}.'],
+                ['zahl', 'Auf der leeren Leinwand leuchten Ziffern.'],
                 ['behaelter', 'Hinter dem Rahmen klemmt etwas: {ziel}.'],
-                ['bedrohung', 'Wer dem Portr\u00e4t in die Augen sieht, kann sich nicht mehr r\u00fchren.'],
-                ['keine', 'Das Portr\u00e4t scheint zu l\u00e4cheln.'],
-                ['teil', 'Im Hintergrund des Portr\u00e4ts leuchtet etwas auf. {teil}']] },
+                ['bedrohung', 'Auf der Leinwand gl\u00fchen zwei Augen. Wer hineinsieht, kann sich nicht mehr r\u00fchren.'],
+                ['keine', 'Die Leinwand bleibt leer.'],
+                ['teil', 'Auf der leeren Leinwand leuchtet etwas auf. {teil}']] },
             katze: { name: 'Katze', nom: 'die Katze', akk: 'die Katze', verb: 'Streicheln',
                 b: 'Eine Katze. Sie beobachtet dich, als w\u00fcsste sie mehr als du.', f: [
                 ['richtung', 'Die Katze flitzt zu ihrem Versteck: {ziel}.'],
@@ -504,19 +504,22 @@ var Setting = (function () {
         // namen: je Spiegel [Name, Nominativ, Akkusativ]; {spiegel} = "den ersten Drehspiegel, dann den dritten Drehspiegel"
         strahl: {
             quelle: { name: 'Blendlaterne', nom: 'die Blendlaterne', akk: 'die Blendlaterne', verb: 'Ansehen',
-                b: 'Eine eiserne Laterne mit geschliffener Linse h\u00e4ngt an einer Kette von der Decke. Sie brennt und wirft einen scharfen Lichtstrahl in den Raum.' },
-            spiegel: { verb: 'Drehen', b: 'Eine blanke Messingscheibe, die an einem Zapfen von der Decke h\u00e4ngt. Sie l\u00e4sst sich drehen.',
+                b: 'Eine Laterne h\u00e4ngt an einem Seil von der Decke. Sie brennt, und durch den Spalt ihrer Blende f\u00e4llt ein scharfer Lichtstrahl in den Raum.' },
+            spiegel: { verb: 'Drehen', b: 'Ein blank polierter Schild, der an einem Seil von der Decke h\u00e4ngt. Er spiegelt auf beiden Seiten und l\u00e4sst sich drehen.',
                 gedreht: 'Du drehst {was} eine Vierteldrehung weiter.',
-                namen: [['erster Drehspiegel', 'der erste Drehspiegel', 'den ersten Drehspiegel'], ['zweiter Drehspiegel', 'der zweite Drehspiegel', 'den zweiten Drehspiegel'],
-                    ['dritter Drehspiegel', 'der dritte Drehspiegel', 'den dritten Drehspiegel'], ['vierter Drehspiegel', 'der vierte Drehspiegel', 'den vierten Drehspiegel'],
-                    ['f\u00fcnfter Drehspiegel', 'der f\u00fcnfte Drehspiegel', 'den f\u00fcnften Drehspiegel']] },
-            kristall: { name: 'Kristallk\u00e4fig', nom: 'der Kristallk\u00e4fig', akk: 'den Kristallk\u00e4fig', verb: 'Ansehen',
-                b: 'In einem kleinen K\u00e4fig unter der Decke h\u00e4ngt ein faustgro\u00dfer Bergkristall. Unter dem K\u00e4fig sitzt eine Klappe ohne Griff.',
-                offen: 'Der Kristall gl\u00fcht im Licht. Die Klappe unter dem K\u00e4fig steht offen.' },
+                namen: [['erster Spiegelschild', 'der erste Spiegelschild', 'den ersten Spiegelschild'], ['zweiter Spiegelschild', 'der zweite Spiegelschild', 'den zweiten Spiegelschild'],
+                    ['dritter Spiegelschild', 'der dritte Spiegelschild', 'den dritten Spiegelschild'], ['vierter Spiegelschild', 'der vierte Spiegelschild', 'den vierten Spiegelschild'],
+                    ['f\u00fcnfter Spiegelschild', 'der f\u00fcnfte Spiegelschild', 'den f\u00fcnften Spiegelschild']] },
+            kristall: { name: 'Kristallstab', nom: 'der Kristallstab', akk: 'den Kristallstab', verb: 'Ansehen',
+                b: 'Unter der Decke h\u00e4ngt ein Stab, in dessen Spitze ein blauer Kristall gefasst ist. In der Decke dar\u00fcber sitzt eine Klappe ohne Griff.',
+                offen: 'Der Kristall gl\u00fcht im Licht. Die Klappe in der Decke \u00fcber dem Stab steht offen.' },
             ohne: 'Der Strahl der Laterne trifft keinen Spiegel und verliert sich an der Wand.',
             ueber: 'Der Strahl der Laterne trifft {spiegel} und {ende}.', dann: ', dann ',
             ende: { wand: 'verliert sich an der Wand', kristall: 'f\u00e4llt in den Kristall', zurueck: 'f\u00e4llt auf die Laterne zur\u00fcck', kreis: 'l\u00e4uft im Kreis' },
-            treffer: 'Der Kristall gl\u00fcht auf, und die Klappe unter dem K\u00e4fig springt auf: {was}.'
+            treffer: 'Der Kristall gl\u00fcht auf, und die Klappe in der Decke dar\u00fcber springt auf: {was}.',
+            // fuer Protokoll und Loesungsweg
+            lage: 'hinter der Klappe \u00fcber dem Kristallstab (Lichtstrahl \u00fcber die Spiegelschilde in den Kristall lenken)',
+            lenken: 'den Lichtstrahl in den Kristall lenken'
         },
         // Der richtige Standpunkt (R22): Farbkleckse im Raum ergeben nur von einer Stelle aus Ziffern. {zeichen} = "eine Krone",
         // {ziffern} = "der Ziffer 4" oder "den Ziffern 4 7"
@@ -561,22 +564,22 @@ var Setting = (function () {
         },
         // Losung (R104): wer sie im Raum in den Chat schreibt, dem gibt das W\u00e4chterbild frei, was es verbirgt
         wache: {
-            bild: { name: 'Portr\u00e4t des Burgvogts', nom: 'das Portr\u00e4t des Burgvogts', akk: 'das Portr\u00e4t des Burgvogts',
-                b: 'Ein strenger Herr in \u00d6l. Seine Augen folgen dir. Unter dem Rahmen steht: Wer die Losung nennt, dem \u00f6ffne ich.',
-                auf: 'Das Portr\u00e4t schwingt wie eine T\u00fcr zur Seite. Dahinter: {was}.' },
+            bild: { name: 'leeres Bildnis des Burgvogts', nom: 'das leere Bildnis des Burgvogts', akk: 'das leere Bildnis des Burgvogts',
+                b: 'Ein schwerer Rahmen, die Leinwand darin ist leer, als w\u00e4re der Burgvogt herausgestiegen. Trotzdem f\u00fchlst du dich gemustert. Unter dem Rahmen steht: Wer die Losung nennt, dem \u00f6ffne ich.',
+                auf: 'Der Rahmen schwingt wie eine T\u00fcr zur Seite. Dahinter: {was}.' },
             buch: { name: 'Buch der Wache', nom: 'das Buch der Wache', akk: 'das Buch der Wache',
                 b: 'Ein schweres Buch auf einem Pult. Es fl\u00fcstert: Nenne die Losung, und ich gebe her, was ich h\u00fcte.',
                 auf: 'Das Buch klappt auf. Zwischen den Seiten liegt: {was}.' },
             schon: 'Es hat seine Losung geh\u00f6rt.'
         },
-        // Kr\u00fcge umf\u00fcllen (R18): zwei Kr\u00fcge, ein Messbecken will genau {n} Ma\u00df; {a} {b} Fassungsverm\u00f6gen
+        // Kr\u00fcge umf\u00fcllen (R18): zwei Kr\u00fcge, ein Messkessel will genau {n} Ma\u00df; {a} {b} Fassungsverm\u00f6gen
         kruege: {
             klein: { name: 'kleiner Krug', nom: 'der kleine Krug', akk: 'den kleinen Krug', b: 'Ein Krug, an dem eingeritzt steht: {a} Ma\u00df.' },
             gross: { name: 'gro\u00dfer Krug', nom: 'der gro\u00dfe Krug', akk: 'den gro\u00dfen Krug', b: 'Ein Krug, an dem eingeritzt steht: {b} Ma\u00df.' },
             stand: 'Darin sind gerade {x} Ma\u00df.', leer: 'Er ist leer.',
-            becken: { name: 'Messbecken', nom: 'das Messbecken', akk: 'das Messbecken',
-                b: 'Ein Bottich mit einer Kerbe innen und der Inschrift am Rand: genau {n} Ma\u00df. Unten sitzt eine Klappe.', verb: 'Hineinsehen' },
-            gefuellt: 'Du f\u00fcllst {was} bis zum Rand.', umgegossen: 'Du gie\u00dft um. {stand}', versickert: 'Das Wasser versickert durch einen Spalt im Becken. Es waren nicht genau {n} Ma\u00df.',
+            becken: { name: 'Messkessel', nom: 'der Messkessel', akk: 'den Messkessel',
+                b: 'Ein Kessel mit einer Kerbe innen und der Inschrift am Rand: genau {n} Ma\u00df. Unten sitzt eine Klappe.', verb: 'Hineinsehen' },
+            gefuellt: 'Du f\u00fcllst {was} bis zum Rand.', umgegossen: 'Du gie\u00dft um. {stand}', versickert: 'Das Wasser versickert durch einen Spalt im Kessel. Es waren nicht genau {n} Ma\u00df.',
             treffer: 'Das Wasser steht genau an der Kerbe. Die Klappe springt auf: {was}.', ohneWasser: 'Erst muss Wasser laufen.'
         },
         // Waage aus Menschen (R85): zwei Trittplatten vor der T\u00fcr; die Fu\u00dfspuren sagen, wie viel auf jeder lasten muss,
@@ -608,7 +611,10 @@ var Setting = (function () {
             klopfen: 'Irgendwo im Raum klopft es, dumpf und in gleichem Abstand. Es kommt immer von derselben Stelle.',
             klopfenWeg: 'verr\u00e4t sich durch Klopfen',
             takt: 'Wie viele Schl\u00e4ge es sind, zeigt nichts an: Man muss mitz\u00e4hlen, und jede Pause beendet eine Ziffer.',
-            staebe: 'Daneben h\u00e4ngen {n} Klangst\u00e4be, jeder mit einem Zeichen, von links nach rechts gez\u00e4hlt 1 bis {n}. Die Ziffern des Schlosses sind die St\u00e4be in der Folge, in der sie erklingen sollen.'
+            staebe: 'Zu ihm geh\u00f6rt das Bord mit {n} Flaschen an der Wand, von links nach rechts gez\u00e4hlt 1 bis {n}. Die Ziffern des Schlosses sind die Flaschen in der Folge, in der sie erklingen sollen.',
+            bord: { name: 'Flaschenbord', nom: 'das Flaschenbord', akk: 'das Flaschenbord', verb: 'Flaschen anschlagen',
+                b: 'Ein Wandbord mit {n} Flaschen, von gro\u00df nach klein, unter jeder ein Zeichen. Schl\u00e4gt man sie an, klingen sie, die gr\u00f6\u00dfte am tiefsten.',
+                schlag: 'Du schl\u00e4gst eine Flasche an. Sie klingt.' }
         },
         // Was hat sich veraendert? (R24): Im Dunkeln rueckt ein Versteck an eine andere Stelle; welches, sagt der Text nicht
         verrueckt: { text: 'Etwas scharrt \u00fcber den Boden. Als du wieder siehst, steht ein Ding im Raum nicht mehr dort, wo es stand.',
@@ -643,8 +649,8 @@ var Setting = (function () {
         },
         // zweit: Name, Nominativ, Akkusativ, wenn dieselbe Art ein zweites Mal im Raum vorkommt
         hindernisse: {
-            holzkiste: { name: 'Truhe mit Vorh\u00e4ngeschloss', nom: 'die Truhe mit Vorh\u00e4ngeschloss', akk: 'die Truhe mit Vorh\u00e4ngeschloss',
-                zweit: ['zweite Truhe mit Vorh\u00e4ngeschloss', 'die zweite Truhe mit Vorh\u00e4ngeschloss', 'die zweite Truhe mit Vorh\u00e4ngeschloss'],
+            holzkiste: { name: 'verschlossene Truhe', nom: 'die verschlossene Truhe', akk: 'die verschlossene Truhe',
+                zweit: ['zweite verschlossene Truhe', 'die zweite verschlossene Truhe', 'die zweite verschlossene Truhe'],
                 alt: ['aufbrechen', 'Schloss weg\u00e4tzen', 'Deckel aufhebeln'] },
             paket: { name: 'mit Draht verschn\u00fcrtes B\u00fcndel', nom: 'das mit Draht verschn\u00fcrte B\u00fcndel', akk: 'das mit Draht verschn\u00fcrte B\u00fcndel',
                 zweit: ['zweites mit Draht verschn\u00fcrtes B\u00fcndel', 'das zweite mit Draht verschn\u00fcrte B\u00fcndel', 'das zweite mit Draht verschn\u00fcrte B\u00fcndel'],
@@ -715,6 +721,8 @@ var Setting = (function () {
         //           der Generator baut dann andere Raetsel.
         //   anders  Rollen, deren Modell etwas anderes zeigt als im Setting beschrieben: neue Namen und Texte, damit das
         //           Wort zum Bild passt. ersetze = Wortpaare, die in allen Texten der Rolle getauscht werden.
+        //   block   ganze Textbloecke des Settings (Name wie im Katalog, etwa STRAHL), die in diesem Stil anders lauten;
+        //           nur die genannten Felder werden ersetzt
         //   raum    wo eine Rolle in diesem Stil steht (stand), wie hoch an der Wand (wandhoehe), ihre Grundflaeche (grund)
         // Ob ein Stil fuer das Setting genug hergibt, prueft kern/katalog.js (Katalog.fuer(stil).maengel). Ein Stil mit
         // Maengeln ist nicht zulaessig und wird nie gewuerfelt.
@@ -734,6 +742,11 @@ var Setting = (function () {
                         zweit: ['zweite mit Draht verschn\u00fcrte Kiste', 'die zweite mit Draht verschn\u00fcrte Kiste', 'die zweite mit Draht verschn\u00fcrte Kiste'] },
                     schrank_oben: { name: 'hohes Wandbord', nom: 'das hohe Wandbord', akk: 'das hohe Wandbord',
                         zweit: ['zweites hohes Wandbord', 'das zweite hohe Wandbord', 'das zweite hohe Wandbord'] }
+                },
+                block: {
+                    KRUEGE: { becken: { name: 'Messzuber', nom: 'der Messzuber', akk: 'den Messzuber',
+                        b: 'Ein Zuber mit einer Kerbe innen und der Inschrift am Rand: genau {n} Ma\u00df. Unten sitzt eine Klappe.' },
+                        versickert: 'Das Wasser versickert durch einen Spalt im Zuber. Es waren nicht genau {n} Ma\u00df.' }
                 },
                 raum: {
                     stand: { schrank_oben: 'wand', paket: 'tisch' },
@@ -756,9 +769,26 @@ var Setting = (function () {
                     decke: { name: 'Wolldecke', nom: 'die Wolldecke', akk: 'die Wolldecke', b: 'Eine dicke, sehr gro\u00dfe Wolldecke.' },
                     kleiderhaken: { name: 'Hakenleiste', nom: 'die Hakenleiste', akk: 'die Hakenleiste', b: 'Eine Holzleiste mit eisernen Haken.' },
                     pfanne: { name: 'Eisentopf', nom: 'der Eisentopf', akk: 'den Eisentopf', b: 'Ein schwerer Topf aus Eisen.' },
+                    hebelpaar: { b: 'Eine Kette, aufgerollt an einem Haken an der Wand; ihr Ende verschwindet in der Mauer. Im Nebenraum h\u00e4ngt eine zweite, und ein Riegel verbindet sie durch die Mauer.' },
                     diele: { name: 'vernagelte Bodenluke', nom: 'die vernagelte Bodenluke', akk: 'die vernagelte Bodenluke',
                         zweit: ['zweite vernagelte Bodenluke', 'die zweite vernagelte Bodenluke', 'die zweite vernagelte Bodenluke'],
                         ersetze: [['Fugen auskratzen', 'N\u00e4gel herausschneiden']] }
+                },
+                // ganze Textbloecke, die in diesem Stil anders lauten (werden ueber den Block des Settings gelegt)
+                block: {
+                    STRAHL: {
+                        spiegel: { b: 'Ein blank polierter Zinnteller, der hochkant an einem Seil von der Decke h\u00e4ngt. Er spiegelt auf beiden Seiten und l\u00e4sst sich drehen.',
+                            namen: [['erster Spiegelteller', 'der erste Spiegelteller', 'den ersten Spiegelteller'], ['zweiter Spiegelteller', 'der zweite Spiegelteller', 'den zweiten Spiegelteller'],
+                                ['dritter Spiegelteller', 'der dritte Spiegelteller', 'den dritten Spiegelteller'], ['vierter Spiegelteller', 'der vierte Spiegelteller', 'den vierten Spiegelteller'],
+                                ['f\u00fcnfter Spiegelteller', 'der f\u00fcnfte Spiegelteller', 'den f\u00fcnften Spiegelteller']] },
+                        kristall: { name: 'Kelchk\u00e4fig', nom: 'der Kelchk\u00e4fig', akk: 'den Kelchk\u00e4fig',
+                            b: 'In einem kleinen K\u00e4fig unter der Decke steht ein Kelch. In der Decke dar\u00fcber sitzt eine Klappe ohne Griff.',
+                            offen: 'Der Kelch gl\u00fcht im Licht. Die Klappe in der Decke \u00fcber dem K\u00e4fig steht offen.' },
+                        ende: { kristall: 'f\u00e4llt in den Kelch' },
+                        treffer: 'Der Kelch gl\u00fcht auf, und die Klappe in der Decke dar\u00fcber springt auf: {was}.',
+                        lage: 'hinter der Klappe \u00fcber dem Kelchk\u00e4fig (Lichtstrahl \u00fcber die Spiegelteller in den Kelch lenken)',
+                        lenken: 'den Lichtstrahl in den Kelch lenken'
+                    }
                 },
                 raum: {
                     geschoss: 2.5,
@@ -777,9 +807,9 @@ var Setting = (function () {
                 raeume: [{ name: 'Zelle', in: 'in der Zelle', nach: 'in die Zelle' }, { name: 'Wachstube', in: 'in der Wachstube', nach: 'in die Wachstube' },
                     { name: 'Kerkergang', in: 'im Kerkergang', nach: 'in den Kerkergang' }, { name: 'Vorratskammer', in: 'in der Vorratskammer', nach: 'in die Vorratskammer' }] },
             { id: 'schatzkammer', titel: 'Die Schatzkammer',
-                intro: 'Du bist in die Schatzkammer des Burgherrn eingestiegen. Hinter dir ist die Eisent\u00fcr ins Schloss gefallen. Du bist {in}, und bis zum Morgen musst du hier raus sein.',
+                intro: 'Du bist in die Schatzkammer des Burgherrn eingestiegen. Hinter dir ist die Kammert\u00fcr ins Schloss gefallen. Du bist {in}, und bis zum Morgen musst du hier raus sein.',
                 ende: 'Du bist drau\u00dfen, und niemand hat dich gesehen.',
-                ausgang: { name: 'Eisent\u00fcr', nom: 'die Eisent\u00fcr', akk: 'die Eisent\u00fcr', verb: 'T\u00fcr \u00f6ffnen', auf: 'Die Eisent\u00fcr schwingt auf.' },
+                ausgang: { name: 'Kammert\u00fcr', nom: 'die Kammert\u00fcr', akk: 'die Kammert\u00fcr', verb: 'T\u00fcr \u00f6ffnen', auf: 'Die Kammert\u00fcr schwingt auf.' },
                 raeume: [{ name: 'Schatzkammer', in: 'in der Schatzkammer', nach: 'in die Schatzkammer' }, { name: 'Vorkammer', in: 'in der Vorkammer', nach: 'in die Vorkammer' },
                     { name: 'R\u00fcstkammer', in: 'in der R\u00fcstkammer', nach: 'in die R\u00fcstkammer' }, { name: 'Schreibstube', in: 'in der Schreibstube', nach: 'in die Schreibstube' }] },
             { id: 'labor', titel: 'Das Labor des Alchemisten',
@@ -1255,6 +1285,15 @@ var Katalog = (function () {
         }
         return m;
     }
+    // legt die Felder von neu ueber ziel; Objekte werden Feld fuer Feld ueberlagert, alles andere (auch Listen) ersetzt
+    function lege(ziel, neu) {
+        var k;
+        for (k in neu) {
+            if (!neu.hasOwnProperty(k)) continue;
+            if (neu[k] && typeof neu[k] === 'object' && !(neu[k] instanceof Array) && ziel[k] && typeof ziel[k] === 'object' && !(ziel[k] instanceof Array)) lege(ziel[k], neu[k]);
+            else ziel[k] = neu[k];
+        }
+    }
     function fuer(id) {
         if (STILCACHE[id]) return STILCACHE[id];
         var st = S.stile && S.stile[id], K, i, k, r, ziel, tabellen;
@@ -1275,6 +1314,11 @@ var Katalog = (function () {
             if (!ziel) throw new Error('Setting ' + S.id + ', Stil ' + id + ': anders.' + r + ' meint eine Rolle, die es nicht gibt oder die in ohne steht');
             if (st.anders[r].ersetze) tausche(ziel, st.anders[r].ersetze);
             for (k in st.anders[r]) if (st.anders[r].hasOwnProperty(k) && k !== 'ersetze') ziel[k] = st.anders[r][k];
+        }
+        for (r in (st.block || {})) {
+            if (!st.block.hasOwnProperty(r)) continue;
+            if (!K[r]) throw new Error('Setting ' + S.id + ', Stil ' + id + ': block.' + r + ' gibt es im Katalog nicht');
+            lege(K[r], st.block[r]);
         }
         K.STIL = id; K.STILNAME = st.name || id;
         K.RAUM = { stand: (st.raum && st.raum.stand) || {}, wandhoehe: (st.raum && st.raum.wandhoehe) || {}, grund: (st.raum && st.raum.grund) || {},
@@ -2295,8 +2339,8 @@ var Generator = (function () {
     };
 
     // Lichtstrahl umlenken (R20): Unter der Decke haengt ein Lichtspiel auf einem Gitter aus STRAHL_N mal STRAHL_N Feldern:
-    // eine Blendlaterne am Rand, Drehspiegel, ein Kristall im Kaefig. Jeder Spiegel steht schraeg und laesst sich in
-    // Vierteldrehungen weiterdrehen. Faellt der Strahl in den Kristall, springt die Klappe unter dem Kaefig auf.
+    // eine Blendlaterne am Rand, Drehspiegel (Schilde oder Teller), als Ziel ein Kristallstab oder ein Kelch im Kaefig. Jeder Spiegel steht schraeg und laesst sich in
+    // Vierteldrehungen weiterdrehen. Faellt der Strahl in den Kristall, springt die Klappe in der Decke darueber auf.
     // Gebaut wird durch Probieren: Felder wuerfeln, bis der Strahl in einer Lage der Spiegel ueber mindestens zwei von
     // ihnen in den Kristall faellt; dann eine Anfangslage, aus der es mindestens zwei Drehungen braucht. Die kuerzeste
     // Folge liegt der Aktion bei (fuer die Treiber der Tests), der Pruefer rechnet mit ihrer Laenge.
@@ -2342,14 +2386,14 @@ var Generator = (function () {
         var kr = this.ding('fixtur', ST.kristall.name, g.raum, { vorlage: 'kristall', nom: ST.kristall.nom, akk: ST.kristall.akk, b: ST.kristall.b,
             strahl: { x: bau.kristall[0], z: bau.kristall[1] } });
         kr.zone = this.zoneFuer(g.raum, opt);
-        g.lage = 'hinter der Klappe unter ' + kr.name + ' (Lichtstrahl \u00fcber die Drehspiegel in den Kristall lenken)';
-        var ak = this.aktion({ text: 'den Lichtstrahl in den Kristall lenken', art: 'strahl', raum: g.raum, ding: kr.id, gibt: ['hat:' + g.id], kosten: bau.loesung.length, sicher: true });
+        g.lage = ST.lage;
+        var ak = this.aktion({ text: ST.lenken, art: 'strahl', raum: g.raum, ding: kr.id, gibt: ['hat:' + g.id], kosten: bau.loesung.length, sicher: true });
         ak.strahl = { n: bau.n, quelle: q.id, kristall: kr.id, spiegel: ids };
         ak.loesung = bau.loesung.map(function (j) { return ids[j]; });
         return true;
     };
 
-    // Kruege umfuellen (R18): Hinter der Klappe eines Messbeckens liegt der Gegenstand; das Becken will genau n Mass.
+    // Kruege umfuellen (R18): Hinter der Klappe eines Messkessels liegt der Gegenstand; das Becken will genau n Mass.
     // Zwei Kruege (a < b Mass) liegen irgendwo, Wasser kommt aus dem Hahn des Raums. Umfuellen, ausgiessen ins Becken
     // (falsche Menge versickert). Der Generator sucht per Breitensuche (a, b, n) mit 4 bis 8 Schritten und legt den
     // kuerzesten Weg der Aktion bei (fuer die Treiber der Tests); der Pruefer rechnet mit seiner Laenge.
@@ -2446,6 +2490,9 @@ var Generator = (function () {
         schloss.code = code;
         schloss.form = 'melodie';
         schloss.staebe = this.r.mischen(alle).slice(0, N);
+        // die Flaschen stehen auf einem eigenen Bord an der Wand, im Raum des Schlosses
+        var KB = this.K.KLANG.bord;
+        this.ding('fixtur', KB.name, this.p.dinge[schloss.id].raum, { vorlage: 'flaschenbord', nom: KB.nom, akk: KB.akk, b: KB.b.split('{n}').join(String(N)), schloss: schloss.id });
         rg.code = code;
         if (this.spieler > 1 && this.r.chance(0.5)) rg.privat = 1 + this.r.bis(this.spieler);
         var bedarf = this.ausloeserBedarf(aus, d, tiefe - 1, {});
@@ -3299,7 +3346,7 @@ var Protokoll = (function () {
         richtung: 'weist auf ein Versteck',
         verrueckt: 'steht danach woanders',
         klopfen: 'klopft, bis man es findet',
-        melodie: 'spielt die Folge f\u00fcr die Klangst\u00e4be',
+        melodie: 'spielt die Folge f\u00fcr die klingenden Flaschen',
         behaelter: 'gibt etwas frei',
         traeger: 'bringt Unerreichbares heran',
         bedrohung: 'BEDROHUNG',
@@ -3359,7 +3406,7 @@ var Protokoll = (function () {
         var gt = [], j;
         for (j = 0; j < (s.gruppen || []).length; j++) gt.push(Katalog.ZEICHEN[s.gruppen[j].zeichen][0] + ' ' + s.code.substr(s.gruppen[j].von, s.gruppen[j].laenge));
         for (j = 0; j < (s.legende || []).length; j++) gt.push(Katalog.ZEICHEN[s.legende[j].zeichen][0] + ' ' + s.legende[j].ziffer);
-        var form = { symbol: ', Symbolschl\u00fcssel', rechnung: ', Rechenbild', raten: ', nur zu erraten, mit R\u00fcckmeldung', logik: ', Logikgitter', melodie: ', als Folge an Klangst\u00e4ben', folge: ', Zahlenreihen', handbuch: ', Handbuch und Ger\u00e4t', chiffre: ', Geheimschrift', anagramm: ', Anagramm', anfang: ', Anfangsbuchstaben', raetsel: ', R\u00e4tselfrage' }[s.form] || '';
+        var form = { symbol: ', Symbolschl\u00fcssel', rechnung: ', Rechenbild', raten: ', nur zu erraten, mit R\u00fcckmeldung', logik: ', Logikgitter', melodie: ', als Folge an klingenden Flaschen', folge: ', Zahlenreihen', handbuch: ', Handbuch und Ger\u00e4t', chiffre: ', Geheimschrift', anagramm: ', Anagramm', anfang: ', Anfangsbuchstaben', raetsel: ', R\u00e4tselfrage' }[s.form] || '';
         return s.name + (s.code ? ' (Code ' + s.code + form + (gt.length ? (s.form === 'teile' || !s.form ? ', aus Teilen: ' : ', Zeichen: ') + gt.join(' \u00b7 ') : '') + ')' : '');
     }
 
@@ -3793,7 +3840,7 @@ var Spiel = (function () {
     }
 
     // Kruege umfuellen (R18): Fuellen am Hahn (wenn Wasser laeuft), Umgiessen in den anderen Krug, Ausgiessen ins
-    // Messbecken: genau die Kerbe oeffnet die Klappe, sonst versickert es (wie Ausleeren)
+    // Messkessel: genau die Kerbe oeffnet die Klappe, sonst versickert es (wie Ausleeren)
     function kruege(s, d, items, nr) {
         var K = KAT.KRUEGE, krug = null, i;
         for (i = 0; i < items.length; i++) if (items[i].vorlage === 'krug') krug = items[i];
@@ -4092,7 +4139,7 @@ var Spiel = (function () {
         if (d.vorlage === 'licht') return KAT.LICHT.b + ' ' + (s.f['licht_aus:' + d.raum] ? KAT.LICHT.aus : KAT.LICHT.an);
         if (d.vorlage === 'zaehl') return KAT.ZAEHL[d.modell].b + ' ' + d.zeichenText;
         if (d.vorlage === 'gedenktafel') return d.b + ' ' + d.teilText;
-        if (d.vorlage === 'standpunkt') return d.b;
+        if (d.vorlage === 'standpunkt' || d.vorlage === 'flaschenbord') return d.b;
         if (d.vorlage === 'strahlquelle' || d.vorlage === 'drehspiegel') return d.b + ' ' + strahlText(s, strahlAktion(s));
         if (d.vorlage === 'kristall') return erledigt(s, strahlAktion(s)) ? KAT.STRAHL.kristall.offen : d.b + ' ' + strahlText(s, strahlAktion(s));
         if (d.vorlage === 'messbecken') return d.b;
@@ -4276,6 +4323,7 @@ var Spiel = (function () {
                     for (i = 0; i < l.length; i++) fuehreAus(s, l[i], null);
                     break;
                 }
+                if (d.vorlage === 'flaschenbord') { aus.push(m(KAT.KLANG.bord.schlag)); break; }
                 if (d.vorlage === 'drehspiegel') { aus = aus.concat(dreheSpiegel(s, d, nr)); break; }
                 if (d.vorlage === 'strahlquelle' || d.vorlage === 'kristall') { aus.push(m(ansehenText(s, d))); break; }
                 // Standpunkt (R22): Die Oberflaeche schickt das erst, wenn man in den Fussspuren steht und hinsieht
@@ -4647,6 +4695,7 @@ var Spiel = (function () {
             else if (v === 'gedenktafel') verb = 'Lesen';
             else if (v === 'standpunkt') verb = KAT.STANDPUNKT.verb;
             else if (v === 'drehspiegel') verb = KAT.STRAHL.spiegel.verb;
+            else if (v === 'flaschenbord') verb = KAT.KLANG.bord.verb;
             else if (v === 'strahlquelle' || v === 'kristall') verb = 'Ansehen';
             else if (v === 'waechter') verb = 'Ansehen';
             else if (v === 'messbecken') verb = KAT.KRUEGE.becken.verb;
@@ -4690,7 +4739,11 @@ var Spiel = (function () {
             // Geraet am Schloss (R80): Farbe der Lampe (Index), Zahl der Zahnraeder, Zeichen, Stand des Hebels (Index)
             if (sc.geraet) e.geraet = [sc.geraet.farbe, sc.geraet.raeder, KAT.ZEICHEN[sc.geraet.zeichen][0], sc.geraet.stand];
             // Klangstaebe (R27): das Zeichen je Stab, von links
-            if (sc.staebe) { e.staebe = []; for (g = 0; g < sc.staebe.length; g++) e.staebe.push(KAT.ZEICHEN[sc.staebe[g]][0]); }
+            if (sc.staebe) {
+                e.staebe = []; for (g = 0; g < sc.staebe.length; g++) e.staebe.push(KAT.ZEICHEN[sc.staebe[g]][0]);
+                // das Bord mit den Flaschen: dieselben Zeichen, dazu fuer welches Schloss es ist
+                for (k in partie.dinge) if (partie.dinge.hasOwnProperty(k) && partie.dinge[k].schloss === sc.id && aus[k]) { aus[k].staebe = e.staebe; aus[k].fuer = sc.id; aus[k].stellen = sc.code.length; }
+            }
         }
         return aus;
     }
@@ -4722,7 +4775,7 @@ if (typeof module !== 'undefined' && module.exports) { module.exports = Spiel; }
       if (w.art === "zahl" && w.takt && w.code) l.push("Du hörst Schläge: " + w.code.split("").map(function (z) { return z + (z === "1" ? " Schlag" : " Schläge"); }).join(", Pause, ") + ".");
       if (w.art === "melodie" && w.code) l.push("Du hörst die Folge, zu jedem Ton leuchtet ein Zeichen auf: " + w.code.split("").map(function (z) { return staebe[+z - 1] || z; }).join(", ") + ".");
     });
-    if (n.staebe && !d.offen) l.push("Die Klangstäbe von links: " + n.staebe.map(function (z, i) { return (i + 1) + " " + z; }).join(", ") + ". Die Folge gibst du hier als Ziffern ein.");
+    if (n.staebe && !d.offen) l.push("Die Flaschen von links: " + n.staebe.map(function (z, i) { return (i + 1) + " " + z; }).join(", ") + ". Die Folge gibst du am Schloss als Ziffern ein.");
     return l.join(" ");
   }
 
