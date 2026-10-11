@@ -302,7 +302,8 @@ var Setting = (function () {
                 ['zahl', 'Auf der Wasseroberfl\u00e4che spiegeln sich Ziffern von der Decke.'],
                 ['behaelter', 'Das Wasser l\u00e4uft ab. Am Grund liegt: {ziel}.'],
                 ['keine', 'Der Kessel gluckert.'],
-                ['teil', 'Auf der Wasseroberfl\u00e4che spiegelt sich etwas von der Decke. {teil}']] },
+                ['teil', 'Auf der Wasseroberfl\u00e4che spiegelt sich etwas von der Decke. {teil}'],
+                ['richtung', 'Dampf steigt auf und riecht nach Schwefel. Der Geruch zieht zu einer Stelle hin: {ziel}.']] },
             grammophon: { name: 'Spieluhr', nom: 'die Spieluhr', akk: 'die Spieluhr', verb: 'Kurbeln',
                 b: 'Ein K\u00e4stchen mit Kurbel und Messingwalze: eine Spieluhr.', f: [
                 ['zahl', 'Die Spieluhr spielt. Die Zahl der T\u00f6ne je Takt ergibt die Ziffern.'],
@@ -578,6 +579,27 @@ var Setting = (function () {
             gefuellt: 'Du f\u00fcllst {was} bis zum Rand.', umgegossen: 'Du gie\u00dft um. {stand}', versickert: 'Das Wasser versickert durch einen Spalt im Becken. Es waren nicht genau {n} Ma\u00df.',
             treffer: 'Das Wasser steht genau an der Kerbe. Die Klappe springt auf: {was}.', ohneWasser: 'Erst muss Wasser laufen.'
         },
+        // Waage aus Menschen (R85): zwei Trittplatten vor der T\u00fcr; die Fu\u00dfspuren sagen, wie viel auf jeder lasten muss,
+        // genau so viel. Wer fehlt, wird durch etwas Schweres ersetzt.
+        waage: {
+            links: { name: 'linke Trittplatte', nom: 'die linke Trittplatte', akk: 'die linke Trittplatte', dat: 'der linken Trittplatte' },
+            rechts: { name: 'rechte Trittplatte', nom: 'die rechte Trittplatte', akk: 'die rechte Trittplatte', dat: 'der rechten Trittplatte' },
+            b: 'Eine Steinplatte im Boden, die unter Gewicht nachgibt; daneben liegt eine zweite. Am Rand steht: Jede Spur will das Gewicht eines Menschen, nicht mehr und nicht weniger.',
+            spuren: ['In diese Platte ist keine Fu\u00dfspur gemei\u00dfelt.', 'In diese Platte ist eine Fu\u00dfspur gemei\u00dfelt.',
+                'In diese Platte sind zwei Fu\u00dfspuren gemei\u00dfelt.', 'In diese Platte sind drei Fu\u00dfspuren gemei\u00dfelt.'],
+            last: ['Sie tr\u00e4gt nichts.', 'Sie tr\u00e4gt Gewicht f\u00fcr einen.', 'Sie tr\u00e4gt Gewicht f\u00fcr zwei.', 'Sie tr\u00e4gt Gewicht f\u00fcr drei.', 'Sie tr\u00e4gt Gewicht f\u00fcr mehr als drei.'],
+            stand: 'Die linke Platte tr\u00e4gt {l}, die rechte {r}.',
+            zahl: ['nichts', 'einen', 'zwei', 'drei', 'mehr als drei'],
+            auf: 'Du stellst dich auf {akk}.', ab: 'Du steigst von {dat} herunter.', keine: 'Du stehst auf keiner Platte.',
+            lege: 'Du legst {was} auf {akk}.', leicht: '{was} ist zu leicht, davon senkt sich die Platte nicht.',
+            offen: 'Beide Platten rasten zugleich ein. An der T\u00fcr schnappt ein Riegel zur\u00fcck.', schon: 'Die Platten sind eingerastet.'
+        },
+        // Ertasten im Dunkeln (R29): Kerben, die man nur im Dunkeln f\u00fchlt; lang z\u00e4hlt f\u00fcnf, kurz eins
+        kerbstein: { name: 'Kerbstein', nom: 'der Kerbstein', akk: 'den Kerbstein', verb: 'Abtasten',
+            b: 'Eine glatte Steintafel. Daneben ist eingeritzt: lang z\u00e4hlt f\u00fcnf, kurz eins. Zu sehen ist auf der Tafel nichts.',
+            dunkel: 'Im Dunkeln sp\u00fcren deine Finger, was das Auge nicht sieht: {zeichen}, dazu {kerben}.',
+            hell: 'Im Licht gl\u00e4nzt die Tafel nur, und die Finger finden nichts. Vielleicht im Dunkeln.',
+            lang: ['eine lange Kerbe'], kurz: ['eine kurze Kerbe', 'zwei kurze Kerben', 'drei kurze Kerben', 'vier kurze Kerben'] },
         // Ziffer je Kopf (R91): was ein Spieler privat sieht, {teile} z. B. "an zweiter Stelle eine 7"
         zifferJeKopf: 'Nur f\u00fcr deine Augen erscheinen Ziffern: {teile}. Die anderen sehen andere Stellen.',
         // Raetsel mit Ton (R26, R27, R28). klopfen: Regel am Versteck, nennt es nicht. takt: haengt an Regeln, deren Ziffern man
@@ -669,7 +691,9 @@ var Setting = (function () {
                 alt: ['zu zweit, je einer in jedem Raum, im selben Augenblick ziehen', 'eine Kette mit etwas Langem verkeilen und dann die andere ziehen',
                     'eine Kette mit etwas Schwerem beschweren und dann die andere ziehen'],
                 allein: 'Die Kette gibt nach und gleitet langsam wieder hoch. Die im Nebenraum m\u00fcsste im selben Augenblick unten sein.',
-                geklemmt: 'Du verkeilst die Kette, sie bleibt unten.', unten: 'Beide Ketten sind unten. Durch die Mauer rastet ein Riegel aus.' }
+                geklemmt: 'Du verkeilst die Kette, sie bleibt unten.', unten: 'Beide Ketten sind unten. Durch die Mauer rastet ein Riegel aus.' },
+            // Waage aus Menschen (R85): das Schloss ist die linke der beiden Trittplatten
+            waage: { name: 'linke Trittplatte', nom: 'die linke Trittplatte', akk: 'die linke Trittplatte', verb: 'Draufstellen' }
         },
         gegenmittel: {
             wegsehen: ['etwas Spiegelndes so aufstellen, dass sie sich selbst ansieht'],
@@ -721,8 +745,8 @@ var Setting = (function () {
             // Steingew\u00f6lbe, deshalb ohne die Stories Verlies und Gruft (siehe stories[].stile)
             quaternius: {
                 name: 'Quaternius',
-                ohne: ['standuhr', 'spiegel', 'gemaelde', 'katze', 'bodenschacht', 'schrank_oben', 'druckplatte', 'hammer', 'schere', 'feuerzeug',
-                    'besen', 'angel', 'v_balken', 'v_bodenplatte', 'v_wappen'],
+                ohne: ['standuhr', 'spiegel', 'gemaelde', 'katze', 'bodenschacht', 'schrank_oben', 'hammer', 'schere', 'feuerzeug',
+                    'besen', 'angel', 'v_balken', 'v_wappen'],
                 anders: {
                     radio: { b: 'Ein aufgeschlagenes Buch auf einem Lesepult. Die Seiten rascheln, als atme es, und manchmal fl\u00fcstert es.' },
                     messer: { name: 'Messer', nom: 'das Messer', akk: 'das Messer', b: 'Ein Messer mit frisch geschliffener Klinge.' },
@@ -867,7 +891,8 @@ var Katalog = (function () {
             { art: 'zahl', aus: ['wasser'] },
             { art: 'behaelter', aus: ['beruehrung', 'anzahl', 'licht_nebenan'] },
             { art: 'keine', aus: ['wasser', 'zeit'] },
-            { art: 'teil', aus: ['wasser'] }
+            { art: 'teil', aus: ['wasser'] },
+            { art: 'richtung', aus: ['waerme'] }
         ] },
         grammophon: { f: [
             { art: 'zahl', aus: ['beruehrung', 'zeit', 'stille', 'laerm_nebenan'], takt: true },
@@ -1011,8 +1036,12 @@ var Katalog = (function () {
         druckplatte: { art: 'anforderung', alt: [{ b: { schwer: 3 } }, { h: 2 }] },
         // Gleichzeitig (R84): je Raum eine Zugkette, beide im selben Augenblick unten (zweiRaeume: je einer in jedem Raum),
         // oder eine verkeilen bzw. beschweren und dann die andere ziehen. Nur in Partien mit zwei Raeumen.
-        hebelpaar: { art: 'anforderung', zweiRaeume: true, alt: [{ h: 2, zweiRaeume: true }, { b: { lang: 2 } }, { b: { schwer: 2 } }] }
+        hebelpaar: { art: 'anforderung', zweiRaeume: true, alt: [{ h: 2, zweiRaeume: true }, { b: { lang: 2 } }, { b: { schwer: 2 } }] },
+        // Waage aus Menschen (R85): zwei Trittplatten, jede will genau so viel Last, wie Spuren eingemeisselt sind. Ein
+        // Spieler zaehlt eins, ebenso ein Gegenstand, der mindestens WAAGE_SCHWER schwer ist.
+        waage: { art: 'waage' }
     };
+    var WAAGE_SCHWER = 2;
 
     // Gegenmittel je Ausloeser einer Bedrohung. beobachter = ein freier Spieler haelt sie in Schach (wegsehen).
     // null bei laerm: Laerm-Bedrohungen werden nicht gebannt, man muss leise Wege nehmen.
@@ -1096,6 +1125,11 @@ var Katalog = (function () {
     if (!S.gedenktafel || !S.gedenktafel.length) fehlt('gedenktafel');
     if (!S.strahl || !S.strahl.quelle || !S.strahl.spiegel || !S.strahl.kristall || !S.strahl.ende) fehlt('strahl');
     if (!S.standpunkt) fehlt('standpunkt'); else uebernimm({}, S.standpunkt, ['name', 'nom', 'akk', 'verb', 'b', 'hier'], 'standpunkt');
+    if (!S.waage || !S.waage.links || !S.waage.rechts || !S.waage.links.dat || !S.waage.rechts.dat || !S.waage.spuren || S.waage.spuren.length < 4 ||
+        !S.waage.last || S.waage.last.length < 5 || !S.waage.zahl || S.waage.zahl.length < 5) fehlt('waage');
+    uebernimm({}, S.waage, ['b', 'stand', 'auf', 'ab', 'keine', 'lege', 'leicht', 'offen', 'schon'], 'waage');
+    if (!S.kerbstein || !S.kerbstein.dunkel || !S.kerbstein.hell || !S.kerbstein.lang || !S.kerbstein.kurz) fehlt('kerbstein');
+    uebernimm({}, S.kerbstein, ['name', 'nom', 'akk', 'b', 'verb', 'dunkel', 'hell'], 'kerbstein');
     if (!S.kruege || !S.kruege.klein || !S.kruege.gross || !S.kruege.becken) fehlt('kruege');
     uebernimm({}, S.kruege, ['stand', 'leer', 'gefuellt', 'umgegossen', 'versickert', 'treffer', 'ohneWasser'], 'kruege');
     if (!S.wache || !S.wache.bild || !S.wache.buch || !S.wache.schon) fehlt('wache');
@@ -1150,7 +1184,7 @@ var Katalog = (function () {
         version: 3, SETTING: S.id, ARTEN: ARTEN, AUSLOESER: AUSLOESER, ELEMENTE: ELEMENTE, GEGENSTAENDE: GEGENSTAENDE,
         EIGENSCHAFT_TEXT: EIGENSCHAFT_TEXT, ZU_WENIG: S.zuWenig, HINDERNISSE: HINDERNISSE, SCHLOESSER: SCHLOESSER, GEGENMITTEL: GEGENMITTEL,
         VERSTECKE: S.verstecke, LICHT: S.licht, WASSER: WASSER, SCHLUESSEL: S.schluessel, NOTIZ: S.notiz, STORIES: S.stories,
-        VERWANDLUNGEN: S.verwandlungen, ZAEHL: S.zaehl, LOGIK: S.logik, LUEGNER: S.luegner, HANDBUCH: S.handbuch, ZIFFER_JE_KOPF: S.zifferJeKopf, KLEIN: KLEIN, BEWEGLICH: BEWEGLICH, VERRUECKT: S.verrueckt, KLANG: S.klang, KLOPF_AUS: KLOPF_AUS, STAEBE: STAEBE, DURCHREICHE: S.durchreiche, HAUSORDNUNG: S.hausordnung, GEDENKTAFEL: S.gedenktafel, STANDPUNKT: S.standpunkt, STRAHL: S.strahl, WORT: S.wort, WACHE: S.wache, KRUEGE: S.kruege, FALLGITTER: FALLGITTER_K, ZEICHEN: S.zeichen, FETZEN: S.fetzen, UHR: S.uhr, ZWISCHENTUER: S.zwischentuer, TAFEL: S.tafel, INSCHRIFT: INSCHRIFT_K,
+        VERWANDLUNGEN: S.verwandlungen, ZAEHL: S.zaehl, LOGIK: S.logik, LUEGNER: S.luegner, HANDBUCH: S.handbuch, ZIFFER_JE_KOPF: S.zifferJeKopf, KLEIN: KLEIN, BEWEGLICH: BEWEGLICH, VERRUECKT: S.verrueckt, KLANG: S.klang, KLOPF_AUS: KLOPF_AUS, STAEBE: STAEBE, DURCHREICHE: S.durchreiche, HAUSORDNUNG: S.hausordnung, GEDENKTAFEL: S.gedenktafel, STANDPUNKT: S.standpunkt, STRAHL: S.strahl, WORT: S.wort, WACHE: S.wache, KRUEGE: S.kruege, KERBSTEIN: S.kerbstein, WAAGE: S.waage, WAAGE_SCHWER: WAAGE_SCHWER, FALLGITTER: FALLGITTER_K, ZEICHEN: S.zeichen, FETZEN: S.fetzen, UHR: S.uhr, ZWISCHENTUER: S.zwischentuer, TAFEL: S.tafel, INSCHRIFT: INSCHRIFT_K,
         SCHLOSSTEXT: S.schlosstext,
         HELL: S.hell, DUNKEL: S.dunkel
     };
@@ -1410,6 +1444,17 @@ var Pruefer = (function () {
                 if (b.beobachter) { extra++; continue; }
                 return null;
             }
+        }
+        // Waage (R85): jede Spur ein Mensch oder etwas Schweres; wer fehlt, wird durch Schweres der Gruppe ersetzt
+        if (a.gewicht) {
+            var schwer = gegenstaendeInHand(partie, z, a.raum).filter(function (h) { return (h.e.schwer || 0) >= a.schwer; });
+            var noetigW = Math.max(0, a.gewicht - (hd - extra)), mw = [];
+            if (schwer.length < noetigW) return null;
+            for (i = 0; i < noetigW; i++) {
+                mw.push(schwer[i].id); abh.push('hat:' + schwer[i].id);
+                if (getrenntZu(partie, z)) abh.push('bei:' + schwer[i].id + ':' + a.raum);
+            }
+            return { alt: null, mittel: mw.length ? mw : null, abh: abh };
         }
         if (!a.mittel) {
             if (1 + extra > hd) return null;
@@ -2840,12 +2885,14 @@ var Generator = (function () {
             var el = j === uhrBei ? uhr : (wahl < 0.45 ? this.nimmElement('teil', keineUhr) : null);
             if (zaehlKey) {
                 this.zaehlReihe(zaehlKey, t, fakt, schloss);
+            } else if (!el && j !== uhrBei && wahl >= 0.75 && wahl < 0.8 && !this.fixtur.standpunkt) {
+                this.standpunkt(t, fakt, schloss);
             } else if (!el && j !== uhrBei && wahl >= 0.75 && !this.fixtur.inschrift) {
                 this.inschrift(t, fakt, tiefe);
             } else if (!el && j !== uhrBei && wahl >= 0.62 && wahl < 0.7 && !this.fixtur.gedenktafel) {
                 this.gedenktafel(t, fakt, schloss);
-            } else if (!el && j !== uhrBei && wahl >= 0.7 && wahl < 0.77 && !this.fixtur.standpunkt) {
-                this.standpunkt(t, fakt, schloss);
+            } else if (!el && j !== uhrBei && wahl >= 0.7 && wahl < 0.75 && laengen[j] === 1 && t.ziffern !== '0' && !this.fixtur.kerbstein) {
+                this.kerbstein(t, fakt, schloss);
             } else if (el) {
                 var d = this.elementDing(el.key, this.teilRaum(schloss), {}), aus = this.ausWahl(el.f);
                 var rg = this.regel(d, el.f, aus, null);
@@ -2910,6 +2957,18 @@ var Generator = (function () {
             hier: SP.hier.replace('{ziffern}', (t.ziffern.length === 1 ? 'der Ziffer ' : 'den Ziffern ') + t.ziffern.split('').join(' ')).replace('{zeichen}', zn) });
         d.zone = this.zoneFuer(raum, {});
         var a = this.aktion({ text: 'sich in die ' + SP.name + ' stellen', art: 'bedienen', raum: raum, ding: d.id, gibt: [fakt], sicher: true });
+        a.teil = t;
+    };
+
+    // Ertasten im Dunkeln (R29): Ein Kerbstein traegt eine Ziffer als Kerben (lang fuenf, kurz eins), die man nur im
+    // Dunkeln fuehlt. Der Pruefer verlangt dafuer, dass es im Raum dunkel ist.
+    Bau.prototype.kerbstein = function (t, fakt, schloss) {
+        var K = this.K.KERBSTEIN, raum = this.teilRaum(schloss);
+        this.fixtur.kerbstein = true;
+        this.licht(raum);
+        var d = this.ding('fixtur', K.name, raum, { vorlage: 'kerbstein', modell: 'inschrift', nom: K.nom, akk: K.akk });
+        d.zone = this.zoneFuer(raum, {});
+        var a = this.aktion({ text: K.name + ' im Dunkeln abtasten', art: 'ertasten', raum: raum, ding: d.id, braucht: ['licht_aus:' + raum], gibt: [fakt], sicher: true });
         a.teil = t;
     };
 
@@ -2985,6 +3044,24 @@ var Generator = (function () {
             sd.zone = this.zoneFuer(tuerRaum, {});
             return { id: sd.id, vorlage: art, name: s.name };
         }
+        // Waage aus Menschen (R85): links das Schloss, rechts die zweite Platte. Zusammen drei (bei zweien oft zwei) Spuren;
+        // wer fehlt, wird durch Schweres ersetzt. Der Pruefer belegt jede Partie auch mit einem weniger: so viel Schweres
+        // muss es mindestens geben.
+        if (art === 'waage') {
+            var W = this.K.WAAGE, gesamt = this.spieler >= 3 || this.r.chance(0.5) ? 3 : 2, links = this.r.waehle(gesamt === 3 ? [1, 2, 3] : [1, 2]);
+            var pr = this.ding('fixtur', W.rechts.name, tuerRaum, { vorlage: 'waage', modell: 'druckplatte', nom: W.rechts.nom, akk: W.rechts.akk });
+            sd.modell = 'druckplatte'; sd.seite = 'links'; sd.soll = links;
+            pr.seite = 'rechts'; pr.soll = gesamt - links; pr.partner = sd.id; sd.partner = pr.id;
+            if (sd.an) pr.an = sd.an;
+            sd.zone = false; pr.zone = false;            // nie im Bereich einer Bedrohung: wer draufsteht, steht still
+            var fehlen = gesamt - Math.max(1, this.spieler - 1), versuche = 0, schwerD = this.K.WAAGE_SCHWER, dinge = this.p.dinge;
+            var schwere = function () { var n = 0, k; for (k in dinge) if (dinge.hasOwnProperty(k) && dinge[k].typ === 'gegenstand' && dinge[k].e && (dinge[k].e.schwer || 0) >= schwerD) n++; return n; };
+            while (schwere() < fehlen && versuche++ < 10) this.liefere({ schwer: schwerD }, tiefe - 1, {});
+            var aw = this.aktion({ text: 'Trittplatten belasten (links ' + sd.soll + ', rechts ' + pr.soll + ')', art: 'waage', raum: tuerRaum, ding: sd.id,
+                gibt: ['schloss:' + sd.id], sicher: true });
+            aw.gewicht = gesamt; aw.schwer = schwerD;
+            return { id: sd.id, vorlage: art, name: s.name, waage: [sd.soll, pr.soll] };
+        }
         sd.zone = this.zoneFuer(tuerRaum, {});
         var schlossInfo = { id: sd.id, vorlage: art, name: s.name };
         if (s.art === 'code') {
@@ -3046,13 +3123,17 @@ var Generator = (function () {
         var mitDurchreiche = getrennt && this.r.chance(0.7);
         var tuer = this.ding('fixtur', story.ausgang.name, tuerRaum, { vorlage: 'ausgang', nom: story.ausgang.nom, akk: story.ausgang.akk });
         var anzahl = Math.min(3, cfg.schloesser + (this.spieler >= 3 && cfg.schloesser < 3 ? 1 : 0));
-        var K = this.K, arten = this.r.mischen(['zahlenschloss', 'schluesselloch', 'doppelhebel', 'druckplatte', 'hebelpaar', 'buchstabenschloss'].filter(function (x) {
+        var K = this.K, arten = this.r.mischen(['zahlenschloss', 'schluesselloch', 'doppelhebel', 'druckplatte', 'hebelpaar', 'buchstabenschloss', 'waage'].filter(function (x) {
             return !!K.SCHLOESSER[x] && (x !== 'hebelpaar' || zwei);                  // Ketten in zwei Raeumen brauchen zwei Raeume
         }));
         // Codes und Schluessel tragen die Raetselketten; Hebel und Platte sind Beigaben
         // stabil sortiert (Rhino sortiert nicht stabil): Gleichstand entscheidet die gewuerfelte Reihenfolge
         // das Buchstabenschloss nur in etwa einer von drei Partien, sonst verdraengte es die anderen Schloesser
         if (!this.r.chance(0.35)) arten = arten.filter(function (x) { return x !== 'buchstabenschloss'; });
+        // Waage aus Menschen (R85): lohnt sich mit vielen; nie neben der einfachen Trittplatte (beide liegen vor der Tuer),
+        // nie getrennt (vor dem Treffen stehen nur zwei in jedem Raum)
+        if (getrennt || !this.r.chance(this.spieler >= 3 ? 0.6 : 0.3)) arten = arten.filter(function (x) { return x !== 'waage'; });
+        if (arten.indexOf('waage') >= 0 && arten.indexOf('druckplatte') >= 0) arten.splice(arten.indexOf(this.r.chance(0.5) ? 'waage' : 'druckplatte'), 1);
         var rang = function (x) { return (x === 'zahlenschloss' || x === 'schluesselloch' || x === 'buchstabenschloss' ? 0 : 1) * 10 + arten.indexOf(x); };
         arten = arten.slice().sort(function (a, b) { return rang(a) - rang(b); });
         if (p.opfer) arten = arten.filter(function (x) { return x === 'zahlenschloss' || x === 'schluesselloch' || x === 'buchstabenschloss'; });
@@ -3401,7 +3482,7 @@ if (typeof module !== 'undefined' && module.exports) {
 var Spiel = (function () {
     'use strict';
 
-    var ZEIT = { ansehen: 0, anfassen: 1, nehmen: 1, benutzen: 1, krach: 1, eingeben: 1, warten: 3, gehen: 1, verlassen: 0, geben: 0, ablegen: 0, verwandeln: 1 };
+    var ZEIT = { ansehen: 0, anfassen: 1, nehmen: 1, benutzen: 1, krach: 1, eingeben: 1, warten: 3, gehen: 1, verlassen: 0, geben: 0, ablegen: 0, verwandeln: 1, absteigen: 0 };
     var LAERM_STRAFE = 5;
     // Zu dritt kostet eine Handlung ein Drittel: Die Summe driftet sonst (4.999999999999999 statt 5), und Anzeige und
     // Fristen kippen an der Grenze. Anteile fuer 1 bis 4 Spieler sind alle Zwoelftel, also dort einrasten.
@@ -3741,6 +3822,75 @@ var Spiel = (function () {
         return [m('Damit l\u00e4sst sich hier nichts anfangen.')];
     }
 
+    // Ertasten im Dunkeln (R29): Nur wenn es im Raum dunkel ist, spuert man die Kerben
+    function ertasten(s, d, nr) {
+        var K = KAT.KERBSTEIN, a = aktionenAn(s, d.id, ['ertasten'])[0];
+        if (!a) return [m(K.hell)];
+        if (!s.f['licht_aus:' + d.raum]) return [m(K.hell)];
+        var sp = sperre(s, a, nr, 1);
+        if (sp) return [sp];
+        fuehreAus(s, a, null);
+        var z = parseInt(a.teil.ziffern, 10), kerben = [];
+        if (z >= 5) kerben.push(K.lang[0]);
+        if (z % 5) kerben.push(K.kurz[z % 5 - 1]);
+        return [m(K.dunkel.replace('{zeichen}', gross(KAT.ZEICHEN[a.teil.zeichen][1])).replace('{kerben}', kerben.join(' und ')))];
+    }
+
+    // Waage aus Menschen (R85): Last einer Trittplatte = wer im Raum darauf steht und was Schweres darauf liegt
+    function waageLast(s, d) {
+        var n = 0, k;
+        for (k in s.steht) if (s.steht.hasOwnProperty(k) && s.steht[k] === d.id && s.raum[k] === d.raum) n++;
+        for (k in s.wer) if (s.wer.hasOwnProperty(k) && liegt(s, k) && s.wer[k].auf === d.id && !s.f['weg:' + k] && schwerGenug(s.partie.dinge[k])) n++;
+        return n;
+    }
+    function schwerGenug(g) { return ((g.e && g.e.schwer) || 0) >= KAT.WAAGE_SCHWER; }
+    function waagePaar(s, d) {
+        var p = s.partie.dinge[d.partner];
+        return d.seite === 'links' ? [d, p] : [p, d];
+    }
+    function waageStand(s, d) {
+        var W = KAT.WAAGE, pa = waagePaar(s, d);
+        return W.stand.replace('{l}', W.zahl[Math.min(4, waageLast(s, pa[0]))]).replace('{r}', W.zahl[Math.min(4, waageLast(s, pa[1]))]);
+    }
+    function waageOffen(s, d) { return !!s.f['schloss:' + waagePaar(s, d)[0].id]; }
+    function trete(s, d, nr) {
+        var W = KAT.WAAGE, T = W[d.seite];
+        if (waageOffen(s, d)) return [m(W.schon)];
+        if (s.steht[nr] === d.id) { delete s.steht[nr]; return [m(W.ab.replace('{dat}', T.dat) + ' ' + waageStand(s, d))]; }
+        s.steht[nr] = d.id;
+        return [m(W.auf.replace('{akk}', T.akk) + ' ' + waageStand(s, d))];
+    }
+    function absteigen(s, nr) {
+        var id = s.steht[nr], W = KAT.WAAGE;
+        if (!id) return [m(W.keine, 'system')];
+        delete s.steht[nr];
+        var d = s.partie.dinge[id];
+        return [m(W.ab.replace('{dat}', W[d.seite].dat) + (waageOffen(s, d) ? '' : ' ' + waageStand(s, d)))];
+    }
+    function belaste(s, d, nr, items) {
+        var W = KAT.WAAGE, T = W[d.seite], t = [], i, gelegt = false;
+        if (!items.length) return trete(s, d, nr);
+        if (waageOffen(s, d)) return [m(W.schon)];
+        for (i = 0; i < items.length; i++) {
+            if (!schwerGenug(items[i])) { t.push(gross(W.leicht.replace('{was}', nom(items[i])))); continue; }
+            s.wer[items[i].id] = { raum: d.raum, x: null, z: null, auf: d.id };
+            t.push(W.lege.replace('{was}', akk(items[i])).replace('{akk}', T.akk));
+            gelegt = true;
+        }
+        return [m(t.join(' ') + (gelegt ? ' ' + waageStand(s, d) : ''))];
+    }
+    // Nach jedem Befehl: Tragen beide Platten genau ihre Spuren, rastet das Schloss ein (bleibt dann offen)
+    function waagen(s) {
+        var aus = [], i, l = s.partie.aktionen;
+        for (i = 0; i < l.length; i++) {
+            var a = l[i];
+            if (a.art !== 'waage' || erledigt(s, a)) continue;
+            var pa = waagePaar(s, s.partie.dinge[a.ding]);
+            if (waageLast(s, pa[0]) === pa[0].soll && waageLast(s, pa[1]) === pa[1].soll) { fuehreAus(s, a, null); aus.push(m(KAT.WAAGE.offen, 'erfolg')); }
+        }
+        return aus;
+    }
+
     function itemsAus(s, ids, nr) {
         var l = [], i;
         for (i = 0; i < (ids || []).length; i++) {
@@ -3899,7 +4049,7 @@ var Spiel = (function () {
 
     function neu(partie) {
         kat(partie);
-        var s = { partie: partie, f: {}, zeit: 0, raum: {}, gesehen: {}, status: 'laeuft', fristGemeldet: {}, log: [], vorfuehrungen: [], wer: {} }, i;
+        var s = { partie: partie, f: {}, zeit: 0, raum: {}, gesehen: {}, status: 'laeuft', fristGemeldet: {}, log: [], vorfuehrungen: [], wer: {}, steht: {} }, i;
         for (i = 0; i < partie.start.length; i++) s.f[partie.start[i]] = true;
         verteile(s, 1);
         var start1 = partie.getrennt && partie.getrennt.r2.indexOf(1) >= 0 ? 'r2' : 'r1';
@@ -3928,6 +4078,7 @@ var Spiel = (function () {
         }
         if (d.typ === 'gegenstand') return beschreibung(d);
         if (d.vorlage === 'hausordnung') return KAT.HAUSORDNUNG.b + ' ' + ordnungZeile(s, d) + '.';
+        if (d.vorlage === 'waage') return KAT.WAAGE.b + ' ' + KAT.WAAGE.spuren[d.soll] + ' ' + (waageOffen(s, d) ? KAT.WAAGE.schon : KAT.WAAGE.last[Math.min(4, waageLast(s, d))]);
         if (d.vorlage === 'hebelpaar') return KAT.SCHLOESSER.hebelpaar.b + (s.f['schloss:' + (d.typ === 'schloss' ? d.id : d.partner)] ? ' Der Riegel ist offen.' : '');
         if (d.typ === 'schloss') {
             var zu = s.f['schloss:' + d.id] ? ' Es ist offen.' : '';
@@ -3945,6 +4096,7 @@ var Spiel = (function () {
         if (d.vorlage === 'strahlquelle' || d.vorlage === 'drehspiegel') return d.b + ' ' + strahlText(s, strahlAktion(s));
         if (d.vorlage === 'kristall') return erledigt(s, strahlAktion(s)) ? KAT.STRAHL.kristall.offen : d.b + ' ' + strahlText(s, strahlAktion(s));
         if (d.vorlage === 'messbecken') return d.b;
+        if (d.vorlage === 'kerbstein') return KAT.KERBSTEIN.b;
         if (d.vorlage === 'waechter') return (KAT.WACHE[d.modell === 'gemaelde' ? 'bild' : 'buch']).b + (aktionenAn(s, d.id, ['losung']).some(function (a) { return erledigt(s, a); }) ? ' ' + KAT.WACHE.schon : '');
         if (d.vorlage === 'inschrift') {
             for (i = 0; i < s.partie.aktionen.length; i++) {
@@ -4080,6 +4232,7 @@ var Spiel = (function () {
             var kv;
             for (kv in s.wer) if (s.wer.hasOwnProperty(kv) && s.wer[kv] === nr) legeAb(s, kv, s.raum[nr], b.x, b.z);
             s.raum[nr] = null;
+            if (s.steht) delete s.steht[nr];
             return [m('Du verl\u00e4sst die Partie. Die anderen spielen ohne dich weiter.', 'system')];
         }
         var aus = [], d = b.ding ? s.partie.dinge[b.ding] : null, i, a, sp;
@@ -4135,6 +4288,8 @@ var Spiel = (function () {
                 if (d.vorlage === 'durchreiche') { aus.push(m(d.einwurf ? KAT.DURCHREICHE.leer : KAT.DURCHREICHE.falsch)); break; }
                 if (d.vorlage === 'hebelpaar') { aus = aus.concat(kette(s, d, nr, null)); break; }
                 if (d.vorlage === 'hausordnung' || d.vorlage === 'messbecken') { aus.push(m(ansehenText(s, d))); break; }
+                if (d.vorlage === 'kerbstein') { aus = aus.concat(ertasten(s, d, nr)); break; }
+                if (d.vorlage === 'waage') { aus = aus.concat(trete(s, d, nr)); break; }
                 var getan = false, l = aktionenAn(s, d.id, ['bedienen', 'oeffnen', 'schalter', 'durchsuchen']);
                 for (i = 0; i < l.length; i++) {
                     a = l[i];
@@ -4192,6 +4347,7 @@ var Spiel = (function () {
                 if (itemsAus(s, b.mit, nr).some(function (x) { return x.vorlage === 'krug'; })) { aus = aus.concat(kruege(s, d, itemsAus(s, b.mit, nr), nr)); break; }
                 if (d.vorlage === 'hebelpaar') { aus = aus.concat(kette(s, d, nr, itemsAus(s, b.mit, nr))); break; }
                 if (d.vorlage === 'hausordnung') { aus = aus.concat(einsetzen(s, d, nr, itemsAus(s, b.mit, nr))); break; }
+                if (d.vorlage === 'waage') { aus = aus.concat(belaste(s, d, nr, itemsAus(s, b.mit, nr))); break; }
                 var items = itemsAus(s, b.mit, nr), versucht = false, erfolg = false, grund = null;
                 l = aktionenAn(s, d.id, ['benutzen', 'schluessel']);
                 for (i = 0; i < l.length && !erfolg; i++) {
@@ -4279,6 +4435,13 @@ var Spiel = (function () {
                 break;
 
             case 'ablegen':
+                // wer auf einer Trittplatte steht (R85), legt es auf die Platte; zaehlen tut nur Schweres
+                if (s.steht[nr]) {
+                    var dw = s.partie.dinge[s.steht[nr]];
+                    s.wer[d.id] = { raum: s.raum[nr], x: null, z: null, auf: dw.id };
+                    aus.push(m(KAT.WAAGE.lege.replace('{was}', akk(d)).replace('{akk}', KAT.WAAGE[dw.seite].akk) + (waageOffen(s, dw) ? '' : ' ' + waageStand(s, dw))));
+                    break;
+                }
                 legeAb(s, d.id, s.raum[nr], b.x, b.z);
                 aus.push(m('Du legst ' + akk(d) + ' ab.'));
                 break;
@@ -4292,13 +4455,19 @@ var Spiel = (function () {
                 }
                 break;
 
+            case 'absteigen':
+                aus = aus.concat(absteigen(s, nr));
+                break;
+
             case 'gehen':
                 if (b.raum === s.raum[nr]) break;
+                delete s.steht[nr];                      // wer geht, steigt von der Trittplatte
                 aus.push(m('Du gehst ' + raumNach(s, b.raum) + '.'));
                 aus = aus.concat(betrete(s, nr, b.raum));
                 break;
         }
 
+        aus = aus.concat(waagen(s));
         verlasseneRaeume(s);
         aus = aus.concat(ereignisse(s, nr, b));
         verteile(s, nr);
@@ -4405,6 +4574,7 @@ var Spiel = (function () {
                     var lg = { id: d.id, name: d.name, typ: d.typ, offen: false, code: false, liegt: { x: w0.x, z: w0.z } };
                     if (w0.an) lg.liegt.an = w0.an;                  // durchgereicht: liegt vor dieser Oeffnung
                     if (d.vorlage === 'krug') lg.krug = [(s.krug && s.krug[d.id]) || 0, d.fasst];
+                    if (w0.auf) lg.liegt.auf = w0.auf;              // liegt auf einer Trittplatte (R85)
                     dinge.push(lg);
                 }
                 continue;
@@ -4424,6 +4594,7 @@ var Spiel = (function () {
             }
             if (d.vorlage === 'zwischentuer') offen = !!s.f['offen:' + s.partie.durchgang.nach];
             if (d.vorlage === 'kristall') offen = erledigt(s, strahlAktion(s));
+            if (d.vorlage === 'waage') offen = waageOffen(s, d);
             if (d.vorlage === 'waechter') offen = aktionenAn(s, d.id, ['losung']).some(function (a) { return erledigt(s, a); });   // hat seine Losung gehoert: die Ansicht zeigt ihn offen
             var code = false, alleS = schloesserAlle(s.partie);
             for (k = 0; k < alleS.length; k++) if (alleS[k].id === d.id && alleS[k].code) code = true;
@@ -4435,6 +4606,8 @@ var Spiel = (function () {
             if (d.typ === 'element') { eintrag.w = wirkungen(s, d, nr); if (s.f['waerme:' + d.id]) eintrag.warm = true; }
             // Hausordnung: die drei Plaettchen, wie sie gerade auf der Tafel stehen
             if (d.vorlage === 'hausordnung') eintrag.tafel = ordnungZeile(s, d).split(' \u00b7 ');
+            // Trittplatte (R85): wie tief sie sinkt; ich = du stehst darauf (die Oberflaeche stellt dich hin)
+            if (d.vorlage === 'waage') { eintrag.last = waageLast(s, d); if (s.steht[nr] === d.id) eintrag.ich = true; }
             // Inschrift: einmal lesbar gemacht, steht ihr Teil fuer alle sichtbar im Stein
             if (d.vorlage === 'inschrift' || d.vorlage === 'gedenktafel' || d.vorlage === 'standpunkt') {
                 for (k = 0; k < s.partie.aktionen.length; k++) {
@@ -4477,6 +4650,8 @@ var Spiel = (function () {
             else if (v === 'strahlquelle' || v === 'kristall') verb = 'Ansehen';
             else if (v === 'waechter') verb = 'Ansehen';
             else if (v === 'messbecken') verb = KAT.KRUEGE.becken.verb;
+            else if (v === 'kerbstein') verb = KAT.KERBSTEIN.verb;
+            else if (v === 'waage') verb = KAT.SCHLOESSER.waage.verb;
             else if (v === 'durchreiche') verb = d.einwurf ? KAT.DURCHREICHE[partie.durchreiche.richtung].verb : 'Ansehen';
             // nur gesetzte Felder: Das Partie-Ereignis muss unter der Groessengrenze von Knuddels bleiben
             aus[k] = { name: d.name, typ: d.typ, vorlage: v };
@@ -4486,6 +4661,7 @@ var Spiel = (function () {
             if (d.anzahl) aus[k].anzahl = d.anzahl;
             if (d.strahl) aus[k].strahl = v === 'strahlquelle' ? [d.strahl.x, d.strahl.z, d.strahl.dx, d.strahl.dz, d.strahl.n] : v === 'drehspiegel' ? [d.strahl.x, d.strahl.z, d.strahl.lage] : [d.strahl.x, d.strahl.z];   // R20: Feld im Gitter
             if (d.fasst) aus[k].fasst = d.fasst;                     // Krug (R18): so viel Mass fasst er, die Oberflaeche zeigt ihn so gross
+            if (d.vorlage === 'waage') { aus[k].soll = d.soll; aus[k].seite = d.seite; }     // Trittplatte (R85): eingemeisselte Fussspuren
             if (d.verborgen) aus[k].verborgen = true;
             if (verb) aus[k].verb = verb;
             // Zaehlreihe: das Zeichen, das daran steht
