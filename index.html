@@ -513,6 +513,25 @@ var Setting = (function () {
                 beispiel: 'Darunter, kleiner: So schreibt man {klar}: {probe}.', hinten: 'Und alles steht von hinten nach vorn.' },
             anagramm: { name: 'Pergament mit Buchstaben', nom: 'das Pergament mit Buchstaben', akk: 'das Pergament mit Buchstaben',
                 b: 'Ein Pergament, darauf durcheinander die Buchstaben {buchstaben}. Darunter: Richtig geordnet ergeben sie etwas, das in jede Burg geh\u00f6rt.' },
+            // R\u00e4tselfrage (R100): Antwort ohne Umlaute; die Zahl der Ringe am Schloss sagt, wie lang sie ist
+            raetsel: { name: 'Pergament mit einer R\u00e4tselfrage', nom: 'das Pergament mit einer R\u00e4tselfrage', akk: 'das Pergament mit einer R\u00e4tselfrage',
+                b: 'Ein Pergament mit einer R\u00e4tselfrage: \u00bb{frage}\u00ab Darunter: Die Antwort ist der Schl\u00fcssel.' },
+            fragen: [
+                ['NADEL', 'Ich habe ein Auge und sehe nichts, und durch mein Auge zieht man einen Faden.'],
+                ['LOCH', 'Je mehr man von mir wegnimmt, desto gr\u00f6\u00dfer werde ich.'],
+                ['UHR', 'Ich habe Zeiger, aber keine Finger, ein Gesicht, aber keine Augen.'],
+                ['KAMM', 'Ich habe Z\u00e4hne und bei\u00dfe nie, aber ich fahre dir durchs Haar.'],
+                ['FLASCHE', 'Ich habe einen Hals, aber keinen Kopf, und trage einen Korken als Hut.'],
+                ['KIRSCHE', 'Erst wei\u00df wie Schnee, dann gr\u00fcn wie Klee, dann rot wie Blut, schmeckt allen gut.'],
+                ['SCHRITTE', 'Je mehr man davon macht, desto mehr bleibt hinter einem zur\u00fcck.'],
+                ['KARTE', 'Ich habe St\u00e4dte, aber keine H\u00e4user, W\u00e4lder, aber keine B\u00e4ume, Meere, aber kein Wasser.'],
+                ['KERZE', 'Je l\u00e4nger ich lebe, desto k\u00fcrzer werde ich.'],
+                ['SCHATTEN', 'Am Tag folge ich dir \u00fcberallhin, in der Nacht bin ich fort.'],
+                ['ECHO', 'Ich spreche ohne Mund und antworte, ohne gefragt zu werden.'],
+                ['FEUER', 'Gibt man mir zu essen, wachse ich. Gibt man mir zu trinken, sterbe ich.'],
+                ['STILLE', 'Wer meinen Namen ausspricht, zerbricht mich.'],
+                ['ZUKUNFT', 'Ich bin immer vor dir, und doch hast du mich nie gesehen.']
+            ],
             // Anfangsbuchstaben (R101): Namen untereinander, ihre Anfaenge ergeben das Wort
             anfang: { name: 'Liste der Gefangenen', nom: 'die Liste der Gefangenen', akk: 'die Liste der Gefangenen',
                 b: 'Eine Liste, die Namen untereinander geschrieben: {namen}.', hinweis: 'Ganz unten, klein: Auf die Anf\u00e4nge kommt es an.' },
@@ -531,6 +550,16 @@ var Setting = (function () {
                 auf: 'Das Buch klappt auf. Zwischen den Seiten liegt: {was}.' },
             schon: 'Es hat seine Losung geh\u00f6rt.'
         },
+        // Kr\u00fcge umf\u00fcllen (R18): zwei Kr\u00fcge, ein Messbecken will genau {n} Ma\u00df; {a} {b} Fassungsverm\u00f6gen
+        kruege: {
+            klein: { name: 'kleiner Krug', nom: 'der kleine Krug', akk: 'den kleinen Krug', b: 'Ein Krug, an dem eingeritzt steht: {a} Ma\u00df.' },
+            gross: { name: 'gro\u00dfer Krug', nom: 'der gro\u00dfe Krug', akk: 'den gro\u00dfen Krug', b: 'Ein Krug, an dem eingeritzt steht: {b} Ma\u00df.' },
+            stand: 'Darin sind gerade {x} Ma\u00df.', leer: 'Er ist leer.',
+            becken: { name: 'Messbecken', nom: 'das Messbecken', akk: 'das Messbecken',
+                b: 'Ein Bottich mit einer Kerbe innen und der Inschrift am Rand: genau {n} Ma\u00df. Unten sitzt eine Klappe.', verb: 'Hineinsehen' },
+            gefuellt: 'Du f\u00fcllst {was} bis zum Rand.', umgegossen: 'Du gie\u00dft um. {stand}', versickert: 'Das Wasser versickert durch einen Spalt im Becken. Es waren nicht genau {n} Ma\u00df.',
+            treffer: 'Das Wasser steht genau an der Kerbe. Die Klappe springt auf: {was}.', ohneWasser: 'Erst muss Wasser laufen.'
+        },
         // Ziffer je Kopf (R91): was ein Spieler privat sieht, {teile} z. B. "an zweiter Stelle eine 7"
         zifferJeKopf: 'Nur f\u00fcr deine Augen erscheinen Ziffern: {teile}. Die anderen sehen andere Stellen.',
         // Raetsel mit Ton (R26, R27, R28). klopfen: Regel am Versteck, nennt es nicht. takt: haengt an Regeln, deren Ziffern man
@@ -538,8 +567,8 @@ var Setting = (function () {
         klang: {
             klopfen: 'Irgendwo im Raum klopft es, dumpf und in gleichem Abstand. Es kommt immer von derselben Stelle.',
             klopfenWeg: 'verr\u00e4t sich durch Klopfen',
-            takt: 'Welche Ziffern es sind, sagt dir niemand: Z\u00e4hl mit.',
-            staebe: 'Daneben h\u00e4ngen {n} Klangst\u00e4be, jeder mit einem Zeichen. In der richtigen Folge angeschlagen, \u00f6ffnen sie das Schloss. Von links nach rechts z\u00e4hlen sie 1 bis {n}.'
+            takt: 'Wie viele Schl\u00e4ge es sind, zeigt nichts an: Man muss mitz\u00e4hlen, und jede Pause beendet eine Ziffer.',
+            staebe: 'Daneben h\u00e4ngen {n} Klangst\u00e4be, jeder mit einem Zeichen, von links nach rechts gez\u00e4hlt 1 bis {n}. Die Ziffern des Schlosses sind die St\u00e4be in der Folge, in der sie erklingen sollen.'
         },
         // Was hat sich veraendert? (R24): Im Dunkeln rueckt ein Versteck an eine andere Stelle; welches, sagt der Text nicht
         verrueckt: { text: 'Etwas scharrt \u00fcber den Boden. Als du wieder siehst, steht ein Ding im Raum nicht mehr dort, wo es stand.',
@@ -1048,6 +1077,8 @@ var Katalog = (function () {
     if (!S.zifferJeKopf || S.zifferJeKopf.indexOf('{teile}') < 0) fehlt('zifferJeKopf');
     if (!S.gedenktafel || !S.gedenktafel.length) fehlt('gedenktafel');
     if (!S.standpunkt) fehlt('standpunkt'); else uebernimm({}, S.standpunkt, ['name', 'nom', 'akk', 'verb', 'b', 'hier'], 'standpunkt');
+    if (!S.kruege || !S.kruege.klein || !S.kruege.gross || !S.kruege.becken) fehlt('kruege');
+    uebernimm({}, S.kruege, ['stand', 'leer', 'gefuellt', 'umgegossen', 'versickert', 'treffer', 'ohneWasser'], 'kruege');
     if (!S.wache || !S.wache.bild || !S.wache.buch || !S.wache.schon) fehlt('wache');
     uebernimm({}, S.wache.bild, ['name', 'nom', 'akk', 'b', 'auf'], 'wache.bild');
     uebernimm({}, S.wache.buch, ['name', 'nom', 'akk', 'b', 'auf'], 'wache.buch');
@@ -1056,6 +1087,9 @@ var Katalog = (function () {
     uebernimm({}, S.wort.chiffre, ['name', 'nom', 'akk', 'b', 'verschiebung', 'beispiel', 'hinten'], 'wort.chiffre');
     uebernimm({}, S.wort.anagramm, ['name', 'nom', 'akk', 'b'], 'wort.anagramm');
     uebernimm({}, S.wort.anfang || {}, ['name', 'nom', 'akk', 'b', 'hinweis'], 'wort.anfang');
+    uebernimm({}, S.wort.raetsel || {}, ['name', 'nom', 'akk', 'b'], 'wort.raetsel');
+    if (!S.wort.fragen || S.wort.fragen.length < 6) fehlt('wort.fragen');
+    for (i = 0; i < S.wort.fragen.length; i++) if (!/^[A-Z]{3,10}$/.test(S.wort.fragen[i][0]) || !S.wort.fragen[i][1]) fehlt('wort.fragen[' + i + '] (Antwort in Grossbuchstaben, Frage)');
     // jeder Buchstabe der Woerter braucht Namen (Anfangsbuchstaben, R101)
     for (i = 0; i < S.wort.woerter.length; i++) for (k = 0; k < S.wort.woerter[i].length; k++) if (!S.wort.namen || !S.wort.namen[S.wort.woerter[i].charAt(k)]) fehlt('wort.namen.' + S.wort.woerter[i].charAt(k));
     for (i = 0; i < S.gedenktafel.length; i++) uebernimm({}, S.gedenktafel[i], ['name', 'nom', 'akk', 'b'], 'gedenktafel[' + i + ']');
@@ -1097,7 +1131,7 @@ var Katalog = (function () {
         version: 3, SETTING: S.id, ARTEN: ARTEN, AUSLOESER: AUSLOESER, ELEMENTE: ELEMENTE, GEGENSTAENDE: GEGENSTAENDE,
         EIGENSCHAFT_TEXT: EIGENSCHAFT_TEXT, ZU_WENIG: S.zuWenig, HINDERNISSE: HINDERNISSE, SCHLOESSER: SCHLOESSER, GEGENMITTEL: GEGENMITTEL,
         VERSTECKE: S.verstecke, LICHT: S.licht, WASSER: WASSER, SCHLUESSEL: S.schluessel, NOTIZ: S.notiz, STORIES: S.stories,
-        VERWANDLUNGEN: S.verwandlungen, ZAEHL: S.zaehl, LOGIK: S.logik, LUEGNER: S.luegner, HANDBUCH: S.handbuch, ZIFFER_JE_KOPF: S.zifferJeKopf, KLEIN: KLEIN, BEWEGLICH: BEWEGLICH, VERRUECKT: S.verrueckt, KLANG: S.klang, KLOPF_AUS: KLOPF_AUS, STAEBE: STAEBE, DURCHREICHE: S.durchreiche, HAUSORDNUNG: S.hausordnung, GEDENKTAFEL: S.gedenktafel, STANDPUNKT: S.standpunkt, WORT: S.wort, WACHE: S.wache, FALLGITTER: FALLGITTER_K, ZEICHEN: S.zeichen, FETZEN: S.fetzen, UHR: S.uhr, ZWISCHENTUER: S.zwischentuer, TAFEL: S.tafel, INSCHRIFT: INSCHRIFT_K,
+        VERWANDLUNGEN: S.verwandlungen, ZAEHL: S.zaehl, LOGIK: S.logik, LUEGNER: S.luegner, HANDBUCH: S.handbuch, ZIFFER_JE_KOPF: S.zifferJeKopf, KLEIN: KLEIN, BEWEGLICH: BEWEGLICH, VERRUECKT: S.verrueckt, KLANG: S.klang, KLOPF_AUS: KLOPF_AUS, STAEBE: STAEBE, DURCHREICHE: S.durchreiche, HAUSORDNUNG: S.hausordnung, GEDENKTAFEL: S.gedenktafel, STANDPUNKT: S.standpunkt, WORT: S.wort, WACHE: S.wache, KRUEGE: S.kruege, FALLGITTER: FALLGITTER_K, ZEICHEN: S.zeichen, FETZEN: S.fetzen, UHR: S.uhr, ZWISCHENTUER: S.zwischentuer, TAFEL: S.tafel, INSCHRIFT: INSCHRIFT_K,
         SCHLOSSTEXT: S.schlosstext,
         HELL: S.hell, DUNKEL: S.dunkel
     };
@@ -1700,7 +1734,7 @@ var Generator = (function () {
             this.liefere(alt[this.r.bis(alt.length)].b, tiefe - 1, opt);
         }
         this.aktion({ text: Wa.tun, art: m ? 'benutzen' : 'bedienen', raum: raum, ding: h.id, mittel: m, gibt: ['wasser:' + raum] });
-        this.fixtur['hahn:' + raum] = true;
+        this.fixtur['hahn:' + raum] = h.id;
     };
 
     // Was die Spieler tun muessen, damit der Ausloeser eintritt; liefert die noetigen Fakten.
@@ -1890,7 +1924,7 @@ var Generator = (function () {
         g.raum = g.raum || this.raum();
         g.zone = this.zoneFuer(g.raum, opt);
         var arten = tiefe <= 0 ? ['frei'] : this.r.mischen(['frei', 'hindernis', 'hindernis', 'hindernis', 'behaelter', 'behaelter',
-            'traeger', 'richtung', 'richtung', 'zweitfach', 'luegner', 'hausordnung', 'verrueckt', 'klopfen', 'losung']);
+            'traeger', 'richtung', 'richtung', 'zweitfach', 'luegner', 'hausordnung', 'verrueckt', 'klopfen', 'losung', 'kruege']);
         var i;
         if (tiefe > 0 && arten[0] === 'frei' && this.r.chance(0.6)) arten.push(arten.shift());
         for (i = 0; i < arten.length; i++) {
@@ -2172,6 +2206,61 @@ var Generator = (function () {
         g.lage = 'verborgen in/bei ' + d.name + ' (erst nach dem Tausch an ' + H.akk + ')';
         this.aktion({ text: g.name + ' von ' + d.name + ' bekommen', art: 'ereignis', ausloeser: aus, raum: d.raum, ding: d.id, braucht: ['ordnung:' + rg.id].concat(bedarf),
             kennt: [rg.id], gibt: ['hat:' + g.id], sicher: aus !== 'beruehrung' });
+        return true;
+    };
+
+    // Kruege umfuellen (R18): Hinter der Klappe eines Messbeckens liegt der Gegenstand; das Becken will genau n Mass.
+    // Zwei Kruege (a < b Mass) liegen irgendwo, Wasser kommt aus dem Hahn des Raums. Umfuellen, ausgiessen ins Becken
+    // (falsche Menge versickert). Der Generator sucht per Breitensuche (a, b, n) mit 4 bis 8 Schritten und legt den
+    // kuerzesten Weg der Aktion bei (fuer die Treiber der Tests); der Pruefer rechnet mit seiner Laenge.
+    function kruegeWeg(a, b, n) {
+        var start = '0,0', vor = {}, schlange = [[0, 0]], i;
+        vor[start] = null;
+        while (schlange.length) {
+            var z = schlange.shift(), x = z[0], y = z[1], k = x + ',' + y;
+            if (x === n || y === n) {
+                var weg = [[x === n ? 'becken' : 'becken', x === n ? 'a' : 'b']], h = k;
+                while (vor[h]) { weg.unshift(vor[h].op); h = vor[h].von; }
+                return weg;
+            }
+            var a2b = Math.min(x, b - y), b2a = Math.min(y, a - x);
+            var folge = [[[a, y], ['fuellen', 'a']], [[x, b], ['fuellen', 'b']], [[0, y], ['becken', 'a']], [[x, 0], ['becken', 'b']],
+                [[x - a2b, y + a2b], ['giessen', 'a', 'b']], [[x + b2a, y - b2a], ['giessen', 'b', 'a']]];
+            for (i = 0; i < folge.length; i++) {
+                var nk = folge[i][0][0] + ',' + folge[i][0][1];
+                if (vor[nk] !== undefined) continue;
+                vor[nk] = { von: k, op: folge[i][1] };
+                schlange.push(folge[i][0]);
+            }
+        }
+        return null;
+    }
+    Bau.prototype.lege_kruege = function (g, tiefe, opt) {
+        if (this.fixtur.kruege || !this.r.chance(0.5) || this.elementeFrei.indexOf('becken') < 0) return false;
+        var paare = [], a, b, n, w;
+        for (a = 2; a <= 5; a++) for (b = a + 2; b <= 8; b++) for (n = 1; n < b; n++) {
+            if (n === a) continue;
+            w = kruegeWeg(a, b, n);
+            if (w && w.length >= 4 && w.length <= 8) paare.push([a, b, n, w]);
+        }
+        var wahl = this.r.waehle(paare), KR = this.K.KRUEGE;
+        a = wahl[0]; b = wahl[1]; n = wahl[2]; w = wahl[3];
+        this.fixtur.kruege = true;
+        this.elementeFrei.splice(this.elementeFrei.indexOf('becken'), 1);      // der Kessel saehe aus wie ein zweites Becken
+        this.hahn(g.raum, tiefe - 1, opt);
+        var mb = this.ding('fixtur', KR.becken.name, g.raum, { vorlage: 'messbecken', modell: 'becken', leihStand: true, nom: KR.becken.nom, akk: KR.becken.akk,
+            b: KR.becken.b.replace('{n}', String(n)), mass: n });
+        mb.zone = this.zoneFuer(g.raum, opt);
+        var kl = this.ding('gegenstand', KR.klein.name, g.raum, { vorlage: 'krug', modell: 'topf', e: {}, nom: KR.klein.nom, akk: KR.klein.akk,
+            b: KR.klein.b.replace('{a}', String(a)), fasst: a });
+        var gr = this.ding('gegenstand', KR.gross.name, g.raum, { vorlage: 'krug', modell: 'topf', e: {}, nom: KR.gross.nom, akk: KR.gross.akk,
+            b: KR.gross.b.replace('{b}', String(b)), fasst: b });
+        this.platziere(kl, tiefe - 1, opt);
+        this.platziere(gr, tiefe - 1, opt);
+        g.lage = 'hinter der Klappe von ' + mb.name + ' (genau ' + n + ' Ma\u00df mit Kruegen zu ' + a + ' und ' + b + ')';
+        var ak = this.aktion({ text: 'mit den Kruegen genau ' + n + ' Mass abmessen', art: 'abmessen', raum: g.raum, ding: mb.id,
+            braucht: ['hat:' + kl.id, 'hat:' + gr.id, 'wasser:' + g.raum], gibt: ['hat:' + g.id], kosten: w.length });
+        ak.loesung = w; ak.kruege = { a: kl.id, b: gr.id }; ak.hahn = this.fixtur['hahn:' + g.raum];
         return true;
     };
 
@@ -2521,15 +2610,23 @@ var Generator = (function () {
             for (j = 0; j < W.woerter.length; j++) if (buchstabenVon(W.woerter[j]) === buchstabenVon(W.woerter[i])) gleich++;
             if (gleich === 1 && !this.fixtur['wort:' + W.woerter[i]]) eindeutig.push(W.woerter[i]);
         }
-        var x = this.r.zahl(), form = x < 0.4 ? 'chiffre' : x < 0.7 ? 'anagramm' : 'anfang', T, wort, text, fx = this.fixtur;
-        var reihe = form === 'chiffre' ? ['chiffre', 'anagramm', 'anfang'] : form === 'anagramm' ? ['anagramm', 'anfang', 'chiffre'] : ['anfang', 'chiffre', 'anagramm'];
+        var x = this.r.zahl(), form = x < 0.3 ? 'chiffre' : x < 0.55 ? 'anagramm' : x < 0.75 ? 'anfang' : 'raetsel', T, wort, text, fx = this.fixtur;
+        var alle = ['chiffre', 'anagramm', 'anfang', 'raetsel'], reihe = alle.slice(alle.indexOf(form)).concat(alle.slice(0, alle.indexOf(form)));
         reihe = reihe.filter(function (f) { return !fx['wortform:' + f]; });
         if (!reihe.length) throw new Fehlschlag('kein Wortraetsel mehr frei');
         form = reihe[0]; T = W[form];
         this.fixtur['wortform:' + form] = true;
         wort = this.r.waehle(eindeutig);
+        if (form === 'raetsel') {
+            // Raetselfrage (R100): eine Frage aus dem Vorrat, ihre Antwort ist das Wort
+            var frage = this.r.waehle(W.fragen);
+            wort = frage[0];
+            text = T.b.replace('{frage}', frage[1]);
+        }
         this.fixtur['wort:' + wort] = true;
-        if (form === 'chiffre') {
+        if (form === 'raetsel') {
+            // Text steht schon
+        } else if (form === 'chiffre') {
             var n = 1 + this.r.bis(5), hinten = this.p.stufe >= 3, kodiere = function (w) { var v = verschiebe(w, n); return hinten ? umgedreht(v) : v; };
             text = T.b.replace('{geheim}', kodiere(wort));
             if (this.p.stufe === 1) text += ' ' + T.verschiebung.replace('{n}', String(n));
@@ -3086,7 +3183,7 @@ var Protokoll = (function () {
         var gt = [], j;
         for (j = 0; j < (s.gruppen || []).length; j++) gt.push(Katalog.ZEICHEN[s.gruppen[j].zeichen][0] + ' ' + s.code.substr(s.gruppen[j].von, s.gruppen[j].laenge));
         for (j = 0; j < (s.legende || []).length; j++) gt.push(Katalog.ZEICHEN[s.legende[j].zeichen][0] + ' ' + s.legende[j].ziffer);
-        var form = { symbol: ', Symbolschl\u00fcssel', rechnung: ', Rechenbild', raten: ', nur zu erraten, mit R\u00fcckmeldung', logik: ', Logikgitter', melodie: ', als Folge an Klangst\u00e4ben', folge: ', Zahlenreihen', handbuch: ', Handbuch und Ger\u00e4t', chiffre: ', Geheimschrift', anagramm: ', Anagramm', anfang: ', Anfangsbuchstaben' }[s.form] || '';
+        var form = { symbol: ', Symbolschl\u00fcssel', rechnung: ', Rechenbild', raten: ', nur zu erraten, mit R\u00fcckmeldung', logik: ', Logikgitter', melodie: ', als Folge an Klangst\u00e4ben', folge: ', Zahlenreihen', handbuch: ', Handbuch und Ger\u00e4t', chiffre: ', Geheimschrift', anagramm: ', Anagramm', anfang: ', Anfangsbuchstaben', raetsel: ', R\u00e4tselfrage' }[s.form] || '';
         return s.name + (s.code ? ' (Code ' + s.code + form + (gt.length ? (s.form === 'teile' || !s.form ? ', aus Teilen: ' : ', Zeichen: ') + gt.join(' \u00b7 ') : '') + ')' : '');
     }
 
@@ -3319,7 +3416,8 @@ var Spiel = (function () {
     }
 
     // Was man einem Gegenstand ansieht: Worte statt Eigenschaften und Stufen
-    function beschreibung(d) {
+    function beschreibung(d, s) {
+        if (d.vorlage === 'krug' && s) return d.b + ' ' + (s.krug && s.krug[d.id] ? KAT.KRUEGE.stand.replace('{x}', String(s.krug[d.id])) : KAT.KRUEGE.leer);
         if (d.b) return d.b;                    // Pergamentfetzen tragen ihren Text selbst (Teil eines Codes)
         if (d.vorlage === 'schluessel' && KAT.SCHLUESSEL.b) return KAT.SCHLUESSEL.b;
         var g = KAT.GEGENSTAENDE[d.vorlage];
@@ -3465,7 +3563,8 @@ var Spiel = (function () {
     function losungIn(s, nr, text) {
         var l = s.partie.aktionen, i, t = ' ' + String(text || '').toUpperCase().replace(/[^A-Z]+/g, ' ') + ' ';
         for (i = 0; i < l.length; i++) {
-            if (l[i].art !== 'losung' || l[i].raum !== s.raum[nr] || erledigt(s, l[i])) continue;
+            // erst wenn jemand das Pergament gelesen hat (braucht losung:): sonst oeffnete, wer alle Burgwoerter in den Chat schreibt
+            if (l[i].art !== 'losung' || l[i].raum !== s.raum[nr] || erledigt(s, l[i]) || !brauchtErfuellt(s, l[i])) continue;
             if (t.indexOf(' ' + l[i].wort + ' ') >= 0) return l[i];
         }
         return null;
@@ -3483,6 +3582,36 @@ var Spiel = (function () {
         aus = aus.concat(ereignisse(s, nr, null));       // ein freigegebenes Pergament liest, wer es nimmt
         s.log = s.log.concat(aus);
         return aus;
+    }
+
+    // Kruege umfuellen (R18): Fuellen am Hahn (wenn Wasser laeuft), Umgiessen in den anderen Krug, Ausgiessen ins
+    // Messbecken: genau die Kerbe oeffnet die Klappe, sonst versickert es (wie Ausleeren)
+    function kruege(s, d, items, nr) {
+        var K = KAT.KRUEGE, krug = null, i;
+        for (i = 0; i < items.length; i++) if (items[i].vorlage === 'krug') krug = items[i];
+        if (!s.krug) s.krug = {};
+        var x = s.krug[krug.id] || 0;
+        if (d.vorlage === 'wasser') {
+            if (!s.f['wasser:' + d.raum]) return [m(K.ohneWasser)];
+            s.krug[krug.id] = krug.fasst;
+            return [m(K.gefuellt.replace('{was}', akk(krug)))];
+        }
+        if (d.vorlage === 'krug' && d.id !== krug.id) {
+            var y = s.krug[d.id] || 0, menge = Math.min(x, d.fasst - y);
+            s.krug[krug.id] = x - menge; s.krug[d.id] = y + menge;
+            return [m(K.umgegossen.replace('{stand}', gross(nom(d)) + ': ' + (y + menge) + ' Ma\u00df, ' + nom(krug) + ': ' + (x - menge) + ' Ma\u00df.'))];
+        }
+        if (d.vorlage === 'messbecken') {
+            s.krug[krug.id] = 0;
+            var a = aktionenAn(s, d.id, ['abmessen'])[0];
+            if (!a || erledigt(s, a)) return [m(K.versickert.replace('{n}', String(d.mass)))];
+            if (x !== d.mass) return [m(K.versickert.replace('{n}', String(d.mass)))];
+            var sp = sperre(s, a, nr, 1);
+            if (sp) return [sp];
+            fuehreAus(s, a, null);
+            return [m(K.treffer.replace('{was}', nom(s.partie.dinge[a.gibt[0].slice(4)])) + ' Du nimmst ' + akk(s.partie.dinge[a.gibt[0].slice(4)]) + ' an dich.')];
+        }
+        return [m('Damit l\u00e4sst sich hier nichts anfangen.')];
     }
 
     function itemsAus(s, ids, nr) {
@@ -3604,7 +3733,8 @@ var Spiel = (function () {
                 }
                 else if (rg.art === 'zahl' && rg.takt) text += ' ' + KAT.KLANG.takt;          // R28: mitzaehlen statt ablesen
                 else if (rg.art === 'zahl') text += ' Die Ziffern: ' + rg.code.split('').join(' ') + '.';
-                if (rg.art === 'behaelter' || rg.art === 'traeger' || rg.art === 'werkzeug') text += ' Du nimmst es an dich.';
+                // wer es auffaengt, nimmt es: mit Namen, denn "es" passt nicht zu jedem Gegenstand
+                if (rg.art === 'behaelter' || rg.art === 'traeger' || rg.art === 'werkzeug') text += ' Du nimmst ' + akk(rg.ziel ? s.partie.dinge[rg.ziel] : el) + ' an dich.';
                 if (rg.art === 'richtung') text += ' Die Stelle ist jetzt sichtbar.';
                 aus.push(m(text, 'ereignis', rg.privat && s.partie.spieler > 1 ? rg.privat : null));
                 aus = aus.concat(privat);
@@ -3685,6 +3815,7 @@ var Spiel = (function () {
         if (d.vorlage === 'zaehl') return KAT.ZAEHL[d.modell].b + ' ' + d.zeichenText;
         if (d.vorlage === 'gedenktafel') return d.b + ' ' + d.teilText;
         if (d.vorlage === 'standpunkt') return d.b;
+        if (d.vorlage === 'messbecken') return d.b;
         if (d.vorlage === 'waechter') return (KAT.WACHE[d.modell === 'gemaelde' ? 'bild' : 'buch']).b + (aktionenAn(s, d.id, ['losung']).some(function (a) { return erledigt(s, a); }) ? ' ' + KAT.WACHE.schon : '');
         if (d.vorlage === 'inschrift') {
             for (i = 0; i < s.partie.aktionen.length; i++) {
@@ -3872,7 +4003,7 @@ var Spiel = (function () {
                 }
                 if (d.vorlage === 'durchreiche') { aus.push(m(d.einwurf ? KAT.DURCHREICHE.leer : KAT.DURCHREICHE.falsch)); break; }
                 if (d.vorlage === 'hebelpaar') { aus = aus.concat(kette(s, d, nr, null)); break; }
-                if (d.vorlage === 'hausordnung') { aus.push(m(ansehenText(s, d))); break; }
+                if (d.vorlage === 'hausordnung' || d.vorlage === 'messbecken') { aus.push(m(ansehenText(s, d))); break; }
                 var getan = false, l = aktionenAn(s, d.id, ['bedienen', 'oeffnen', 'schalter', 'durchsuchen']);
                 for (i = 0; i < l.length; i++) {
                     a = l[i];
@@ -3927,6 +4058,7 @@ var Spiel = (function () {
 
             case 'benutzen':
                 if (d.vorlage === 'durchreiche') { aus = aus.concat(durchreichen(s, d, b.mit, nr)); break; }
+                if (itemsAus(s, b.mit, nr).some(function (x) { return x.vorlage === 'krug'; })) { aus = aus.concat(kruege(s, d, itemsAus(s, b.mit, nr), nr)); break; }
                 if (d.vorlage === 'hebelpaar') { aus = aus.concat(kette(s, d, nr, itemsAus(s, b.mit, nr))); break; }
                 if (d.vorlage === 'hausordnung') { aus = aus.concat(einsetzen(s, d, nr, itemsAus(s, b.mit, nr))); break; }
                 var items = itemsAus(s, b.mit, nr), versucht = false, erfolg = false, grund = null;
@@ -4044,7 +4176,8 @@ var Spiel = (function () {
         for (i = 1; i <= s.partie.spieler; i++) {
             if (i === nr || !s.raum[i] || s.raum[i] === s.raum[nr] || nebenDran[s.raum[i]]) continue;
             nebenDran[s.raum[i]] = true;
-            aus = aus.concat(ereignisse(s, i, null));
+            // was dort geschieht, erfaehrt der Spieler dort, nicht der Handelnde hier
+            aus = aus.concat(ereignisse(s, i, null).map(function (x) { if (!x.an) x.an = i; return x; }));
             verteile(s, i);
         }
         if (b.art !== 'gehen') aus = aus.concat(naechsteVorfuehrung(s, nr));
@@ -4131,14 +4264,16 @@ var Spiel = (function () {
                 // gefunden: in der eigenen Tasche, bei einem anderen (dann nur der Name, zum Absprechen) oder am Boden
                 var w0 = s.wer[d.id];
                 if (w0 === nr) {
-                    var eintragG = { id: d.id, name: d.name, b: beschreibung(d), code: !!(d.e && d.e.schluessel) };
+                    var eintragG = { id: d.id, name: d.name, b: beschreibung(d, s), code: !!(d.e && d.e.schluessel) };
                     for (k = 0; k < s.partie.aktionen.length; k++) if (s.partie.aktionen[k].art === 'verwandeln' && s.partie.aktionen[k].ding === d.id) eintragG.verwandeln = s.partie.aktionen[k].verb;
+                    if (d.vorlage === 'krug') eintragG.krug = [(s.krug && s.krug[d.id]) || 0, d.fasst];       // R18: Fuellstand und Fassung in Mass
                     inventar.push(eintragG);
                 }
                 else if (typeof w0 === 'number') { if (!tragen[w0]) tragen[w0] = []; tragen[w0].push(d.name); }
                 else if (w0 && w0.raum === raum) {
                     var lg = { id: d.id, name: d.name, typ: d.typ, offen: false, code: false, liegt: { x: w0.x, z: w0.z } };
                     if (w0.an) lg.liegt.an = w0.an;                  // durchgereicht: liegt vor dieser Oeffnung
+                    if (d.vorlage === 'krug') lg.krug = [(s.krug && s.krug[d.id]) || 0, d.fasst];
                     dinge.push(lg);
                 }
                 continue;
@@ -4161,6 +4296,7 @@ var Spiel = (function () {
             var code = false, alleS = schloesserAlle(s.partie);
             for (k = 0; k < alleS.length; k++) if (alleS[k].id === d.id && alleS[k].code) code = true;
             var eintrag = { id: d.id, name: d.name, typ: d.typ, offen: offen, code: code };
+            if (d.vorlage === 'krug') eintrag.krug = [(s.krug && s.krug[d.id]) || 0, d.fasst];
             if (suchen) eintrag.suchen = true;
             if (d.verrueckt || d.klopft) eintrag.w = wirkungen(s, d, nr);       // R24: art verrueckt, an = steht am zweiten Platz; R26: art klopfen, an = es klopft
             if (d.typ === 'element') { eintrag.w = wirkungen(s, d, nr); if (s.f['waerme:' + d.id]) eintrag.warm = true; }
@@ -4205,6 +4341,7 @@ var Spiel = (function () {
             else if (v === 'gedenktafel') verb = 'Lesen';
             else if (v === 'standpunkt') verb = KAT.STANDPUNKT.verb;
             else if (v === 'waechter') verb = 'Ansehen';
+            else if (v === 'messbecken') verb = KAT.KRUEGE.becken.verb;
             else if (v === 'durchreiche') verb = d.einwurf ? KAT.DURCHREICHE[partie.durchreiche.richtung].verb : 'Ansehen';
             // nur gesetzte Felder: Das Partie-Ereignis muss unter der Groessengrenze von Knuddels bleiben
             aus[k] = { name: d.name, typ: d.typ, vorlage: v };
@@ -4212,6 +4349,7 @@ var Spiel = (function () {
             if (v === 'zwischentuer' && partie.durchgang && partie.durchgang.opfer) aus[k].modell = 'fallgitter';
             if (v === 'durchreiche') aus[k].modell = partie.durchreiche.richtung === 'beide' ? 'mauerloch' : (d.einwurf ? 'mauerschacht' : 'mauerschacht_ende');
             if (d.anzahl) aus[k].anzahl = d.anzahl;
+            if (d.fasst) aus[k].fasst = d.fasst;                     // Krug (R18): so viel Mass fasst er, die Oberflaeche zeigt ihn so gross
             if (d.verborgen) aus[k].verborgen = true;
             if (verb) aus[k].verb = verb;
             // Zaehlreihe: das Zeichen, das daran steht
@@ -4317,7 +4455,8 @@ if (typeof module !== 'undefined' && module.exports) { module.exports = Spiel; }
     }).join("");
     auswahl = auswahl.filter(function (id) { return s.inventar.some(function (g) { return g.id === id; }); });
     $("inv").innerHTML = s.inventar.length ? s.inventar.map(function (g) {
-      return '<button type="button" class="gegenstand' + (auswahl.indexOf(g.id) >= 0 ? " gewaehlt" : "") + '" data-g="' + g.id + '" aria-pressed="' + (auswahl.indexOf(g.id) >= 0) + '">' + esc(g.name) + (g.b ? "<small>" + esc(g.b) + "</small>" : "") + "</button>";
+      return '<button type="button" class="gegenstand' + (auswahl.indexOf(g.id) >= 0 ? " gewaehlt" : "") + '" data-g="' + g.id + '" aria-pressed="' + (auswahl.indexOf(g.id) >= 0) + '">' + esc(g.name) + (g.b ? "<small>" + esc(g.b) + "</small>" : "") + "</button>" +
+        (g.krug ? s.inventar.filter(function (o) { return o.krug && o.id !== g.id; }).map(function (o) { return '<button type="button" class="knopf" data-giess="' + g.id + '" data-in="' + o.id + '">' + esc(g.name) + " in: " + esc(o.name) + " gießen</button>"; }).join("") : "");
     }).join("") : '<span class="leer">Nichts.</span>';
     var d = gewaehlt ? s.dinge.filter(function (x) { return x.id === gewaehlt; })[0] : null;
     $("ziel").textContent = d ? "Gewählt: " + d.name + (auswahl.length ? ", mit " + auswahl.map(function (id) { return sitzung.partie.dinge[id].name; }).join(" + ") : "") : "Wähle etwas im Raum.";
@@ -4365,6 +4504,8 @@ if (typeof module !== 'undefined' && module.exports) { module.exports = Spiel; }
     zeichne();
   });
   $("inv").addEventListener("click", function (e) {
+    var gs = e.target.closest("[data-giess]");
+    if (gs) { tue({ art: "benutzen", ding: gs.getAttribute("data-in"), mit: [gs.getAttribute("data-giess")] }, gs.textContent); return; }
     var b = e.target.closest("[data-g]"); if (!b) return;
     var id = b.getAttribute("data-g"), i = auswahl.indexOf(id);
     if (i >= 0) auswahl.splice(i, 1); else auswahl.push(id);
