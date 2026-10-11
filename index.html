@@ -499,6 +499,24 @@ var Setting = (function () {
             { name: 'Gedenktafel', nom: 'die Gedenktafel', akk: 'die Gedenktafel', b: 'Eine Gedenktafel aus Stein. Die Namen darauf sind verblasst, gro\u00df lesbar ist nur noch eines:' },
             { name: 'Bauinschrift', nom: 'die Bauinschrift', akk: 'die Bauinschrift', b: 'Eine Steintafel, die der Baumeister in die Mauer setzen lie\u00df. Darauf steht:' }
         ],
+        // Lichtstrahl umlenken (R20): Unter der Decke haengen eine Blendlaterne, drehbare Spiegel und ein Kristall im Kaefig.
+        // namen: je Spiegel [Name, Nominativ, Akkusativ]; {spiegel} = "den ersten Drehspiegel, dann den dritten Drehspiegel"
+        strahl: {
+            quelle: { name: 'Blendlaterne', nom: 'die Blendlaterne', akk: 'die Blendlaterne', verb: 'Ansehen',
+                b: 'Eine eiserne Laterne mit geschliffener Linse h\u00e4ngt an einer Kette von der Decke. Sie brennt und wirft einen scharfen Lichtstrahl in den Raum.' },
+            spiegel: { verb: 'Drehen', b: 'Eine blanke Messingscheibe, die an einem Zapfen von der Decke h\u00e4ngt. Sie l\u00e4sst sich drehen.',
+                gedreht: 'Du drehst {was} eine Vierteldrehung weiter.',
+                namen: [['erster Drehspiegel', 'der erste Drehspiegel', 'den ersten Drehspiegel'], ['zweiter Drehspiegel', 'der zweite Drehspiegel', 'den zweiten Drehspiegel'],
+                    ['dritter Drehspiegel', 'der dritte Drehspiegel', 'den dritten Drehspiegel'], ['vierter Drehspiegel', 'der vierte Drehspiegel', 'den vierten Drehspiegel'],
+                    ['f\u00fcnfter Drehspiegel', 'der f\u00fcnfte Drehspiegel', 'den f\u00fcnften Drehspiegel']] },
+            kristall: { name: 'Kristallk\u00e4fig', nom: 'der Kristallk\u00e4fig', akk: 'den Kristallk\u00e4fig', verb: 'Ansehen',
+                b: 'In einem kleinen K\u00e4fig unter der Decke h\u00e4ngt ein faustgro\u00dfer Bergkristall. Unter dem K\u00e4fig sitzt eine Klappe ohne Griff.',
+                offen: 'Der Kristall gl\u00fcht im Licht. Die Klappe unter dem K\u00e4fig steht offen.' },
+            ohne: 'Der Strahl der Laterne trifft keinen Spiegel und verliert sich an der Wand.',
+            ueber: 'Der Strahl der Laterne trifft {spiegel} und {ende}.', dann: ', dann ',
+            ende: { wand: 'verliert sich an der Wand', kristall: 'f\u00e4llt in den Kristall', zurueck: 'f\u00e4llt auf die Laterne zur\u00fcck', kreis: 'l\u00e4uft im Kreis' },
+            treffer: 'Der Kristall gl\u00fcht auf, und die Klappe unter dem K\u00e4fig springt auf: {was}.'
+        },
         // Der richtige Standpunkt (R22): Farbkleckse im Raum ergeben nur von einer Stelle aus Ziffern. {zeichen} = "eine Krone",
         // {ziffern} = "der Ziffer 4" oder "den Ziffern 4 7"
         standpunkt: { name: 'Fu\u00dfspuren', nom: 'die Fu\u00dfspuren', akk: 'die Fu\u00dfspuren', verb: 'Hineinstellen',
@@ -1076,6 +1094,7 @@ var Katalog = (function () {
     // Logikgitter (R8): Zeichen brauchen bestimmte Artikel, die Saetze alle Arten des Generators
     if (!S.zifferJeKopf || S.zifferJeKopf.indexOf('{teile}') < 0) fehlt('zifferJeKopf');
     if (!S.gedenktafel || !S.gedenktafel.length) fehlt('gedenktafel');
+    if (!S.strahl || !S.strahl.quelle || !S.strahl.spiegel || !S.strahl.kristall || !S.strahl.ende) fehlt('strahl');
     if (!S.standpunkt) fehlt('standpunkt'); else uebernimm({}, S.standpunkt, ['name', 'nom', 'akk', 'verb', 'b', 'hier'], 'standpunkt');
     if (!S.kruege || !S.kruege.klein || !S.kruege.gross || !S.kruege.becken) fehlt('kruege');
     uebernimm({}, S.kruege, ['stand', 'leer', 'gefuellt', 'umgegossen', 'versickert', 'treffer', 'ohneWasser'], 'kruege');
@@ -1131,7 +1150,7 @@ var Katalog = (function () {
         version: 3, SETTING: S.id, ARTEN: ARTEN, AUSLOESER: AUSLOESER, ELEMENTE: ELEMENTE, GEGENSTAENDE: GEGENSTAENDE,
         EIGENSCHAFT_TEXT: EIGENSCHAFT_TEXT, ZU_WENIG: S.zuWenig, HINDERNISSE: HINDERNISSE, SCHLOESSER: SCHLOESSER, GEGENMITTEL: GEGENMITTEL,
         VERSTECKE: S.verstecke, LICHT: S.licht, WASSER: WASSER, SCHLUESSEL: S.schluessel, NOTIZ: S.notiz, STORIES: S.stories,
-        VERWANDLUNGEN: S.verwandlungen, ZAEHL: S.zaehl, LOGIK: S.logik, LUEGNER: S.luegner, HANDBUCH: S.handbuch, ZIFFER_JE_KOPF: S.zifferJeKopf, KLEIN: KLEIN, BEWEGLICH: BEWEGLICH, VERRUECKT: S.verrueckt, KLANG: S.klang, KLOPF_AUS: KLOPF_AUS, STAEBE: STAEBE, DURCHREICHE: S.durchreiche, HAUSORDNUNG: S.hausordnung, GEDENKTAFEL: S.gedenktafel, STANDPUNKT: S.standpunkt, WORT: S.wort, WACHE: S.wache, KRUEGE: S.kruege, FALLGITTER: FALLGITTER_K, ZEICHEN: S.zeichen, FETZEN: S.fetzen, UHR: S.uhr, ZWISCHENTUER: S.zwischentuer, TAFEL: S.tafel, INSCHRIFT: INSCHRIFT_K,
+        VERWANDLUNGEN: S.verwandlungen, ZAEHL: S.zaehl, LOGIK: S.logik, LUEGNER: S.luegner, HANDBUCH: S.handbuch, ZIFFER_JE_KOPF: S.zifferJeKopf, KLEIN: KLEIN, BEWEGLICH: BEWEGLICH, VERRUECKT: S.verrueckt, KLANG: S.klang, KLOPF_AUS: KLOPF_AUS, STAEBE: STAEBE, DURCHREICHE: S.durchreiche, HAUSORDNUNG: S.hausordnung, GEDENKTAFEL: S.gedenktafel, STANDPUNKT: S.standpunkt, STRAHL: S.strahl, WORT: S.wort, WACHE: S.wache, KRUEGE: S.kruege, FALLGITTER: FALLGITTER_K, ZEICHEN: S.zeichen, FETZEN: S.fetzen, UHR: S.uhr, ZWISCHENTUER: S.zwischentuer, TAFEL: S.tafel, INSCHRIFT: INSCHRIFT_K,
         SCHLOSSTEXT: S.schlosstext,
         HELL: S.hell, DUNKEL: S.dunkel
     };
@@ -1237,6 +1256,27 @@ var Katalog = (function () {
     for (i = 0; i < ALLE_STILE.length; i++) if (!fuer(ALLE_STILE[i]).maengel.length) ZULAESSIG.push(ALLE_STILE[i]);
     if (!ZULAESSIG.length) fehlt('ein zulaessiger Stil');
 
+    // Lichtstrahl ueber ein Gitter aus n mal n Feldern (R20). q = [x, z, dx, dz]: Feld der Laterne und wohin sie strahlt;
+    // k = [x, z]: Feld des Kristalls; sp = [[x, z, lage], ...]: Spiegel, Lage gerade wie "/", ungerade wie "\" (von oben
+    // gesehen, x nach rechts, z nach unten). Liefert, welche Spiegel der Strahl der Reihe nach trifft und wo er endet.
+    function strahlLauf(n, q, k, sp) {
+        var x = q[0], z = q[1], dx = q[2], dz = q[3], weg = [], i, t, schritte = 0;
+        while (schritte++ < 4 * n * n) {
+            x += dx; z += dz;
+            if (x < 0 || z < 0 || x >= n || z >= n) return { weg: weg, ende: 'wand', bei: [x, z] };
+            if (x === k[0] && z === k[1]) return { weg: weg, ende: 'kristall', bei: [x, z] };
+            if (x === q[0] && z === q[1]) return { weg: weg, ende: 'zurueck', bei: [x, z] };
+            for (i = 0; i < sp.length; i++) {
+                if (sp[i][0] !== x || sp[i][1] !== z) continue;
+                weg.push(i);
+                t = dx;
+                if (sp[i][2] % 2 === 0) { dx = -dz; dz = -t; } else { dx = dz; dz = t; }
+                break;
+            }
+        }
+        return { weg: weg, ende: 'kreis', bei: [x, z] };
+    }
+    BASIS.strahlLauf = strahlLauf;
     BASIS.fuer = fuer; BASIS.ALLE_STILE = ALLE_STILE; BASIS.STILE = ZULAESSIG; BASIS.MINDEST = MINDEST;
     return BASIS;
 })();
@@ -1924,7 +1964,7 @@ var Generator = (function () {
         g.raum = g.raum || this.raum();
         g.zone = this.zoneFuer(g.raum, opt);
         var arten = tiefe <= 0 ? ['frei'] : this.r.mischen(['frei', 'hindernis', 'hindernis', 'hindernis', 'behaelter', 'behaelter',
-            'traeger', 'richtung', 'richtung', 'zweitfach', 'luegner', 'hausordnung', 'verrueckt', 'klopfen', 'losung', 'kruege']);
+            'traeger', 'richtung', 'richtung', 'zweitfach', 'luegner', 'hausordnung', 'verrueckt', 'klopfen', 'losung', 'kruege', 'strahl']);
         var i;
         if (tiefe > 0 && arten[0] === 'frei' && this.r.chance(0.6)) arten.push(arten.shift());
         for (i = 0; i < arten.length; i++) {
@@ -2206,6 +2246,61 @@ var Generator = (function () {
         g.lage = 'verborgen in/bei ' + d.name + ' (erst nach dem Tausch an ' + H.akk + ')';
         this.aktion({ text: g.name + ' von ' + d.name + ' bekommen', art: 'ereignis', ausloeser: aus, raum: d.raum, ding: d.id, braucht: ['ordnung:' + rg.id].concat(bedarf),
             kennt: [rg.id], gibt: ['hat:' + g.id], sicher: aus !== 'beruehrung' });
+        return true;
+    };
+
+    // Lichtstrahl umlenken (R20): Unter der Decke haengt ein Lichtspiel auf einem Gitter aus STRAHL_N mal STRAHL_N Feldern:
+    // eine Blendlaterne am Rand, Drehspiegel, ein Kristall im Kaefig. Jeder Spiegel steht schraeg und laesst sich in
+    // Vierteldrehungen weiterdrehen. Faellt der Strahl in den Kristall, springt die Klappe unter dem Kaefig auf.
+    // Gebaut wird durch Probieren: Felder wuerfeln, bis der Strahl in einer Lage der Spiegel ueber mindestens zwei von
+    // ihnen in den Kristall faellt; dann eine Anfangslage, aus der es mindestens zwei Drehungen braucht. Die kuerzeste
+    // Folge liegt der Aktion bei (fuer die Treiber der Tests), der Pruefer rechnet mit ihrer Laenge.
+    var STRAHL_N = 4;
+    function strahlBau(r, zahl) {
+        var n = STRAHL_N, seite = r.bis(4), p = r.bis(n), q = seite === 0 ? [0, p, 1, 0] : seite === 1 ? [n - 1, p, -1, 0] : seite === 2 ? [p, 0, 0, 1] : [p, n - 1, 0, -1];
+        var frei = [], x, z, i, m;
+        for (z = 0; z < n; z++) for (x = 0; x < n; x++) if (x !== q[0] || z !== q[1]) frei.push([x, z]);
+        frei = r.mischen(frei);
+        var k = frei[0], sp = [];
+        for (i = 0; i < zahl; i++) sp.push([frei[1 + i][0], frei[1 + i][1], r.bis(2)]);
+        var lauf = Katalog.strahlLauf(n, q, k, sp), verschieden = {}, anzahl = 0;
+        if (lauf.ende !== 'kristall') return null;
+        for (i = 0; i < lauf.weg.length; i++) if (!verschieden[lauf.weg[i]]) { verschieden[lauf.weg[i]] = true; anzahl++; }
+        if (anzahl < 2) return null;
+        // Anfangslage: irgendeine, aus der der kuerzeste Weg zu einer treffenden Lage mindestens zwei Drehungen hat
+        var anfang = r.bis(1 << zahl), best = null, lage = [];
+        for (m = 0; m < (1 << zahl); m++) {
+            for (i = 0; i < zahl; i++) lage[i] = [sp[i][0], sp[i][1], ((anfang ^ m) >> i) & 1];
+            if (Katalog.strahlLauf(n, q, k, lage).ende !== 'kristall') continue;
+            var zuege = [];
+            for (i = 0; i < zahl; i++) if ((m >> i) & 1) zuege.push(i);
+            if (!best || zuege.length < best.length) best = zuege;
+        }
+        if (!best || best.length < 2) return null;
+        for (i = 0; i < zahl; i++) sp[i][2] = (anfang >> i) & 1;
+        return { n: n, quelle: q, kristall: k, spiegel: sp, loesung: best };
+    }
+    Bau.prototype.lege_strahl = function (g, tiefe, opt) {
+        var ST = this.K.STRAHL, i, bau = null;
+        if (!ST || this.fixtur.strahl || tiefe < 1 || !this.r.chance(0.4)) return false;
+        for (i = 0; i < 200 && !bau; i++) bau = strahlBau(this.r, this.p.stufe > 1 ? 4 : 3);
+        if (!bau) return false;
+        this.fixtur.strahl = true;
+        var q = this.ding('fixtur', ST.quelle.name, g.raum, { vorlage: 'strahlquelle', nom: ST.quelle.nom, akk: ST.quelle.akk, b: ST.quelle.b,
+            strahl: { n: bau.n, x: bau.quelle[0], z: bau.quelle[1], dx: bau.quelle[2], dz: bau.quelle[3] } });
+        var ids = [];
+        for (i = 0; i < bau.spiegel.length; i++) {
+            var nm = ST.spiegel.namen[i], sd = this.ding('fixtur', nm[0], g.raum, { vorlage: 'drehspiegel', nom: nm[1], akk: nm[2], b: ST.spiegel.b,
+                strahl: { x: bau.spiegel[i][0], z: bau.spiegel[i][1], lage: bau.spiegel[i][2] } });
+            ids.push(sd.id);
+        }
+        var kr = this.ding('fixtur', ST.kristall.name, g.raum, { vorlage: 'kristall', nom: ST.kristall.nom, akk: ST.kristall.akk, b: ST.kristall.b,
+            strahl: { x: bau.kristall[0], z: bau.kristall[1] } });
+        kr.zone = this.zoneFuer(g.raum, opt);
+        g.lage = 'hinter der Klappe unter ' + kr.name + ' (Lichtstrahl \u00fcber die Drehspiegel in den Kristall lenken)';
+        var ak = this.aktion({ text: 'den Lichtstrahl in den Kristall lenken', art: 'strahl', raum: g.raum, ding: kr.id, gibt: ['hat:' + g.id], kosten: bau.loesung.length, sicher: true });
+        ak.strahl = { n: bau.n, quelle: q.id, kristall: kr.id, spiegel: ids };
+        ak.loesung = bau.loesung.map(function (j) { return ids[j]; });
         return true;
     };
 
@@ -3584,6 +3679,38 @@ var Spiel = (function () {
         return aus;
     }
 
+    // Lichtstrahl (R20): wie die Spiegel gerade stehen und wohin der Strahl damit faellt
+    function strahlAktion(s) { for (var i = 0; i < s.partie.aktionen.length; i++) if (s.partie.aktionen[i].art === 'strahl') return s.partie.aktionen[i]; return null; }
+    function strahlLage(s, id) { return (s.partie.dinge[id].strahl.lage + ((s.spiegel && s.spiegel[id]) || 0)) % 2; }
+    function strahlStand(s, a) {
+        var D = s.partie.dinge, q = D[a.strahl.quelle].strahl, k = D[a.strahl.kristall].strahl, sp = [], i;
+        for (i = 0; i < a.strahl.spiegel.length; i++) { var d = D[a.strahl.spiegel[i]].strahl; sp.push([d.x, d.z, strahlLage(s, a.strahl.spiegel[i])]); }
+        return Katalog.strahlLauf(a.strahl.n, [q.x, q.z, q.dx, q.dz], [k.x, k.z], sp);
+    }
+    function strahlText(s, a) {
+        var T = KAT.STRAHL, lauf = strahlStand(s, a), namen = [], i;
+        if (!lauf.weg.length && lauf.ende === 'wand') return T.ohne;
+        for (i = 0; i < lauf.weg.length; i++) namen.push(akk(s.partie.dinge[a.strahl.spiegel[lauf.weg[i]]]));
+        if (!namen.length) return T.ueber.replace(' {spiegel} und', '').replace('trifft', '').replace('  ', ' ').replace('{ende}', T.ende[lauf.ende]);
+        return T.ueber.replace('{spiegel}', namen.join(T.dann)).replace('{ende}', T.ende[lauf.ende]);
+    }
+    // einen Spiegel weiterdrehen; faellt der Strahl danach in den Kristall, springt die Klappe auf
+    function dreheSpiegel(s, d, nr) {
+        var a = strahlAktion(s), T = KAT.STRAHL;
+        if (!s.spiegel) s.spiegel = {};
+        s.spiegel[d.id] = ((s.spiegel[d.id] || 0) + 1) % 4;
+        var aus = [m(T.spiegel.gedreht.replace('{was}', akk(d)) + ' ' + strahlText(s, a))];
+        if (strahlStand(s, a).ende === 'kristall' && !erledigt(s, a)) {
+            var sp = sperre(s, a, nr, 1);
+            if (sp) { aus.push(sp); return aus; }
+            fuehreAus(s, a, null);
+            var g = s.partie.dinge[a.gibt[0].slice(4)];
+            aus.push(m(T.treffer.replace('{was}', nom(g)), 'erfolg'));
+            aus.push(m('Du nimmst ' + akk(g) + ' an dich.', 'erzaehler', nr));
+        }
+        return aus;
+    }
+
     // Kruege umfuellen (R18): Fuellen am Hahn (wenn Wasser laeuft), Umgiessen in den anderen Krug, Ausgiessen ins
     // Messbecken: genau die Kerbe oeffnet die Klappe, sonst versickert es (wie Ausleeren)
     function kruege(s, d, items, nr) {
@@ -3815,6 +3942,8 @@ var Spiel = (function () {
         if (d.vorlage === 'zaehl') return KAT.ZAEHL[d.modell].b + ' ' + d.zeichenText;
         if (d.vorlage === 'gedenktafel') return d.b + ' ' + d.teilText;
         if (d.vorlage === 'standpunkt') return d.b;
+        if (d.vorlage === 'strahlquelle' || d.vorlage === 'drehspiegel') return d.b + ' ' + strahlText(s, strahlAktion(s));
+        if (d.vorlage === 'kristall') return erledigt(s, strahlAktion(s)) ? KAT.STRAHL.kristall.offen : d.b + ' ' + strahlText(s, strahlAktion(s));
         if (d.vorlage === 'messbecken') return d.b;
         if (d.vorlage === 'waechter') return (KAT.WACHE[d.modell === 'gemaelde' ? 'bild' : 'buch']).b + (aktionenAn(s, d.id, ['losung']).some(function (a) { return erledigt(s, a); }) ? ' ' + KAT.WACHE.schon : '');
         if (d.vorlage === 'inschrift') {
@@ -3994,6 +4123,8 @@ var Spiel = (function () {
                     for (i = 0; i < l.length; i++) fuehreAus(s, l[i], null);
                     break;
                 }
+                if (d.vorlage === 'drehspiegel') { aus = aus.concat(dreheSpiegel(s, d, nr)); break; }
+                if (d.vorlage === 'strahlquelle' || d.vorlage === 'kristall') { aus.push(m(ansehenText(s, d))); break; }
                 // Standpunkt (R22): Die Oberflaeche schickt das erst, wenn man in den Fussspuren steht und hinsieht
                 if (d.vorlage === 'standpunkt') {
                     aus.push(m(d.hier));
@@ -4292,11 +4423,13 @@ var Spiel = (function () {
                 }
             }
             if (d.vorlage === 'zwischentuer') offen = !!s.f['offen:' + s.partie.durchgang.nach];
+            if (d.vorlage === 'kristall') offen = erledigt(s, strahlAktion(s));
             if (d.vorlage === 'waechter') offen = aktionenAn(s, d.id, ['losung']).some(function (a) { return erledigt(s, a); });   // hat seine Losung gehoert: die Ansicht zeigt ihn offen
             var code = false, alleS = schloesserAlle(s.partie);
             for (k = 0; k < alleS.length; k++) if (alleS[k].id === d.id && alleS[k].code) code = true;
             var eintrag = { id: d.id, name: d.name, typ: d.typ, offen: offen, code: code };
             if (d.vorlage === 'krug') eintrag.krug = [(s.krug && s.krug[d.id]) || 0, d.fasst];
+            if (d.vorlage === 'drehspiegel') eintrag.dreh = (s.spiegel && s.spiegel[d.id]) || 0;      // R20: Vierteldrehungen seit Beginn
             if (suchen) eintrag.suchen = true;
             if (d.verrueckt || d.klopft) eintrag.w = wirkungen(s, d, nr);       // R24: art verrueckt, an = steht am zweiten Platz; R26: art klopfen, an = es klopft
             if (d.typ === 'element') { eintrag.w = wirkungen(s, d, nr); if (s.f['waerme:' + d.id]) eintrag.warm = true; }
@@ -4340,6 +4473,8 @@ var Spiel = (function () {
             else if (v === 'hausordnung') verb = KAT.HAUSORDNUNG.verb;
             else if (v === 'gedenktafel') verb = 'Lesen';
             else if (v === 'standpunkt') verb = KAT.STANDPUNKT.verb;
+            else if (v === 'drehspiegel') verb = KAT.STRAHL.spiegel.verb;
+            else if (v === 'strahlquelle' || v === 'kristall') verb = 'Ansehen';
             else if (v === 'waechter') verb = 'Ansehen';
             else if (v === 'messbecken') verb = KAT.KRUEGE.becken.verb;
             else if (v === 'durchreiche') verb = d.einwurf ? KAT.DURCHREICHE[partie.durchreiche.richtung].verb : 'Ansehen';
@@ -4349,6 +4484,7 @@ var Spiel = (function () {
             if (v === 'zwischentuer' && partie.durchgang && partie.durchgang.opfer) aus[k].modell = 'fallgitter';
             if (v === 'durchreiche') aus[k].modell = partie.durchreiche.richtung === 'beide' ? 'mauerloch' : (d.einwurf ? 'mauerschacht' : 'mauerschacht_ende');
             if (d.anzahl) aus[k].anzahl = d.anzahl;
+            if (d.strahl) aus[k].strahl = v === 'strahlquelle' ? [d.strahl.x, d.strahl.z, d.strahl.dx, d.strahl.dz, d.strahl.n] : v === 'drehspiegel' ? [d.strahl.x, d.strahl.z, d.strahl.lage] : [d.strahl.x, d.strahl.z];   // R20: Feld im Gitter
             if (d.fasst) aus[k].fasst = d.fasst;                     // Krug (R18): so viel Mass fasst er, die Oberflaeche zeigt ihn so gross
             if (d.verborgen) aus[k].verborgen = true;
             if (verb) aus[k].verb = verb;
