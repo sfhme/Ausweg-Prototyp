@@ -703,7 +703,9 @@ var Setting = (function () {
                 alt: ['zu zweit, je einer in jedem Raum, im selben Augenblick ziehen', 'eine Kette mit etwas Langem verkeilen und dann die andere ziehen',
                     'eine Kette mit etwas Schwerem beschweren und dann die andere ziehen'],
                 allein: 'Die Kette gibt nach und gleitet langsam wieder hoch. Die im Nebenraum m\u00fcsste im selben Augenblick unten sein.',
-                geklemmt: 'Du verkeilst die Kette, sie bleibt unten.', unten: 'Beide Ketten sind unten. Durch die Mauer rastet ein Riegel aus.' },
+                geklemmt: 'Du verkeilst die Kette, sie bleibt unten.', unten: 'Beide Ketten sind unten. Durch die Mauer rastet ein Riegel aus.',
+                nichtFest: 'Damit l\u00e4sst sich die Kette nicht festmachen.',
+                aktionBeide: 'Zugketten in beiden R\u00e4umen zugleich ziehen', aktionKeil: 'Zugkette verkeilen', aktionAndere: 'die andere Zugkette ziehen' },
             // Waage aus Menschen (R85): das Schloss ist die linke der beiden Trittplatten
             waage: { name: 'linke Trittplatte', nom: 'die linke Trittplatte', akk: 'die linke Trittplatte', verb: 'Draufstellen' }
         },
@@ -747,16 +749,36 @@ var Setting = (function () {
                     paket: { name: 'mit Draht verschn\u00fcrte Kiste', nom: 'die mit Draht verschn\u00fcrte Kiste', akk: 'die mit Draht verschn\u00fcrte Kiste',
                         zweit: ['zweite mit Draht verschn\u00fcrte Kiste', 'die zweite mit Draht verschn\u00fcrte Kiste', 'die zweite mit Draht verschn\u00fcrte Kiste'] },
                     schrank_oben: { name: 'hohes Wandbord', nom: 'das hohe Wandbord', akk: 'das hohe Wandbord',
-                        zweit: ['zweites hohes Wandbord', 'das zweite hohe Wandbord', 'das zweite hohe Wandbord'] }
+                        zweit: ['zweites hohes Wandbord', 'das zweite hohe Wandbord', 'das zweite hohe Wandbord'] },
+                    // KayKit hat keine Kette, aber einen Wandhebel: Hier zieht man Hebel
+                    doppelhebel: { name: 'zwei Hebel, weit auseinander', nom: 'die zwei Hebel', akk: 'die zwei Hebel', verb: 'Hebel ziehen',
+                        ersetze: [['die erste Kette mit einem Seil festbinden und beim Ziehen der zweiten mitziehen', 'den ersten Hebel mit einem Seil unten festbinden und dann den zweiten ziehen'],
+                            ['die erste Kette mit etwas Langem unten verkeilen und dann die zweite ziehen', 'den ersten Hebel mit etwas Langem unten verkeilen und dann den zweiten ziehen']] },
+                    hebelpaar: { name: 'Wandhebel', nom: 'der Wandhebel', akk: 'den Wandhebel', verb: 'Hebel ziehen',
+                        b: 'Ein eiserner Hebel an der Wand. Im Nebenraum sitzt ein zweiter, und ein Riegel verbindet sie durch die Mauer.',
+                        allein: 'Der Hebel gibt nach und gleitet langsam wieder hoch. Der im Nebenraum m\u00fcsste im selben Augenblick unten sein.',
+                        geklemmt: 'Du verkeilst den Hebel, er bleibt unten.', unten: 'Beide Hebel sind unten. Durch die Mauer rastet ein Riegel aus.',
+                        nichtFest: 'Damit l\u00e4sst sich der Hebel nicht festmachen.',
+                        aktionBeide: 'Hebel in beiden R\u00e4umen zugleich ziehen', aktionKeil: 'Hebel verkeilen', aktionAndere: 'den anderen Hebel ziehen',
+                        ersetze: [['eine Kette mit etwas Langem verkeilen und dann die andere ziehen', 'einen Hebel mit etwas Langem verkeilen und dann den anderen ziehen'],
+                            ['eine Kette mit etwas Schwerem beschweren und dann die andere ziehen', 'einen Hebel mit etwas Schwerem beschweren und dann den anderen ziehen']] }
                 },
                 block: {
+                    // am Fallgitter haelt man hier den Hebel unten
+                    FALLGITTER: { verb: 'Hebel halten',
+                        halten: 'Du h\u00e4ltst den Hebel mit aller Kraft unten. Das Gitter bleibt oben, solange du nicht losl\u00e4sst. Die anderen m\u00fcssen ohne dich weiter.',
+                        bleibt: 'Du h\u00e4ltst den Hebel. L\u00e4sst du los, f\u00e4llt das Gitter. Du bleibst hier.',
+                        dank: 'Du hast den Hebel gehalten, bis alle durch waren. Ohne dich w\u00e4ren sie nicht drau\u00dfen.',
+                        wer: 'Das Gitter h\u00e4lt nur, solange jemand den Hebel unten h\u00e4lt. Einer muss bleiben. Wer, entscheidet ihr; wer sich nicht einigt, zieht Lose.',
+                        los: 'Ihr zieht H\u00f6lzchen. Das kurze hat {wer}. Bleiben muss trotzdem nur, wer selbst an den Hebel geht.',
+                        alt: [{ h: 2, opfer: true, text: 'einer h\u00e4lt den Hebel, die anderen gehen durch' }, { b: { reissfest: 1 }, text: 'den Hebel mit einem Seil unten festbinden' }] },
                     KRUEGE: { becken: { name: 'Messzuber', nom: 'der Messzuber', akk: 'den Messzuber',
                         b: 'Ein Zuber mit einer Kerbe innen und der Inschrift am Rand: genau {n} Ma\u00df. Unten sitzt eine Klappe.' },
                         versickert: 'Das Wasser versickert durch einen Spalt im Zuber. Es waren nicht genau {n} Ma\u00df.' }
                 },
                 raum: {
                     stand: { schrank_oben: 'wand', paket: 'tisch' },
-                    wandhoehe: { schrank_oben: 2.25 },
+                    wandhoehe: { schrank_oben: 2.25, doppelhebel: 1.05, hebelpaar: 1.05 },
                     grund: { becken: [0.62, 0.4], puppe: [0.55, 0.3] }
                 }
             },
@@ -1143,7 +1165,7 @@ var Katalog = (function () {
         uebernimm(SCHLOESSER[k], S.schloesser[k], ['name', 'nom', 'akk', 'verb'], 'schloesser.' + k);
         if (SCHLOESSER[k].alt) alternativen(SCHLOESSER[k].alt, S.schloesser[k].alt, 'schloesser.' + k);
         if (S.schloesser[k].offen) SCHLOESSER[k].offen = S.schloesser[k].offen;
-        if (k === 'hebelpaar') uebernimm(SCHLOESSER[k], S.schloesser[k], ['b', 'allein', 'geklemmt', 'unten'], 'schloesser.hebelpaar');
+        if (k === 'hebelpaar') uebernimm(SCHLOESSER[k], S.schloesser[k], ['b', 'allein', 'geklemmt', 'unten', 'nichtFest', 'aktionBeide', 'aktionKeil', 'aktionAndere'], 'schloesser.hebelpaar');
     }
     for (k in GEGENMITTEL) if (GEGENMITTEL.hasOwnProperty(k) && GEGENMITTEL[k]) alternativen(GEGENMITTEL[k].alt, S.gegenmittel[k], 'gegenmittel.' + k);
     var WASSER = { name: S.wasser.name, nom: S.wasser.nom, akk: S.wasser.akk, verb: S.wasser.verb, tun: S.wasser.tun,
@@ -3092,9 +3114,9 @@ var Generator = (function () {
             pk.zone = false;               // nie im Bereich einer Bedrohung: beim Ziehen zugleich prueft der Pruefer nur das Schloss
             var mz = this.anforderung(s.name, [s.alt[0]]), mk = this.anforderung(s.name + ' verkeilen', [s.alt[1], s.alt[2]]);
             if (this.spieler <= 2 || this.r.chance(this.cfg.zweiterWeg)) this.liefere(this.r.waehle([s.alt[1], s.alt[2]]).b, tiefe - 1, {});
-            this.aktion({ text: 'Zugketten in beiden R\u00e4umen zugleich ziehen', art: 'benutzen', raum: tuerRaum, ding: sd.id, mittel: mz, gibt: ['schloss:' + sd.id] });
-            this.aktion({ text: 'Zugkette verkeilen', art: 'benutzen', raum: tuerRaum, ding: sd.id, mittel: mk, gibt: ['kette_fest:' + sd.id] });
-            this.aktion({ text: 'die andere Zugkette ziehen', art: 'bedienen', raum: drueben, ding: pk.id, braucht: ['kette_fest:' + sd.id], gibt: ['schloss:' + sd.id] });
+            this.aktion({ text: this.K.SCHLOESSER.hebelpaar.aktionBeide, art: 'benutzen', raum: tuerRaum, ding: sd.id, mittel: mz, gibt: ['schloss:' + sd.id] });
+            this.aktion({ text: this.K.SCHLOESSER.hebelpaar.aktionKeil, art: 'benutzen', raum: tuerRaum, ding: sd.id, mittel: mk, gibt: ['kette_fest:' + sd.id] });
+            this.aktion({ text: this.K.SCHLOESSER.hebelpaar.aktionAndere, art: 'bedienen', raum: drueben, ding: pk.id, braucht: ['kette_fest:' + sd.id], gibt: ['schloss:' + sd.id] });
             sd.zone = this.zoneFuer(tuerRaum, {});
             return { id: sd.id, vorlage: art, name: s.name };
         }
@@ -3747,7 +3769,7 @@ var Spiel = (function () {
         };
         if (items && items.length) {
             var w = waehleAlternative(s, s.partie.anforderungen[keil.mittel], items, d.raum);
-            if (!w.alt) return [m(knapp(s.partie.anforderungen[keil.mittel], items) || 'Damit l\u00e4sst sich die Kette nicht festmachen.')];
+            if (!w.alt) return [m(knapp(s.partie.anforderungen[keil.mittel], items) || H.nichtFest)];
             var sp0 = sperre(s, keil, nr, 1);
             if (sp0) return [sp0];
             s.f['geklemmt:' + d.id] = true;
