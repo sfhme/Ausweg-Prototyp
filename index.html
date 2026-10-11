@@ -564,10 +564,10 @@ var Setting = (function () {
         },
         // Losung (R104): wer sie im Raum in den Chat schreibt, dem gibt das W\u00e4chterbild frei, was es verbirgt
         wache: {
-            bild: { name: 'leeres Bildnis des Burgvogts', nom: 'das leere Bildnis des Burgvogts', akk: 'das leere Bildnis des Burgvogts',
+            bild: { name: 'leeres Bildnis des Burgvogts', nom: 'das leere Bildnis des Burgvogts', akk: 'das leere Bildnis des Burgvogts', schrift: 'Wer die Losung nennt, dem \u00f6ffne ich.',
                 b: 'Ein schwerer Rahmen, die Leinwand darin ist leer, als w\u00e4re der Burgvogt herausgestiegen. Trotzdem f\u00fchlst du dich gemustert. Unter dem Rahmen steht: Wer die Losung nennt, dem \u00f6ffne ich.',
                 auf: 'Der Rahmen schwingt wie eine T\u00fcr zur Seite. Dahinter: {was}.' },
-            buch: { name: 'Buch der Wache', nom: 'das Buch der Wache', akk: 'das Buch der Wache',
+            buch: { name: 'Buch der Wache', nom: 'das Buch der Wache', akk: 'das Buch der Wache', schrift: 'Nenne die Losung, und ich gebe her, was ich h\u00fcte.',
                 b: 'Ein schweres Buch auf einem Pult. Es fl\u00fcstert: Nenne die Losung, und ich gebe her, was ich h\u00fcte.',
                 auf: 'Das Buch klappt auf. Zwischen den Seiten liegt: {was}.' },
             schon: 'Es hat seine Losung geh\u00f6rt.'
@@ -577,7 +577,7 @@ var Setting = (function () {
             klein: { name: 'kleiner Krug', nom: 'der kleine Krug', akk: 'den kleinen Krug', b: 'Ein Krug, an dem eingeritzt steht: {a} Ma\u00df.' },
             gross: { name: 'gro\u00dfer Krug', nom: 'der gro\u00dfe Krug', akk: 'den gro\u00dfen Krug', b: 'Ein Krug, an dem eingeritzt steht: {b} Ma\u00df.' },
             stand: 'Darin sind gerade {x} Ma\u00df.', leer: 'Er ist leer.',
-            becken: { name: 'Messkessel', nom: 'der Messkessel', akk: 'den Messkessel',
+            becken: { name: 'Messkessel', nom: 'der Messkessel', akk: 'den Messkessel', schrift: 'Genau {n} Ma\u00df.',
                 b: 'Ein Kessel mit einer Kerbe innen und der Inschrift am Rand: genau {n} Ma\u00df. Unten sitzt eine Klappe.', verb: 'Hineinsehen' },
             gefuellt: 'Du f\u00fcllst {was} bis zum Rand.', umgegossen: 'Du gie\u00dft um. {stand}', versickert: 'Das Wasser versickert durch einen Spalt im Kessel. Es waren nicht genau {n} Ma\u00df.',
             treffer: 'Das Wasser steht genau an der Kerbe. Die Klappe springt auf: {was}.', ohneWasser: 'Erst muss Wasser laufen.'
@@ -587,6 +587,7 @@ var Setting = (function () {
         waage: {
             links: { name: 'linke Trittplatte', nom: 'die linke Trittplatte', akk: 'die linke Trittplatte', dat: 'der linken Trittplatte' },
             rechts: { name: 'rechte Trittplatte', nom: 'die rechte Trittplatte', akk: 'die rechte Trittplatte', dat: 'der rechten Trittplatte' },
+            schrift: 'Jede Spur will das Gewicht eines Menschen, nicht mehr und nicht weniger.',
             b: 'Eine Steinplatte im Boden, die unter Gewicht nachgibt; daneben liegt eine zweite. Am Rand steht: Jede Spur will das Gewicht eines Menschen, nicht mehr und nicht weniger.',
             spuren: ['In diese Platte ist keine Fu\u00dfspur gemei\u00dfelt.', 'In diese Platte ist eine Fu\u00dfspur gemei\u00dfelt.',
                 'In diese Platte sind zwei Fu\u00dfspuren gemei\u00dfelt.', 'In diese Platte sind drei Fu\u00dfspuren gemei\u00dfelt.'],
@@ -598,7 +599,7 @@ var Setting = (function () {
             offen: 'Beide Platten rasten zugleich ein. An der T\u00fcr schnappt ein Riegel zur\u00fcck.', schon: 'Die Platten sind eingerastet.'
         },
         // Ertasten im Dunkeln (R29): Kerben, die man nur im Dunkeln f\u00fchlt; lang z\u00e4hlt f\u00fcnf, kurz eins
-        kerbstein: { name: 'Kerbstein', nom: 'der Kerbstein', akk: 'den Kerbstein', verb: 'Abtasten',
+        kerbstein: { name: 'Kerbstein', nom: 'der Kerbstein', akk: 'den Kerbstein', verb: 'Abtasten', schrift: 'Lang z\u00e4hlt f\u00fcnf, kurz eins.',
             b: 'Eine glatte Steintafel. Daneben ist eingeritzt: lang z\u00e4hlt f\u00fcnf, kurz eins. Zu sehen ist auf der Tafel nichts.',
             dunkel: 'Im Dunkeln sp\u00fcren deine Finger, was das Auge nicht sieht: {zeichen}, dazu {kerben}.',
             hell: 'Im Licht gl\u00e4nzt die Tafel nur, und die Finger finden nichts. Vielleicht im Dunkeln.',
@@ -3542,6 +3543,17 @@ var Spiel = (function () {
     function nom(d) { return d.nom || d.name; }
     function akk(d) { return d.akk || d.name; }
     function m(text, art, an) { var x = { text: text, art: art || 'erzaehler' }; if (an) x.an = an; return x; }
+    // Zeigen statt schreiben. Jede Meldung bleibt als Text vollstaendig (Seiten ohne Bild, Notizbuch, Tests); die Marken
+    // sagen der Oberflaeche mit Bild, was sie damit tut:
+    //   z  was die Meldung sagt, zeigt der Raum selbst (etwas geht auf, rastet ein, wird genommen, regt sich):
+    //      nicht ins Bild schreiben
+    //   w  dazu: Wissen, das ins Notizbuch gehoert (Beschreibung mit Spuren)
+    //   n  es ging nicht, und es gibt keinen Grund zu nennen: nur ruetteln, kein Text
+    //   l  was im Raum geschrieben steht oder aus der Meldung zu lesen bleibt (Pergament, Inschrift am Rand): nur das
+    //      zeigt die Oberflaeche, als Schrift
+    function zeigt(x) { x.z = 1; return x; }
+    function nein(x) { x.z = 1; x.n = 1; return x; }
+    function gelesen(x, schrift) { x.z = 1; x.l = schrift; return x; }
 
     // alle Schloesser der Partie: am Ausgang und (linear) an der Zwischentuer
     function schloesserAlle(p) { return p.schloesser || p.tuer.schloesser; }
@@ -3721,7 +3733,7 @@ var Spiel = (function () {
             if (sp) return [sp];
             var r = fuehreAus(s, a, alt);
             s.f['kette_fest:' + schloss.id] = true;          // offen: auch der Weg uebers Verkeilen ist damit erledigt
-            for (var k = 1; k <= s.partie.spieler; k++) if (s.raum[k] === d.raum || s.raum[k] === anderer.raum) r.push(m(H.unten, 'erfolg', k));
+            for (var k = 1; k <= s.partie.spieler; k++) if (s.raum[k] === d.raum || s.raum[k] === anderer.raum) r.push(zeigt(m(H.unten, 'erfolg', k)));
             return r;
         };
         if (items && items.length) {
@@ -3731,7 +3743,7 @@ var Spiel = (function () {
             if (sp0) return [sp0];
             s.f['geklemmt:' + d.id] = true;
             s.f['kette_fest:' + schloss.id] = true;
-            aus.push(m(H.geklemmt));
+            aus.push(zeigt(m(H.geklemmt)));
             if (s.zug[anderer.id] !== undefined && s.zeit - s.zug[anderer.id] <= KETTE_FENSTER) aus = aus.concat(oeffne(nachziehen, null));
             return aus;
         }
@@ -3756,7 +3768,7 @@ var Spiel = (function () {
             var sp = sperre(s, a, nr, 1);
             if (sp) return [sp];
             fuehreAus(s, a, null);
-            return [m(H.getauscht + ' ' + ordnungZeile(s, d) + '.')];
+            return [zeigt(m(H.getauscht + ' ' + ordnungZeile(s, d) + '.'))];
         }
         return [m(items.length ? H.passt : 'Nimm ein Pl\u00e4ttchen in die Hand, um es einzusetzen.')];
     }
@@ -3801,7 +3813,7 @@ var Spiel = (function () {
         var d = s.partie.dinge[a.ding], g = s.partie.dinge[a.gibt[0].slice(4)];
         fuehreAus(s, a, null);
         verteile(s, nr);
-        var aus = [m(KAT.WACHE[d.modell === 'gemaelde' ? 'bild' : 'buch'].auf.replace('{was}', nom(g)), 'erfolg'), m('Du steckst den Fund ein.', 'erzaehler', nr)];   // was aufgeht, sehen alle; wer es nimmt, nur der Sprecher
+        var aus = [zeigt(m(KAT.WACHE[d.modell === 'gemaelde' ? 'bild' : 'buch'].auf.replace('{was}', nom(g)), 'erfolg')), zeigt(m('Du steckst den Fund ein.', 'erzaehler', nr))];   // was aufgeht, sehen alle; wer es nimmt, nur der Sprecher
         aus = aus.concat(ereignisse(s, nr, null));       // ein freigegebenes Pergament liest, wer es nimmt
         s.log = s.log.concat(aus);
         return aus;
@@ -3827,14 +3839,14 @@ var Spiel = (function () {
         var a = strahlAktion(s), T = KAT.STRAHL;
         if (!s.spiegel) s.spiegel = {};
         s.spiegel[d.id] = ((s.spiegel[d.id] || 0) + 1) % 4;
-        var aus = [m(T.spiegel.gedreht.replace('{was}', akk(d)) + ' ' + strahlText(s, a))];
+        var aus = [zeigt(m(T.spiegel.gedreht.replace('{was}', akk(d)) + ' ' + strahlText(s, a)))];
         if (strahlStand(s, a).ende === 'kristall' && !erledigt(s, a)) {
             var sp = sperre(s, a, nr, 1);
             if (sp) { aus.push(sp); return aus; }
             fuehreAus(s, a, null);
             var g = s.partie.dinge[a.gibt[0].slice(4)];
-            aus.push(m(T.treffer.replace('{was}', nom(g)), 'erfolg'));
-            aus.push(m('Du nimmst ' + akk(g) + ' an dich.', 'erzaehler', nr));
+            aus.push(zeigt(m(T.treffer.replace('{was}', nom(g)), 'erfolg')));
+            aus.push(zeigt(m('Du nimmst ' + akk(g) + ' an dich.', 'erzaehler', nr)));
         }
         return aus;
     }
@@ -3849,12 +3861,12 @@ var Spiel = (function () {
         if (d.vorlage === 'wasser') {
             if (!s.f['wasser:' + d.raum]) return [m(K.ohneWasser)];
             s.krug[krug.id] = krug.fasst;
-            return [m(K.gefuellt.replace('{was}', akk(krug)))];
+            return [zeigt(m(K.gefuellt.replace('{was}', akk(krug))))];
         }
         if (d.vorlage === 'krug' && d.id !== krug.id) {
             var y = s.krug[d.id] || 0, menge = Math.min(x, d.fasst - y);
             s.krug[krug.id] = x - menge; s.krug[d.id] = y + menge;
-            return [m(K.umgegossen.replace('{stand}', gross(nom(d)) + ': ' + (y + menge) + ' Ma\u00df, ' + nom(krug) + ': ' + (x - menge) + ' Ma\u00df.'))];
+            return [zeigt(m(K.umgegossen.replace('{stand}', gross(nom(d)) + ': ' + (y + menge) + ' Ma\u00df, ' + nom(krug) + ': ' + (x - menge) + ' Ma\u00df.')))];
         }
         if (d.vorlage === 'messbecken') {
             s.krug[krug.id] = 0;
@@ -3864,9 +3876,9 @@ var Spiel = (function () {
             var sp = sperre(s, a, nr, 1);
             if (sp) return [sp];
             fuehreAus(s, a, null);
-            return [m(K.treffer.replace('{was}', nom(s.partie.dinge[a.gibt[0].slice(4)])) + ' Du nimmst ' + akk(s.partie.dinge[a.gibt[0].slice(4)]) + ' an dich.')];
+            return [zeigt(m(K.treffer.replace('{was}', nom(s.partie.dinge[a.gibt[0].slice(4)])) + ' Du nimmst ' + akk(s.partie.dinge[a.gibt[0].slice(4)]) + ' an dich.'))];
         }
-        return [m('Damit l\u00e4sst sich hier nichts anfangen.')];
+        return [nein(m('Damit l\u00e4sst sich hier nichts anfangen.'))];
     }
 
     // Ertasten im Dunkeln (R29): Nur wenn es im Raum dunkel ist, spuert man die Kerben
@@ -3903,28 +3915,29 @@ var Spiel = (function () {
     function trete(s, d, nr) {
         var W = KAT.WAAGE, T = W[d.seite];
         if (waageOffen(s, d)) return [m(W.schon)];
-        if (s.steht[nr] === d.id) { delete s.steht[nr]; return [m(W.ab.replace('{dat}', T.dat) + ' ' + waageStand(s, d))]; }
+        if (s.steht[nr] === d.id) { delete s.steht[nr]; return [zeigt(m(W.ab.replace('{dat}', T.dat) + ' ' + waageStand(s, d)))]; }
         s.steht[nr] = d.id;
-        return [m(W.auf.replace('{akk}', T.akk) + ' ' + waageStand(s, d))];
+        return [zeigt(m(W.auf.replace('{akk}', T.akk) + ' ' + waageStand(s, d)))];
     }
     function absteigen(s, nr) {
         var id = s.steht[nr], W = KAT.WAAGE;
         if (!id) return [m(W.keine, 'system')];
         delete s.steht[nr];
         var d = s.partie.dinge[id];
-        return [m(W.ab.replace('{dat}', W[d.seite].dat) + (waageOffen(s, d) ? '' : ' ' + waageStand(s, d)))];
+        return [zeigt(m(W.ab.replace('{dat}', W[d.seite].dat) + (waageOffen(s, d) ? '' : ' ' + waageStand(s, d))))];
     }
     function belaste(s, d, nr, items) {
-        var W = KAT.WAAGE, T = W[d.seite], t = [], i, gelegt = false;
+        var W = KAT.WAAGE, T = W[d.seite], t = [], i, gelegt = false, zuLeicht = false;
         if (!items.length) return trete(s, d, nr);
         if (waageOffen(s, d)) return [m(W.schon)];
         for (i = 0; i < items.length; i++) {
-            if (!schwerGenug(items[i])) { t.push(gross(W.leicht.replace('{was}', nom(items[i])))); continue; }
+            if (!schwerGenug(items[i])) { t.push(gross(W.leicht.replace('{was}', nom(items[i])))); zuLeicht = true; continue; }
             s.wer[items[i].id] = { raum: d.raum, x: null, z: null, auf: d.id };
             t.push(W.lege.replace('{was}', akk(items[i])).replace('{akk}', T.akk));
             gelegt = true;
         }
-        return [m(t.join(' ') + (gelegt ? ' ' + waageStand(s, d) : ''))];
+        var x = m(t.join(' ') + (gelegt ? ' ' + waageStand(s, d) : ''));
+        return [zuLeicht ? x : zeigt(x)];          // was auf der Platte liegt und wie tief sie sinkt, sieht man
     }
     // Nach jedem Befehl: Tragen beide Platten genau ihre Spuren, rastet das Schloss ein (bleibt dann offen)
     function waagen(s) {
@@ -3933,7 +3946,7 @@ var Spiel = (function () {
             var a = l[i];
             if (a.art !== 'waage' || erledigt(s, a)) continue;
             var pa = waagePaar(s, s.partie.dinge[a.ding]);
-            if (waageLast(s, pa[0]) === pa[0].soll && waageLast(s, pa[1]) === pa[1].soll) { fuehreAus(s, a, null); aus.push(m(KAT.WAAGE.offen, 'erfolg')); }
+            if (waageLast(s, pa[0]) === pa[0].soll && waageLast(s, pa[1]) === pa[1].soll) { fuehreAus(s, a, null); aus.push(zeigt(m(KAT.WAAGE.offen, 'erfolg'))); }
         }
         return aus;
     }
@@ -3993,6 +4006,28 @@ var Spiel = (function () {
         return t.length ? t.join(' ') : 'Erledigt.';
     }
 
+    // Ergebnis einer Handlung als Meldung: Der Raum zeigt es. Gruendlich gesucht und nichts gefunden: nur ein Ruetteln.
+    function erg(s, a, alt) {
+        var x = zeigt(m(ergebnis(s, a, alt))), i;
+        for (i = 0; i < a.gibt.length; i++) if (a.gibt[i].indexOf('durchsucht:') === 0) x.n = 1;
+        return x;
+    }
+    // Was im Raum geschrieben steht und (noch) nicht aufgemalt ist: Das bleibt beim Hinsehen zu lesen
+    function schriftAn(s, d) {
+        if (d.vorlage === 'kerbstein') return KAT.KERBSTEIN.schrift;
+        if (d.vorlage === 'waage') return KAT.WAAGE.schrift;
+        if (d.vorlage === 'messbecken') return KAT.KRUEGE.becken.schrift.replace('{n}', String(d.mass));
+        if (d.vorlage === 'waechter') return KAT.WACHE[d.modell === 'gemaelde' ? 'bild' : 'buch'].schrift;
+        return null;
+    }
+    // Hinsehen: Die Beschreibung steht im Notizbuch (mit den Spuren, die eine Regel verraten), im Bild nur die Schrift
+    function sieh(s, d) {
+        var x = zeigt(m(ansehenText(s, d))), sch = schriftAn(s, d);
+        x.w = 1;
+        if (sch) x.l = sch;
+        return x;
+    }
+
     function fuehreAus(s, a, alt) {
         var i, aus = [];
         for (i = 0; i < a.gibt.length; i++) s.f[a.gibt[i]] = true;
@@ -4014,14 +4049,14 @@ var Spiel = (function () {
                     // den Fetzen liest, wer ihn traegt; die anderen sehen den Text erst, wenn er ihn weitergibt
                     var fz = s.partie.dinge[a.braucht[0].slice(4)];
                     if (s.wer[fz.id] === undefined) s.wer[fz.id] = nr;          // eben gefunden: der Finder traegt ihn
-                    aus.push(m(gross(nom(fz)) + ': ' + fz.b, 'ereignis', s.partie.spieler > 1 && typeof s.wer[fz.id] === 'number' ? s.wer[fz.id] : null));
+                    aus.push(gelesen(m(gross(nom(fz)) + ': ' + fz.b, 'ereignis', s.partie.spieler > 1 && typeof s.wer[fz.id] === 'number' ? s.wer[fz.id] : null), fz.b));
                     weiter = true;
                     continue;
                 }
                 if (a.art === 'lesen') {
                     var rgl = regel(s, a.gibt[0].slice(6));
                     s.f[a.gibt[0]] = true;
-                    aus.push(m(KAT.NOTIZ.steht + ' \u00bb' + gross(KAT.AUSLOESER[rgl.ausloeser].text) + ': ' + rgl.demo + '\u00ab', 'ereignis'));
+                    aus.push(gelesen(m(KAT.NOTIZ.steht + ' \u00bb' + gross(KAT.AUSLOESER[rgl.ausloeser].text) + ': ' + rgl.demo + '\u00ab', 'ereignis'), gross(KAT.AUSLOESER[rgl.ausloeser].text) + ': ' + rgl.demo));
                     weiter = true;
                     continue;
                 }
@@ -4052,7 +4087,7 @@ var Spiel = (function () {
                         var teile = [];
                         for (var vj = 0; vj < mein.length; vj++) if (mein.charAt(vj) !== '_') teile.push('an ' + KAT.LOGIK.stellen[vj] + ' Stelle eine ' + mein.charAt(vj));
                         if (!teile.length) continue;                 // mehr Spieler als Stellen: einer sieht nichts
-                        privat.push(m(KAT.ZIFFER_JE_KOPF.replace('{teile}', teile.join(', ')), 'ereignis', vk));
+                        privat.push(zeigt(m(KAT.ZIFFER_JE_KOPF.replace('{teile}', teile.join(', ')), 'ereignis', vk)));
                     }
                 }
                 else if (rg.art === 'zahl' && rg.takt) text += ' ' + KAT.KLANG.takt;          // R28: mitzaehlen statt ablesen
@@ -4060,7 +4095,7 @@ var Spiel = (function () {
                 // wer es auffaengt, nimmt es: mit Namen, denn "es" passt nicht zu jedem Gegenstand
                 if (rg.art === 'behaelter' || rg.art === 'traeger' || rg.art === 'werkzeug') text += ' Du nimmst ' + akk(rg.ziel ? s.partie.dinge[rg.ziel] : el) + ' an dich.';
                 if (rg.art === 'richtung') text += ' Die Stelle ist jetzt sichtbar.';
-                aus.push(m(text, 'ereignis', rg.privat && s.partie.spieler > 1 ? rg.privat : null));
+                aus.push(zeigt(m(text, 'ereignis', rg.privat && s.partie.spieler > 1 ? rg.privat : null)));
                 aus = aus.concat(privat);
                 weiter = true;
             }
@@ -4089,7 +4124,7 @@ var Spiel = (function () {
             if (ding && s.vorfuehrungen[i].aktion.ding !== ding) continue;
             var a = s.vorfuehrungen.splice(i, 1)[0].aktion, rg = regel(s, a.gibt[0].slice(6));
             s.f[a.gibt[0]] = true;
-            return [m(KAT.AUSLOESER[rg.ausloeser].vor + ' ' + rg.demo, 'ereignis')];
+            return [zeigt(m(KAT.AUSLOESER[rg.ausloeser].vor + ' ' + rg.demo, 'ereignis'))];
         }
         return [];
     }
@@ -4245,9 +4280,9 @@ var Spiel = (function () {
             var rg = regel(s, b.regel), rest = b.frist - s.zeit;
             if (rest <= 0) {
                 laeuftAb = true;
-                if (!s.fristGemeldet[b.id]) { s.fristGemeldet[b.id] = true; aus.push(m('Jetzt ist es so weit: ' + rg.text, 'warnung')); }
+                if (!s.fristGemeldet[b.id]) { s.fristGemeldet[b.id] = true; aus.push(zeigt(m('Jetzt ist es so weit: ' + rg.text, 'warnung'))); }
             } else if (rest <= 4) {
-                aus.push(m(rg.demo + ' Lange geht das nicht mehr gut.', 'warnung'));
+                aus.push(zeigt(m(rg.demo + ' Lange geht das nicht mehr gut.', 'warnung')));
             }
         }
         if (laeuftAb && s.status === 'laeuft') {
@@ -4293,7 +4328,7 @@ var Spiel = (function () {
             for (i = 0; i < s.partie.raeume.length; i++) if (s.partie.raeume[i].id === b.raum) gibtRaum = true;
             if (!gibtRaum) return [m('Diesen Raum gibt es nicht.', 'system')];
             // linear: hinter der verschlossenen Zwischentuer geht es nicht weiter (kostet keine Zeit)
-            if (b.raum !== s.raum[nr] && zugangZu(s, b.raum, nr)) return [m(s.opfer === nr ? KAT.FALLGITTER.bleibt : tuerText(s).zu)];
+            if (b.raum !== s.raum[nr] && zugangZu(s, b.raum, nr)) return [s.opfer === nr ? m(KAT.FALLGITTER.bleibt) : nein(m(tuerText(s).zu))];
         }
         // Wo ein Ding ist: Gefundene Gegenstaende sind dort, wo sie liegen, oder in einer Tasche
         var dort = d ? d.raum : null, mitIds = b.mit || [];
@@ -4308,7 +4343,7 @@ var Spiel = (function () {
 
         switch (b.art) {
             case 'ansehen':
-                aus.push(m(ansehenText(s, d)));
+                aus.push(sieh(s, d));
                 // Zaehlen: wer die Reihe ansieht, kann sie zaehlen (die Anzahl sieht man im Raum, nicht im Text)
                 l = aktionenAn(s, d.id, ['zaehlen', 'ablesen']);
                 for (i = 0; i < l.length; i++) fuehreAus(s, l[i], null);
@@ -4318,24 +4353,24 @@ var Spiel = (function () {
             case 'anfassen':
                 // eine Reihe zum Zaehlen: Anfassen heisst genau hinsehen und zaehlen
                 if (d.vorlage === 'zaehl' || d.vorlage === 'gedenktafel') {
-                    aus.push(m(ansehenText(s, d)));
+                    aus.push(sieh(s, d));
                     l = aktionenAn(s, d.id, ['zaehlen', 'ablesen']);
                     for (i = 0; i < l.length; i++) fuehreAus(s, l[i], null);
                     break;
                 }
-                if (d.vorlage === 'flaschenbord') { aus.push(m(KAT.KLANG.bord.schlag)); break; }
+                if (d.vorlage === 'flaschenbord') { aus.push(zeigt(m(KAT.KLANG.bord.schlag))); break; }
                 if (d.vorlage === 'drehspiegel') { aus = aus.concat(dreheSpiegel(s, d, nr)); break; }
-                if (d.vorlage === 'strahlquelle' || d.vorlage === 'kristall') { aus.push(m(ansehenText(s, d))); break; }
+                if (d.vorlage === 'strahlquelle' || d.vorlage === 'kristall') { aus.push(sieh(s, d)); break; }
                 // Standpunkt (R22): Die Oberflaeche schickt das erst, wenn man in den Fussspuren steht und hinsieht
                 if (d.vorlage === 'standpunkt') {
-                    aus.push(m(d.hier));
+                    aus.push(zeigt(m(d.hier)));
                     l = aktionenAn(s, d.id, ['bedienen']);
                     for (i = 0; i < l.length; i++) fuehreAus(s, l[i], null);
                     break;
                 }
                 if (d.vorlage === 'durchreiche') { aus.push(m(d.einwurf ? KAT.DURCHREICHE.leer : KAT.DURCHREICHE.falsch)); break; }
                 if (d.vorlage === 'hebelpaar') { aus = aus.concat(kette(s, d, nr, null)); break; }
-                if (d.vorlage === 'hausordnung' || d.vorlage === 'messbecken') { aus.push(m(ansehenText(s, d))); break; }
+                if (d.vorlage === 'hausordnung' || d.vorlage === 'messbecken') { aus.push(sieh(s, d)); break; }
                 if (d.vorlage === 'kerbstein') { aus = aus.concat(ertasten(s, d, nr)); break; }
                 if (d.vorlage === 'waage') { aus = aus.concat(trete(s, d, nr)); break; }
                 var getan = false, l = aktionenAn(s, d.id, ['bedienen', 'oeffnen', 'schalter', 'durchsuchen']);
@@ -4346,7 +4381,7 @@ var Spiel = (function () {
                         var macheDunkel = a.gibt.some(function (f) { return f.indexOf('licht_aus:') === 0; });
                         if ((macheDunkel && aus_) || (!macheDunkel && !aus_)) continue;
                         fuehreAus(s, a, null);
-                        aus.push(m(aus_ ? KAT.LICHT.wirdHell : KAT.LICHT.wirdDunkel));
+                        aus.push(zeigt(m(aus_ ? KAT.LICHT.wirdHell : KAT.LICHT.wirdDunkel)));
                         getan = true; break;
                     }
                     if (erledigt(s, a) || !brauchtErfuellt(s, a)) continue;
@@ -4354,7 +4389,7 @@ var Spiel = (function () {
                     if (sp) { aus.push(sp); getan = true; break; }
                     fuehreAus(s, a, null);
                     if (a.art === 'durchsuchen') s.zeit = zwoelftel(s.zeit + ((a.kosten || 1) - 1) / aktive(s));      // gruendlich suchen dauert
-                    aus.push(m(a.gibt.indexOf('ausgang') >= 0 ? s.partie.story.auf : ergebnis(s, a, null), a.gibt.indexOf('ausgang') >= 0 ? 'erfolg' : 'erzaehler'));
+                    aus.push(a.gibt.indexOf('ausgang') >= 0 ? zeigt(m(s.partie.story.auf, 'erfolg')) : erg(s, a, null));
                     getan = true; break;
                 }
                 // Aufgaben fuer mehrere Haende: anfassen, waehrend genug Leute im Raum sind (ohne Gegenstand)
@@ -4368,7 +4403,7 @@ var Spiel = (function () {
                         if (!wh.alt) continue;
                         sp = sperre(s, a, nr, wh.alt.h || 1);
                         if (sp) { aus.push(sp); getan = true; break; }
-                        aus.push(m(ergebnis(s, a, wh.alt)));
+                        aus.push(erg(s, a, wh.alt));
                         aus = aus.concat(fuehreAus(s, a, wh.alt));
                         // Opfer: wer die Kette haelt, bleibt zurueck
                         if (wh.alt.opfer) { s.opfer = nr; aus.push(m(KAT.FALLGITTER.halten, 'warnung', nr)); }
@@ -4376,18 +4411,18 @@ var Spiel = (function () {
                     }
                     if (!getan && mehrHaende) { aus.push(m('Allein bekommst du das so nicht hin. Daf\u00fcr br\u00e4uchte es mehr H\u00e4nde.')); getan = true; }
                 }
-                if (!getan && d.vorlage === 'ausgang') aus.push(m(ansehenText(s, d)));
-                else if (!getan) aus.push(m('Du fasst ' + akk(d) + ' an.'));
+                if (!getan && d.vorlage === 'ausgang') aus.push(sieh(s, d));
+                else if (!getan) aus.push(nein(m('Du fasst ' + akk(d) + ' an.')));
                 break;
 
             case 'nehmen':
-                if (liegt(s, d.id)) { s.wer[d.id] = nr; aus.push(m('Du nimmst ' + akk(d) + '.')); break; }
+                if (liegt(s, d.id)) { s.wer[d.id] = nr; aus.push(zeigt(m('Du nimmst ' + akk(d) + '.'))); break; }
                 l = aktionenAn(s, d.id, ['nehmen']);
-                if (!l.length || erledigt(s, l[0])) { aus.push(m('Das kannst du nicht mitnehmen.')); break; }
+                if (!l.length || erledigt(s, l[0])) { aus.push(nein(m('Das kannst du nicht mitnehmen.'))); break; }
                 sp = sperre(s, l[0], nr, 1);
                 if (sp) { aus.push(sp); break; }
                 fuehreAus(s, l[0], null);
-                aus.push(m('Du nimmst ' + akk(d) + '.'));
+                aus.push(zeigt(m('Du nimmst ' + akk(d) + '.')));
                 break;
 
             case 'benutzen':
@@ -4406,7 +4441,7 @@ var Spiel = (function () {
                         var schl = false;
                         for (var j = 0; j < items.length; j++) if ('hat:' + items[j].id === a.braucht[0]) schl = true;
                         if (!schl) continue;
-                        fuehreAus(s, a, null); aus.push(m('Der Schl\u00fcssel passt. Klack.')); erfolg = true; continue;
+                        fuehreAus(s, a, null); aus.push(zeigt(m('Der Schl\u00fcssel passt. Klack.'))); erfolg = true; continue;
                     }
                     if (!brauchtErfuellt(s, a)) continue;
                     versucht = true;
@@ -4419,7 +4454,7 @@ var Spiel = (function () {
                     sp = sperre(s, a, nr, w.alt.h || 1);
                     if (sp) { aus.push(sp); erfolg = true; continue; }
                     var ergIdx = aus.length;
-                    aus.push(m(ergebnis(s, a, w.alt)));
+                    aus.push(erg(s, a, w.alt));
                     aus = aus.concat(fuehreAus(s, a, w.alt));
                     // verwandelt am Element: was hineinkam, ist weg; was entsteht, traegt der Handelnde
                     if (a.verbrauchtMittel) {
@@ -4436,15 +4471,15 @@ var Spiel = (function () {
                     }
                     erfolg = true;
                 }
-                if (!erfolg) aus.push(m(grund || 'Damit l\u00e4sst sich hier nichts anfangen.'));
+                if (!erfolg) aus.push(grund ? m(grund) : nein(m('Damit l\u00e4sst sich hier nichts anfangen.')));
                 break;
 
             case 'krach':
                 items = itemsAus(s, b.mit, nr);
                 var laut = false;
                 for (i = 0; i < items.length; i++) if ((items[i].e.laut || 0) >= 1) laut = true;
-                if (!laut) { aus.push(m('Damit kannst du keinen L\u00e4rm machen.')); break; }
-                aus.push(m('Du machst ordentlich Krach.'));
+                if (!laut) { aus.push(nein(m('Damit kannst du keinen L\u00e4rm machen.'))); break; }
+                aus.push(zeigt(m('Du machst ordentlich Krach.')));
                 aus = aus.concat(laermFolgen(s, s.raum[nr]));
                 l = s.partie.aktionen;
                 for (i = 0; i < l.length; i++) if (l[i].art === 'krach' && l[i].raum === s.raum[nr]) fuehreAus(s, l[i], null);
@@ -4454,11 +4489,16 @@ var Spiel = (function () {
                 l = aktionenAn(s, d.id, ['eingeben']);
                 var code = null;
                 for (i = 0; i < schloesserAlle(s.partie).length; i++) if (schloesserAlle(s.partie)[i].id === d.id) code = schloesserAlle(s.partie)[i].code;
-                if (!l.length || !code) { aus.push(m('Hier gibt es nichts einzugeben.')); break; }
+                if (!l.length || !code) { aus.push(nein(m('Hier gibt es nichts einzugeben.'))); break; }
                 sp = sperre(s, l[0], nr, 1);
                 if (sp) { aus.push(sp); break; }
-                if (String(b.code).toUpperCase() === code) { s.f['code:' + d.id] = true; fuehreAus(s, l[0], null); aus.push(m(gross(nom(d)) + ' springt auf.')); }
-                else aus.push(m('Falscher Code. Das Schloss bleibt zu.' + (rueckmeldung(s, d.id) ? ' ' + kugeln(code, String(b.code)) : '')));
+                if (String(b.code).toUpperCase() === code) { s.f['code:' + d.id] = true; fuehreAus(s, l[0], null); aus.push(zeigt(m(gross(nom(d)) + ' springt auf.'))); }
+                else {
+                    // die Kugeln in der Schale (R14) bleiben zu lesen, bis die Schale selbst zu sehen ist
+                    var falsch = nein(m('Falscher Code. Das Schloss bleibt zu.' + (rueckmeldung(s, d.id) ? ' ' + kugeln(code, String(b.code)) : '')));
+                    if (rueckmeldung(s, d.id)) falsch.l = kugeln(code, String(b.code));
+                    aus.push(falsch);
+                }
                 break;
 
             case 'geben':
@@ -4468,14 +4508,14 @@ var Spiel = (function () {
                     ((s.raum[nr] === dg.von && s.raum[an] === dg.nach) || (s.raum[nr] === dg.nach && s.raum[an] === dg.von));
                 if (!(an >= 1 && an <= s.partie.spieler) || an === nr || s.raum[an] === null || (s.raum[an] !== s.raum[nr] && !gitter)) { aus.push(m('Daf\u00fcr m\u00fcsst ihr im selben Raum sein.', 'system')); break; }
                 s.wer[d.id] = an;
-                aus.push(m('Du gibst ' + akk(d) + ' weiter.'));
-                aus.push(m('Du bekommst ' + akk(d) + '.', 'erzaehler', an));
+                aus.push(zeigt(m('Du gibst ' + akk(d) + ' weiter.')));
+                aus.push(zeigt(m('Du bekommst ' + akk(d) + '.', 'erzaehler', an)));
                 break;
 
             case 'verwandeln':
                 // zweites Leben: aus dem getragenen Gegenstand wird ein anderer, der erste ist danach weg
                 l = aktionenAn(s, d.id, ['verwandeln']);
-                if (!l.length || erledigt(s, l[0])) { aus.push(m('Daraus l\u00e4sst sich nichts anderes machen.')); break; }
+                if (!l.length || erledigt(s, l[0])) { aus.push(nein(m('Daraus l\u00e4sst sich nichts anderes machen.'))); break; }
                 fuehreAus(s, l[0], null);
                 var neuG = s.partie.dinge[l[0].gibt[0].slice(4)];
                 s.wer[neuG.id] = nr;
@@ -4487,15 +4527,15 @@ var Spiel = (function () {
                 if (s.steht[nr]) {
                     var dw = s.partie.dinge[s.steht[nr]];
                     s.wer[d.id] = { raum: s.raum[nr], x: null, z: null, auf: dw.id };
-                    aus.push(m(KAT.WAAGE.lege.replace('{was}', akk(d)).replace('{akk}', KAT.WAAGE[dw.seite].akk) + (waageOffen(s, dw) ? '' : ' ' + waageStand(s, dw))));
+                    aus.push(zeigt(m(KAT.WAAGE.lege.replace('{was}', akk(d)).replace('{akk}', KAT.WAAGE[dw.seite].akk) + (waageOffen(s, dw) ? '' : ' ' + waageStand(s, dw)))));
                     break;
                 }
                 legeAb(s, d.id, s.raum[nr], b.x, b.z);
-                aus.push(m('Du legst ' + akk(d) + ' ab.'));
+                aus.push(zeigt(m('Du legst ' + akk(d) + ' ab.')));
                 break;
 
             case 'warten':
-                aus.push(m('Du wartest eine Weile.'));
+                aus.push(zeigt(m('Du wartest eine Weile.')));
                 for (i = 0; i < s.partie.aktionen.length; i++) {
                     a = s.partie.aktionen[i];
                     if (a.art !== 'warten' || a.raum !== s.raum[nr]) continue;
@@ -4510,7 +4550,7 @@ var Spiel = (function () {
             case 'gehen':
                 if (b.raum === s.raum[nr]) break;
                 delete s.steht[nr];                      // wer geht, steigt von der Trittplatte
-                aus.push(m('Du gehst ' + raumNach(s, b.raum) + '.'));
+                aus.push(zeigt(m('Du gehst ' + raumNach(s, b.raum) + '.')));
                 aus = aus.concat(betrete(s, nr, b.raum));
                 break;
         }
