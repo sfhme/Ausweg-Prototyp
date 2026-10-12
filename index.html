@@ -937,6 +937,14 @@ var Setting = (function () {
             kette: 'Ketten', pritsche: 'Pritsche', eimer: 'Eimer', schatztruhe: 'Schatztruhe', waffenstaender: 'Waffenst\u00e4nder', ruestung: 'R\u00fcstung', gold: 'Goldbarren',
             muenzen: 'M\u00fcnzhaufen', kelch: 'Kelch', kolben: 'Destillierkolben', moerser: 'M\u00f6rser', buecher: 'B\u00fccherstapel', sarg: 'Sarg', grabplatte: 'Grabplatte',
             knochen: 'Knochenhaufen', schaedel: 'Sch\u00e4del', weinregal: 'Weinregal', buecherbord: 'B\u00fccherbord' },
+        // Mechanismus (Entscheidung 2026-10-12): Ein Ding oeffnet anderswo im Raum ein verborgenes Fach, dauerhaft oder nur fuer
+        // ein Zeitfenster. Bedient wird es mit F oder, je nach Partie, nur durch Festhalten und Bewegen (bedien: 'halten').
+        mechanismen: {
+            buch: { name: 'Buch', nom: 'das Buch', akk: 'das Buch', b: 'Ein dickes, ledergebundenes Buch zwischen anderen.', anzeichen: 'Sein R\u00fccken ist abgegriffener als die der anderen, und es steht ein wenig vor.' },
+            fackelhalter: { name: 'Fackelhalter', nom: 'der Fackelhalter', akk: 'den Fackelhalter', b: 'Ein eiserner Fackelhalter an der Wand, leer.', anzeichen: 'Um den Halter ist der Ru\u00df an der Wand verwischt, als h\u00e4tte ihn jemand oft gedreht.' },
+            kerzenleuchter: { name: 'Kerzenleuchter', nom: 'der Kerzenleuchter', akk: 'den Kerzenleuchter', b: 'Ein schwerer Kerzenleuchter aus Messing auf einem Sockel.', anzeichen: 'Am Fu\u00df des Leuchters ist der Staub zu einem Bogen verwischt.' }
+        },
+        mechanik: { auf: 'Irgendwo klackt ein Riegel. {Nom} steht jetzt offen.', kurz: 'Lange bleibt es nicht offen.', zu: 'Mit einem Klacken schlie\u00dft sich {nom} wieder.' },
         // Anzeichen eines verborgenen Fachs (Abwechslung, Vorgabe 2026-10-12: "manches anzeigen, manches nicht"): steht beim
         // Ansehen da, wenn die Partie es so wuerfelt; leere Verstecke bekommen es genauso oft, es beweist also nichts
         versteckAnzeichen: {
@@ -1176,6 +1184,7 @@ var Setting = (function () {
             code: '{Nom} braucht eine Eingabe. Was du daf\u00fcr brauchst, hast du im Raum gesehen oder wirst es sehen.',
             unbekannt: 'das, was hier \u201e{name}\u201c hei\u00dft',
             schliessen: 'Was du gelesen hast, schlie\u00dft fast alles aus. Wo bleibt nur noch eine M\u00f6glichkeit?',
+            bewegen: '{Nom} will bewegt werden, nicht nur angefasst: festhalten und zur Seite nehmen.',
             loesung: 'Die L\u00f6sung dieses Schritts: {text}.'
         },
         // Ganzer Satz je Weg (Blindtest Runde 3: "Das Rohr zuschlagen." stand als Etikett da). Schluessel ist der Text des
@@ -1879,14 +1888,14 @@ var Katalog = (function () {
     uebernimm(INSCHRIFT_K, S.inschrift, ['name', 'nom', 'akk', 'b', 'verb'], 'inschrift');
     alternativen(INSCHRIFT_K.alt, S.inschrift.alt, 'inschrift');
     for (i = 0; i < S.stories.length; i++) if (!S.stories[i].raeume || S.stories[i].raeume.length < 2) fehlt('stories[' + i + '].raeume (mindestens zwei)');
-    ['keiner', 'raum', 'ding', 'tasche', 'krach', 'warten', 'dunkel', 'hell', 'bauen', 'wann', 'nehmen', 'oeffnen', 'weg', 'mit', 'lesen', 'code', 'loesung', 'unbekannt', 'schliessen'].forEach(function (x) { if (!S.tipp || !S.tipp[x]) fehlt('tipp.' + x); });
+    ['keiner', 'raum', 'ding', 'tasche', 'krach', 'warten', 'dunkel', 'hell', 'bauen', 'wann', 'nehmen', 'oeffnen', 'weg', 'mit', 'lesen', 'code', 'loesung', 'unbekannt', 'schliessen', 'bewegen'].forEach(function (x) { if (!S.tipp || !S.tipp[x]) fehlt('tipp.' + x); });
     for (i = 0; i < S.verstecke.length; i++) if (!S.versteckAnzeichen || !S.versteckAnzeichen[S.verstecke[i][3]]) fehlt('versteckAnzeichen.' + S.verstecke[i][3]);
     for (i = 0; i < S.stories.length; i++) if (!S.stories[i].eile) fehlt('stories[' + i + '].eile (Satz, wenn eine Frist laeuft)');
 
     var BASIS = {
         version: 3, SETTING: S.id, ARTEN: ARTEN, AUSLOESER: AUSLOESER, ELEMENTE: ELEMENTE, GEGENSTAENDE: GEGENSTAENDE,
         EIGENSCHAFT_TEXT: EIGENSCHAFT_TEXT, ZU_WENIG: S.zuWenig, HINDERNISSE: HINDERNISSE, SCHLOESSER: SCHLOESSER, GEGENMITTEL: GEGENMITTEL,
-        VERSTECKE: S.verstecke, VERSTECK_ANZEICHEN: S.versteckAnzeichen || {}, SCHLICHT: S.schlicht, AUSSTATTUNG: S.ausstattung, LICHT: S.licht, WASSER: WASSER, SCHLUESSEL: S.schluessel, NOTIZ: S.notiz, STORIES: S.stories, TIPP: S.tipp, WEG_SATZ: S.wegSatz || {}, SEK_JE_EINHEIT: SEK_JE_EINHEIT,
+        VERSTECKE: S.verstecke, VERSTECK_ANZEICHEN: S.versteckAnzeichen || {}, MECHANISMEN: S.mechanismen || {}, MECHANIK: S.mechanik || null, SCHLICHT: S.schlicht, AUSSTATTUNG: S.ausstattung, LICHT: S.licht, WASSER: WASSER, SCHLUESSEL: S.schluessel, NOTIZ: S.notiz, STORIES: S.stories, TIPP: S.tipp, WEG_SATZ: S.wegSatz || {}, SEK_JE_EINHEIT: SEK_JE_EINHEIT,
         VERWANDLUNGEN: S.verwandlungen, ZAEHL: S.zaehl, LOGIK: S.logik, LUEGNER: S.luegner, HANDBUCH: S.handbuch, REGAL: S.regal, ZIFFER_JE_KOPF: S.zifferJeKopf, KLEIN: KLEIN, BEWEGLICH: BEWEGLICH, VERRUECKT: S.verrueckt, KLANG: S.klang, KLOPF_AUS: KLOPF_AUS, STAEBE: STAEBE, DURCHREICHE: S.durchreiche, HAUSORDNUNG: S.hausordnung, GEDENKTAFEL: S.gedenktafel, STANDPUNKT: S.standpunkt, STRAHL: S.strahl, WORT: WORT, WACHE: S.wache, KRUEGE: S.kruege, KERBSTEIN: S.kerbstein, BALKENWAAGE: S.balkenwaage, KAEFIG: KAEFIG, PAKT: S.pakt, KREIDE: S.kreide, HOCH: S.hoch, NOTSCHACHT: NOTSCHACHT, SPIEGEL: S.spiegel, HEBELREIHE: S.hebelreihe, ORAKEL: S.orakel, NOTIZEN: S.notizen, TRAENKE: S.traenke, BAUEN: BAUEN, BAUEN_TEXT: S.bauen, GABEN: S.gaben, GABEN_REIHE: ['nachtauge', 'gehoer', 'schrift'], WAAGE: S.waage, WAAGE_SCHWER: WAAGE_SCHWER, FALLGITTER: FALLGITTER_K, ZEICHEN: S.zeichen, FETZEN: S.fetzen, TINTE: TINTE_K, UHR: S.uhr, ZWISCHENTUER: S.zwischentuer, TAFEL: S.tafel, INSCHRIFT: INSCHRIFT_K,
         SCHLOSSTEXT: S.schlosstext, VORBEI: S.vorbei, SPUR: S.spur, HAENDE: S.haende, ZWEITFACH: S.zweitfach, RUHIG: S.ruhig,
         FACH: { klemmt: S.fach.klemmt, hohl: S.fach.hohl, alt: [{ b: { lang: 2, schwer: 2 }, text: S.fach.alt[0] }, { b: { stumpf: 2 }, laerm: true, text: S.fach.alt[1] }, { b: { scharf: 2 }, text: S.fach.alt[2] }] },
@@ -2437,7 +2446,8 @@ var Generator = (function () {
     // Stufe 1 ohne leere Verstecke (Blindtest 2026-10-12: zu viel Leerlauf; Entscheidung des Projektinhabers)
     var LEERE = { 1: 0, 2: 2, 3: 2 };
     var MAX_VERSUCHE = 60;
-    var ANZEICHEN = { 1: 0.6, 2: 0.35, 3: 0.15 };      // Anteil verborgener Faecher mit einem Anzeichen beim Ansehen
+    var ANZEICHEN = { 1: 0.6, 2: 0.35, 3: 0.15 };
+    var ABDECKUNG = { v_wandbehang: 1, v_wappen: 1, v_laterne: 1 };      // Faecher hinter etwas, das man zur Seite nehmen kann      // Anteil verborgener Faecher mit einem Anzeichen beim Ansehen
     var MAX_AKTIONEN = 70;
     // name, Nominativ und Akkusativ mit Artikel (die Engine beugt keine Namen)
 
@@ -2457,7 +2467,8 @@ var Generator = (function () {
     // Noch ohne Bild: Raetsel, die es im Kern schon gibt, deren Dinge die Oberflaeche aber noch aus Kaesten baut. Mit
     // opt.bild (Server, Spielseite, Probeseite) kommen sie in keiner Partie vor; ohne (Tests, zeige.js) in jeder. Die
     // PC-Sitzung streicht hier einen Eintrag, sobald das Raetsel Modelle und ein Bild hat (ARBEITSTEILUNG.md 3.1f).
-    var NOCH_OHNE_BILD = {};
+    // Raetsel, fuer die die Oberflaeche noch kein Bild hat: der Server laesst sie aus (Tests nehmen sie mit)
+    var NOCH_OHNE_BILD = { mechanismus: 1 };
     function Bau(seed, spieler, stufe, versuch, stil, bild) {
         this.aus = bild ? NOCH_OHNE_BILD : {};
         this.r = Zufall.strom(String(seed), 'partie:' + spieler + ':' + stufe + ':' + versuch);
@@ -2871,7 +2882,7 @@ var Generator = (function () {
         g.raum = g.raum || this.raum();
         g.zone = this.zoneFuer(g.raum, opt);
         var arten = tiefe <= 0 ? ['frei'] : this.r.mischen(['frei', 'hindernis', 'hindernis', 'hindernis', 'behaelter', 'behaelter',
-            'traeger', 'richtung', 'richtung', 'zweitfach', 'luegner', 'hausordnung', 'verrueckt', 'klopfen', 'losung', 'kruege', 'strahl', 'flut', 'spiegel', 'hebelreihe', 'traenke', 'notizen', 'orakel']);
+            'traeger', 'richtung', 'richtung', 'zweitfach', 'luegner', 'hausordnung', 'verrueckt', 'klopfen', 'losung', 'kruege', 'strahl', 'flut', 'spiegel', 'hebelreihe', 'traenke', 'notizen', 'orakel', 'mechanismus']);
         var i;
         if (tiefe > 0 && arten[0] === 'frei' && this.r.chance(0.6)) arten.push(arten.shift());
         for (i = 0; i < arten.length; i++) {
@@ -2978,7 +2989,9 @@ var Generator = (function () {
     // eigenen Bedarf: Die Faehrte soll den Raum nicht um weitere Dinge vergroessern. Nie noetig, kostet nur den, der ihr folgt.
     Bau.prototype.falscheFaehrte = function () {
         var NZ = this.K.NOTIZEN, self = this, leere = [], k;
-        for (k in this.p.dinge) if (this.p.dinge.hasOwnProperty(k) && this.p.dinge[k].typ === 'versteck' && this.p.dinge[k].leer) leere.push(this.p.dinge[k]);
+        // nur die Attrappen (leereVerstecke): nur sie lassen sich nach einer Faehrte durchsuchen; die leeren Faecher von Orakel und
+        // Zetteln haben ihre eigene Logik
+        for (k in this.p.dinge) if (this.p.dinge.hasOwnProperty(k) && this.p.dinge[k].typ === 'versteck' && this.p.dinge[k].leer && this.p.dinge[k].ablenkung) leere.push(this.p.dinge[k]);
         if (!NZ || !NZ.faehrte || this.aus.faehrte || this.p.stufe < 2 || !leere.length || !this.r.chance(0.15)) return;
         var ohneBedarf = function (a) { return (!self.K.AUSLOESER[a].bedarf || self.K.AUSLOESER[a].bedarf === 'nichts') && a !== 'anzahl' && a !== 'abwesenheit' && a !== 'licht_nebenan' && a !== 'laerm_nebenan'; };
         var el = this.nimmElement('richtung', function (f) { return f.aus.some(ohneBedarf); });
@@ -3258,6 +3271,33 @@ var Generator = (function () {
             kennt: [rg.id], gibt: ['versteck:' + v.id, 'klopft:' + v.id], sicher: true });
         g.lage = v.name + ' (' + KL.klopfenWeg + ')';
         this.aktion({ text: v.name + ' \u00f6ffnen', art: 'oeffnen', raum: v.raum, ding: v.id, braucht: ['versteck:' + v.id], gibt: ['hat:' + g.id] });
+        return true;
+    };
+
+    // Mechanismus (Entscheidung des Projektinhabers 2026-10-12): Ein Ding im Raum (Buch, Fackelhalter, Kerzenleuchter) oeffnet
+    // ein verborgenes Fach anderswo im selben Raum, erkennbar erst dann. Je nach Partie mit F oder nur durch Festhalten und
+    // Bewegen (bedien 'halten', am Fadenkreuz verraet F nichts), und je nach Partie dauerhaft oder nur fuer ein Zeitfenster
+    // (fenster: man muss hinlaufen und nehmen, bevor es zuklackt). Der Pruefer sieht einen Schritt: bedienen und nehmen.
+    var MECH_HALTEN = { 1: 0.3, 2: 0.5, 3: 0.6 }, MECH_FENSTER = { 1: 0.25, 2: 0.5, 3: 0.7 };
+    Bau.prototype.lege_mechanismus = function (g, tiefe) {
+        var MS = this.K.MECHANISMEN, VN = this.K.VERSTECKE, formen = MS ? sortiert(MS) : [], namen = [], i;
+        if (this.aus.mechanismus || !formen.length || this.fixtur.mechanismus) return false;
+        for (i = 0; i < VN.length; i++) if (!this.fixtur['name:' + VN[i][0]]) namen.push(VN[i]);
+        if (!namen.length) return false;
+        var vname = this.r.waehle(namen), form = this.r.waehle(formen), mf = MS[form];
+        this.fixtur['name:' + vname[0]] = true;
+        this.fixtur.mechanismus = true;
+        var v = this.ding('versteck', vname[0], g.raum, { verborgen: true, nom: vname[1], akk: vname[2], modell: 'v_' + vname[3] });
+        v.zone = this.zoneFuer(g.raum, {});
+        var halten = this.r.chance(MECH_HALTEN[this.p.stufe]), fenster = this.r.chance(MECH_FENSTER[this.p.stufe]);
+        var d = this.ding('fixtur', mf.name, g.raum, { vorlage: 'mechanismus', form: form, modell: 'mech_' + form, leihStand: true, nom: mf.nom, akk: mf.akk, fach: v.id });      // steht wie seine Form (Raumplan)
+        d.zone = this.zoneFuer(g.raum, {});
+        if (halten) d.bedien = 'halten';
+        var a = this.aktion({ text: mf.name + (halten ? ' festhalten und bewegen' : ' bedienen') + ', ' + v.name + ' geht auf' + (fenster ? ' (nur kurz: gleich hinlaufen und nehmen)' : ''),
+            art: 'mechanismus', raum: g.raum, ding: d.id, gibt: ['hat:' + g.id, 'geoeffnet:' + v.id], kosten: fenster ? 2 : 1 });
+        a.fach = v.id;
+        if (fenster) a.fenster = true;
+        g.lage = v.name + ' (geht auf, wenn man ' + mf.akk + (halten ? ' festhaelt und bewegt' : ' bedient') + (fenster ? ', nur kurz' : '') + ')';
         return true;
     };
 
@@ -4669,6 +4709,18 @@ var Generator = (function () {
             if (a.art === 'verwandeln') {
                 z = mitStart(a.braucht.concat(a.gibt));
                 if (!Pruefer.pruefe(p, spieler, z).loesbar) return true;
+            } else if (a.mittel && !a.verbrauchtMittel && p.anforderungen[a.mittel]) {
+                // ein Verbrauchsstueck (Phiole) an der falschen Stelle aufgebraucht (Sackgassen-Suchlauf 2026-10-12, Partie 993/1/1:
+                // die einzige Saeure frass das Schloss der Truhe, danach blieb das Buendel zu): jede Stelle, an der es passt, pruefen
+                var altV = p.anforderungen[a.mittel].alt, idsV = sortiert(p.dinge);
+                for (j = 0; j < idsV.length; j++) {
+                    var gv = p.dinge[idsV[j]], passtV = false;
+                    if (gv.typ !== 'gegenstand' || !gv.e || !gv.verbrauch) continue;
+                    for (k = 0; k < altV.length; k++) if (altV[k].b && Pruefer.deckt(gv.e, altV[k].b)) passtV = true;
+                    if (!passtV) continue;
+                    z = mitStart((a.braucht || []).concat(a.gibt, ['hat:' + gv.id, 'weg:' + gv.id]));
+                    if (!Pruefer.pruefe(p, spieler, z).loesbar) return true;
+                }
             } else if (a.verbrauchtMittel && a.mittel) {
                 var alt = p.anforderungen[a.mittel].alt, ids = sortiert(p.dinge);
                 for (j = 0; j < ids.length; j++) {
@@ -4718,7 +4770,16 @@ var Generator = (function () {
             // Anzeichen verborgener Faecher (Abwechslung, 2026-10-12): aus einem eigenen Strom, damit der Rest der Partie gleich bleibt;
             // echte und leere gleich oft, auf Stufe 1 oft, auf Stufe 3 selten
             var za = Zufall.strom(String(seed) + ':' + v, 'anzeichen'), ks = Object.keys(p.dinge).sort();
-            for (i = 0; i < ks.length; i++) if (p.dinge[ks[i]].typ === 'versteck' && p.dinge[ks[i]].verborgen && za.chance(ANZEICHEN[stufe])) p.dinge[ks[i]].anzeichen = true;
+            for (i = 0; i < ks.length; i++) if (((p.dinge[ks[i]].typ === 'versteck' && p.dinge[ks[i]].verborgen) || p.dinge[ks[i]].vorlage === 'mechanismus') && za.chance(ANZEICHEN[stufe])) p.dinge[ks[i]].anzeichen = true;
+            // Bedienart (Abwechslung, 2026-10-12: "nicht immer alles beim ersten F spoilern"): Ein Fach hinter Wandbehang,
+            // Wappenschild oder Wandlaterne geht manchmal nur auf, wenn man die Abdeckung festhaelt und zur Seite nimmt
+            var zb = Zufall.strom(String(seed) + ':' + v, 'bedien');
+            for (i = 0; i < ks.length; i++) {
+                var dv = p.dinge[ks[i]];
+                if (dv.typ !== 'versteck' || !dv.verborgen || !ABDECKUNG[dv.modell] || (opt.bild && NOCH_OHNE_BILD.griff)) continue;
+                if (!p.aktionen.some(function (x) { return x.ding === dv.id && x.art === 'oeffnen'; }) || !zb.chance(0.5)) continue;
+                dv.bedien = 'halten';
+            }
             // Ab Stufe 2 muss eine Bedrohung etwas bewirken (Blindtest Runde 3: Kronleuchter und Leinwand, an denen man nur
             // vorbeiging); sonst wird neu gewuerfelt.
             if (stufe >= 2 && bedrohungWirkungslos(p, spieler, a)) { gruende.push('Bedrohung wirkungslos'); continue; }
@@ -5807,11 +5868,12 @@ var Spiel = (function () {
             var ak = s.partie.aktionen[k];
             if (ak.ding === d.id && ak.art !== 'ereignis' && (ak.art !== 'durchsuchen' || d.leer) && erledigt(s, ak)) return true;
         }
-        return false;
+        return !!s.f['geoeffnet:' + d.id] && !!s.partie.dinge[d.id].verborgen && s.partie.aktionen.some(function (x) { return x.art === 'mechanismus' && x.fach === d.id; });
     }
     function unentdeckt(s, d) {
         if (!d || d.typ !== 'versteck' || !d.verborgen) return false;
         if (d.leer) return !s.f['durchsucht:' + d.id];
+        if (s.f['geoeffnet:' + d.id] || s.f['gesehen:' + d.id]) return false;      // einmal offen gesehen (Mechanismus), bleibt erkannt
         if (s.f['versteck:' + d.id] && klemmt(s, d.id)) return false;
         return !versteckOffen(s, d);
     }
@@ -5850,6 +5912,7 @@ var Spiel = (function () {
     // ohne Spur, Frist oder Fund, der Katalogtext eines Gegenstands. Alles andere traegt etwas zum Merken (PC-Sitzung,
     // 2026-10-11, Vorgabe des Projektinhabers: Das Notizbuch zeigt nur wichtige Hinweise, kein Ereignislog).
     function schlicht(s, d, text) {
+        if (d.vorlage === 'mechanismus') return !d.anzeichen;      // sieht aus wie ein Buch, ein Halter: nichts fuers Notizbuch, ausser es verraet sich
         if (unentdeckt(s, d)) return !d.anzeichen;      // ein Fach, das sich nicht verraet, ist nur ein Fass: nichts fuers Notizbuch
         if (text === gross(d.name) + '.') return true;
         if (d.typ === 'element') return !!KAT.ELEMENTE[d.vorlage] && text === KAT.ELEMENTE[d.vorlage].b;
@@ -6133,6 +6196,7 @@ var Spiel = (function () {
 
     function ansehenText(s, d, nr) {
         var t, i, k;
+        if (d.vorlage === 'mechanismus' && KAT.MECHANISMEN[d.form]) return KAT.MECHANISMEN[d.form].b + (d.anzeichen ? ' ' + KAT.MECHANISMEN[d.form].anzeichen : '');
         // ein Fach, das noch keiner offen hatte, sieht aus wie das, worin es steckt (Vorgabe 2026-10-12)
         if (unentdeckt(s, d)) {
             var mk = d.modell ? d.modell.replace(/^v_/, '') : '', sl = KAT.SCHLICHT ? KAT.SCHLICHT[mk] : null;
@@ -6338,6 +6402,36 @@ var Spiel = (function () {
     // Tipp auf Anfrage (Entscheidung des Projektinhabers 2026-10-12, statt blindem Suchen): Der Pruefer rechnet vom
     // jetzigen Stand den naechsten noetigen Schritt; je Schritt drei Stufen (wohin schauen, was tun, die Loesung). Jeder
     // Tipp kostet TIPP_STRAFE Einheiten auf der Uhr. Lesbar fuer den, der fragt (l).
+    // Mechanismus (Entscheidung 2026-10-12): oeffnet das Fach a.fach; der Fund liegt darin. Mit Zeitfenster schliesst es nach
+    // FENSTER_SEK (ohne Uhr FENSTER_EINHEITEN) wieder, wenn niemand den Fund genommen hat; dann laesst es sich neu ausloesen.
+    var FENSTER_SEK = 20, FENSTER_EINHEITEN = 2;
+    function mechanik(s, nr, a) {
+        var sp = sperre(s, a, nr, 1);
+        if (sp) return [sp];
+        var F = s.partie.dinge[a.fach], g = a.gibt[0].slice(4), MK = KAT.MECHANIK;
+        fuehreAus(s, a, null);
+        s.f['gesehen:' + F.id] = true;
+        s.wer[g] = { raum: F.raum, x: null, z: null, an: F.id };          // der Fund liegt im Fach, man nimmt ihn mit F
+        var aus = [zeigt(m(MK.auf.replace('{Nom}', gross(nom(F)))))];
+        if (a.fenster) {
+            if (!s.fenster) s.fenster = {};
+            s.fenster[F.id] = { bis: s.zeit + (s.echt ? FENSTER_SEK / SEK : FENSTER_EINHEITEN), aktion: a.id, g: g };
+            aus.push(zeigt(m(MK.kurz)));
+        }
+        return aus;
+    }
+    function fensterZu(s) {
+        var aus = [], k;
+        for (k in (s.fenster || {})) {
+            if (!s.fenster.hasOwnProperty(k) || s.zeit < s.fenster[k].bis) continue;
+            var fw = s.fenster[k], w = s.wer[fw.g];
+            delete s.fenster[k];
+            if (!(w && typeof w === 'object' && w.an === k)) continue;     // genommen: das Fach bleibt offen
+            delete s.wer[fw.g]; delete s.f['hat:' + fw.g]; delete s.f['geoeffnet:' + k];
+            aus.push(zeigt(m(KAT.MECHANIK.zu.replace('{nom}', nom(s.partie.dinge[k])))));
+        }
+        return aus;
+    }
     var TIPP_STRAFE = 1;
     function tipp(s, nr) {
         var T = KAT.TIPP, r = Pruefer.pruefe(s.partie, aktive(s), { f: s.f, schritte: s.zeit }), i, text;
@@ -6371,7 +6465,8 @@ var Spiel = (function () {
             else if ((a.art === 'verwandeln' || a.art === 'lesen') && (a.ding || gehalten[0])) text = T.tasche.replace('{akk}', akk(s.partie.dinge[a.ding || gehalten[0]]));
             else text = d ? ein(T.ding) : T.warten;
         } else {
-            if (a.art === 'ereignis' && a.ausloeser && d) text = ein(T.wann).replace('{wann}', KAT.AUSLOESER[a.ausloeser].text);
+            if (d && d.bedien === 'halten') text = ein(T.bewegen);
+            else if (a.art === 'ereignis' && a.ausloeser && d) text = ein(T.wann).replace('{wann}', KAT.AUSLOESER[a.ausloeser].text);
             else if (a.art === 'nehmen' && d) text = ein(T.nehmen);
             else if ((a.art === 'oeffnen' || a.art === 'bedienen' || a.art === 'durchsuchen') && d) text = ein(T.oeffnen);
             else if (w.alt && d) text = ein(T.weg).replace('{weg}', w.alt);
@@ -6397,8 +6492,13 @@ var Spiel = (function () {
         }
         // Wer geht? (R151): Hoelzchen ziehen vor dem Fallgitter. Das Los zeigt nur auf jemanden; bleiben muss nur, wer
         // selbst die Kette nimmt (nie zwingt die Gruppe einen Einzelnen hinaus). Bestimmt aus Seed und Zahl der Lose.
+        var zuFenster = fensterZu(s);
+        if (zuFenster.length) return zuFenster.concat(befehl(s, nr, b));      // erst klackt es zu, dann geschieht der Befehl
         if (b.art === 'tipp') return tipp(s, nr);
         if (b.art === 'lose') return lose(s, nr);
+        // Festhalten und Bewegen (bedien 'halten'): Abdeckung zur Seite, Buch gezogen, Halter gedreht. Das Ding bleibt stehen;
+        // fuer die Engine ist es ein Anfassen, das nur so wirkt (F allein verraet nichts)
+        if (b.art === 'schieben' && s.partie.dinge.hasOwnProperty(String(b.ding)) && s.partie.dinge[String(b.ding)].bedien === 'halten') b = { art: 'anfassen', ding: String(b.ding), halten: true };
         if (b.art === 'schieben') return schiebe(s, nr, b);
         if (b.art === 'sagen') return sagen(s, nr, b.text);
         if (b.art === 'verlassen') return [m('Du verl\u00e4sst die Partie. Die anderen spielen ohne dich weiter.', 'system')].concat(gehtFort(s, nr, b.x, b.z));
@@ -6473,9 +6573,10 @@ var Spiel = (function () {
                 if (d.vorlage === 'notschacht') { aus = aus.concat(notschacht(s, d, nr)); break; }
                 if (d.vorlage === 'pakt') { aus = aus.concat(pakt(s, d, nr)); break; }
                 if (d.vorlage === 'waage') { aus = aus.concat(trete(s, d, nr)); break; }
-                var getan = false, l = aktionenAn(s, d.id, ['bedienen', 'oeffnen', 'schalter', 'durchsuchen']);
+                var getan = false, l = d.bedien === 'halten' && !b.halten ? [] : aktionenAn(s, d.id, ['bedienen', 'oeffnen', 'schalter', 'durchsuchen', 'mechanismus']);      // was man festhalten muss, verraet F nicht
                 for (i = 0; i < l.length; i++) {
                     a = l[i];
+                    if (a.art === 'mechanismus') { if (erledigt(s, a) || !brauchtErfuellt(s, a)) continue; aus = aus.concat(mechanik(s, nr, a)); getan = true; break; }
                     if (a.art === 'schalter') {
                         var aus_ = s.f['licht_aus:' + a.raum];
                         var macheDunkel = a.gibt.some(function (f) { return f.indexOf('licht_aus:') === 0; });
@@ -6732,6 +6833,7 @@ var Spiel = (function () {
                 aus.push(m(KAT.FALLGITTER.dank, 'erfolg', s.opfer));
             } else aus.push(m(endText, 'erfolg'));
         } else {
+            aus = aus.concat(fensterZu(s));      // ist die Zeit des Fensters mit diesem Befehl um, klackt es gleich zu
             aus = aus.concat(zeitPruefen(s));
         }
         s.log = s.log.concat(aus);
@@ -6838,6 +6940,7 @@ var Spiel = (function () {
                 for (k = 0; k < s.partie.aktionen.length; k++) {
                     var ak = s.partie.aktionen[k];
                     if (ak.ding === d.id && ak.art !== 'ereignis' && (ak.art !== 'durchsuchen' || d.leer) && erledigt(s, ak)) offen = true;   // Ereignis am Versteck (R24: es ist gewandert) oeffnet es nicht
+                    if (ak.art === 'mechanismus' && ak.fach === d.id && s.f['geoeffnet:' + d.id]) offen = true;     // ein Mechanismus hat es geoeffnet (vielleicht nur kurz)
                 }
             }
             if (d.vorlage === 'zwischentuer') offen = !!s.f['offen:' + s.partie.durchgang.nach];
@@ -6901,6 +7004,11 @@ var Spiel = (function () {
         for (i = 0; i < s.partie.raeume.length; i++) raeume.push({ id: s.partie.raeume[i].id, name: s.partie.raeume[i].name, hier: s.partie.raeume[i].id === raum, zu: zugangZu(s, s.partie.raeume[i].id, nr) });
         var ansicht = { raum: raum, raeume: raeume, dinge: dinge, inventar: inventar, zeit: sekunden(s), licht: !s.f['licht_aus:' + raum],
             wasser: !!s.f['wasser:' + raum], status: s.draussen && s.draussen[nr] ? 'gewonnen' : s.status, tragen: tragen, laerm: (s.laut && s.laut[raum]) || 0, gaben: meineGaben(s, nr), gefangen: gefangen(s, nr), einhand: einhand(s, nr) };
+        // Zeitfenster eines Mechanismus: wie lange das Fach noch offen steht (Sekunden), fuer eine Anzeige oder ein Ticken
+        for (k in (s.fenster || {})) if (s.fenster.hasOwnProperty(k) && s.partie.dinge[k].raum === raum) {
+            if (!ansicht.fenster) ansicht.fenster = {};
+            ansicht.fenster[k] = Math.max(0, Math.ceil((s.fenster[k].bis - s.zeit) * SEK - 1e-9));
+        }
         // Der ganze Bereich steht (Oberflaeche, 2026-10-12): Steht die Zwischentuer oder das Gitter offen? Die Oberflaeche zeigt
         // das Ding auch von der anderen Seite, wo es nicht in der Sicht steht ("zu" je Raum sagt nur, ob dieser Spieler hinueber darf).
         if (s.partie.durchgang) ansicht.gangOffen = !!s.f['offen:' + s.partie.durchgang.nach];
