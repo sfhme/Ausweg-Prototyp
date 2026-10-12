@@ -404,8 +404,9 @@ var Setting = (function () {
                 ['teil', 'Auf der dunklen Leinwand leuchtet etwas auf. {teil}', 'Auf der dunklen Leinwand sind blasse Umrisse eines Zeichens zu ahnen.']] },
             katze: { name: 'Katze', nom: 'die Katze', akk: 'die Katze', verb: 'Streicheln',
                 b: 'Eine Katze. Sie beobachtet dich, als w\u00fcsste sie mehr als du.',
-                bannBeob: 'Sie l\u00e4sst niemanden heran, und vor einem Stock weicht sie zur\u00fcck.',
-                bann: 'Sie l\u00e4sst niemanden heran. L\u00e4rm w\u00fcrde sie verscheuchen, und mit etwas Langem hielte man sie auf Abstand.', f: [
+                bannBeob: 'Sie l\u00e4sst niemanden heran, vor einem Stock weicht sie zur\u00fcck, und wenn es nach Fisch riecht, hebt sie die Nase.',
+                bann: 'Sie l\u00e4sst niemanden heran. Mit etwas zu fressen lie\u00dfe sie sich bestechen, L\u00e4rm w\u00fcrde sie verscheuchen, und mit etwas Langem hielte man sie auf Abstand.',
+                gegen: { naehe: ['mit Fisch bestechen', 'mit L\u00e4rm verscheuchen', 'mit etwas Langem auf Abstand halten'] }, f: [
                 ['richtung', 'Die Katze flitzt zu ihrem Versteck: {ziel}.', 'Im Staub sind Pfotenspuren, alle zur selben Stelle hin.'],
                 ['traeger', 'Die Katze bringt etwas und legt es vor dir ab: {ziel}.', 'Die Katze hat Staub im Fell, als hole sie oft etwas aus einem Winkel.', 'Die Katze tr\u00e4gt etwas im Maul herbei und l\u00e4sst es wieder in einem Winkel verschwinden.'],
                 ['behaelter', 'Die Katze steht von ihrem warmen Platz auf. Darunter lag: {ziel}.', 'Der Platz, an dem die Katze liegt, ist eingedr\u00fcckt, als liege darunter etwas Hartes.', 'Die Katze steht kurz auf und legt sich gleich wieder hin.'],
@@ -447,6 +448,7 @@ var Setting = (function () {
             schere: { name: 'Schere', nom: 'die Schere', akk: 'die Schere', b: 'Eine alte Schneiderschere, stumpf geworden.' },
             saeurehaltig: { name: 'Phiole Scheidewasser', nom: 'die Phiole Scheidewasser', akk: 'die Phiole Scheidewasser', b: 'Eine Phiole Scheidewasser. Es frisst sich zischend durch Metall.' },
             wandfackel: { name: 'Wandfackel', nom: 'die Wandfackel', akk: 'die Wandfackel', b: 'Eine Fackel mit pechgetr\u00e4nktem Kopf. Sie brennt hell.' },
+            fisch: { name: 'Fisch', nom: 'der Fisch', akk: 'den Fisch', b: 'Ein Fisch, nicht mehr ganz frisch. Er riecht streng.', weg: 'Vom Fisch ist nichts mehr \u00fcbrig.' },
             feuerzeug: { name: 'Feuerstahl', nom: 'der Feuerstahl', akk: 'den Feuerstahl', b: 'Feuerstein und Stahl. Ein Schlag gibt Funken.' },
             streichhoelzer: { name: 'Zunderb\u00fcchse', nom: 'die Zunderb\u00fcchse', akk: 'die Zunderb\u00fcchse', b: 'Eine Zunderb\u00fcchse mit glimmendem Schwamm.' },
             taschenlampe: { name: 'Laterne', nom: 'die Laterne', akk: 'die Laterne', b: 'Eine Blendlaterne; hinter der Klappe brennt eine kr\u00e4ftige Flamme.',
@@ -901,7 +903,8 @@ var Setting = (function () {
             schwer: 'zu leicht', stumpf: 'nicht wuchtig genug', lang: 'zu kurz', scharf: 'nicht scharf genug',
             saeurehaltig: 'nicht \u00e4tzend genug', entzuendend: 'nicht zum Anz\u00fcnden geeignet', licht: 'nicht hell genug',
             deckend: 'zu klein zum Abdecken', saugfaehig: 'nicht saugf\u00e4hig genug', spiegelnd: 'kein brauchbarer Spiegel',
-            haken: 'damit l\u00e4sst sich nichts greifen', reissfest: 'nicht rei\u00dffest genug', laut: 'nicht laut genug', steif: 'zu biegsam'
+            haken: 'damit l\u00e4sst sich nichts greifen', reissfest: 'nicht rei\u00dffest genug', laut: 'nicht laut genug', steif: 'zu biegsam',
+            lockend: 'nicht verlockend genug'
         },
         // zweit: Name, Nominativ, Akkusativ, wenn dieselbe Art ein zweites Mal im Raum vorkommt
         // offen (wahlweise): wie das Ding am Fadenkreuz heisst, sobald es offen ist (eine offene Truhe ist nicht mehr verschlossen)
@@ -1039,7 +1042,7 @@ var Setting = (function () {
             kaykit: {
                 name: 'KayKit',
                 // pakt: Die Figuren dieses Herstellers haben nur runde F\u00e4uste, keine offene Hand (R152 gibt es hier nicht)
-                ohne: ['ventilator', 'katze', 'vitrine', 'wecker', 'v_laterne', 'v_urne', 'pakt'],
+                ohne: ['ventilator', 'katze', 'fisch', 'vitrine', 'wecker', 'v_laterne', 'v_urne', 'pakt'],
                 anders: {
                     // die \u00dcbungspuppe ist hier ein Gerippe: kein Stroh, kein Sackleinen, kein aufgemaltes Gesicht
                     puppe: { ersetze: [['Auf dem Sackleinen der', 'Auf dem Umhang der'], ['Eine Naht im R\u00fccken der \u00dcbungspuppe platzt auf. Im Stroh steckt', 'Der Umhang der \u00dcbungspuppe rutscht zur Seite. Zwischen den Rippen steckt'], ['den Kopf', 'den Sch\u00e4del'], ['Eine Naht im R\u00fccken der \u00dcbungspuppe ist schon einmal geplatzt und grob wieder geflickt.', 'Der Umhang der \u00dcbungspuppe ist am R\u00fccken verrutscht, als h\u00e4tte schon jemand darunter gegriffen.'],
@@ -1103,7 +1106,7 @@ var Setting = (function () {
             // Steingew\u00f6lbe, deshalb ohne die Story Verlies (siehe stories[].stile); die Gruft hat eigene St\u00fccke
             quaternius: {
                 name: 'Quaternius',
-                ohne: ['standuhr', 'spiegel', 'gemaelde', 'katze', 'bodenschacht', 'schrank_oben', 'hammer', 'schere', 'feuerzeug',
+                ohne: ['standuhr', 'spiegel', 'gemaelde', 'bodenschacht', 'schrank_oben', 'hammer', 'schere', 'feuerzeug',
                     'besen', 'angel', 'v_balken', 'v_wappen'],
                 anders: {
                     radio: { b: 'Ein aufgeschlagenes Buch auf einem Lesepult. Die Seiten rascheln, als atme es, und manchmal fl\u00fcstert es.' },
@@ -1278,6 +1281,7 @@ var Setting = (function () {
             'abdecken': 'Du deckst {akk} ab.',
             'ein Licht darauf richten': 'Du richtest ein Licht auf {akk}.',
             'mit L\u00e4rm verscheuchen': 'Du verscheuchst {akk} mit L\u00e4rm.',
+            'mit Fisch bestechen': 'Du legst {akk} den Fisch hin. Sie frisst und l\u00e4sst dich vorbei.',
             'mit etwas Langem auf Abstand halten': 'Du h\u00e4ltst {akk} mit etwas Langem auf Abstand.',
             'aufhalten (Abfluss freistochern, R\u00e4der blockieren)': 'Du h\u00e4ltst {akk} auf.',
             'mit Gewalt stoppen': 'Du stoppst {akk} mit Gewalt.',
@@ -1529,7 +1533,9 @@ var Katalog = (function () {
             { art: 'keine', aus: ['naehe'] },
             { art: 'teil', aus: ['licht_aus', 'hinsehen', 'licht_nebenan'] }
         ] },
-        katze: { nurKlein: true, f: [
+        // R113 Bestechen (2026-10-12): Die Katze laesst sich mit etwas Lockendem (Fisch) bestechen, sonst wie jede Bedrohung
+        // der Naehe verscheuchen oder auf Abstand halten
+        katze: { nurKlein: true, gegen: { naehe: { alt: [{ b: { lockend: 1 } }, { b: { laut: 1 }, laerm: true }, { b: { lang: 2, steif: 1 } }] } }, f: [
             { art: 'richtung', aus: ['laerm', 'stille', 'laerm_nebenan', 'abwesenheit'] },
             { art: 'traeger', aus: ['beruehrung', 'laerm'] },
             { art: 'behaelter', aus: ['waerme'] },
@@ -1582,6 +1588,7 @@ var Katalog = (function () {
         schere:       { e: { scharf: 1 } },
         saeurehaltig: { e: { saeurehaltig: 2 }, verbrauch: true },
         feuerzeug:    { e: { entzuendend: 1 } },
+        fisch:        { e: { lockend: 1 }, verbrauch: true },      // R113: lockt die Katze, danach gefressen
         // eine Fackel, die lose in einem Wandhalter steckt (2026-10-12): Licht und Feuer zum Mitnehmen; liegt immer im Halter
         wandfackel:   { e: { licht: 2, entzuendend: 1 } },
         streichhoelzer: { e: { entzuendend: 1 } },
@@ -1618,7 +1625,7 @@ var Katalog = (function () {
     var EIGENSCHAFT_TEXT = {
         schwer: 'schwer', stumpf: 'stumpf', laut: 'laut', lang: 'lang', scharf: 'scharf', saeurehaltig: '\u00e4tzend',
         entzuendend: 'entz\u00fcndend', licht: 'Licht', deckend: 'deckend', saugfaehig: 'saugf\u00e4hig', spiegelnd: 'spiegelnd',
-        haken: 'Haken', reissfest: 'rei\u00dffest', schluessel: 'Schl\u00fcssel', steif: 'steif'
+        haken: 'Haken', reissfest: 'rei\u00dffest', schluessel: 'Schl\u00fcssel', steif: 'steif', lockend: 'lockend'
     };
 
     // Verstecke. Jede Alternative ist ein Loesungsweg: b = Bedingung (Eigenschaft: Mindeststaerke), h = Haende,
@@ -1742,6 +1749,7 @@ var Katalog = (function () {
         if (!GEGENSTAENDE.hasOwnProperty(k)) continue;
         uebernimm(GEGENSTAENDE[k], S.gegenstaende[k], ['name', 'nom', 'akk', 'b'], 'gegenstaende.' + k);
         if (GEGENSTAENDE[k].zweit) uebernimm(GEGENSTAENDE[k].zweit, S.gegenstaende[k].zweit, ['name', 'nom', 'akk', 'b', 'verb', 'satz'], 'gegenstaende.' + k + '.zweit');
+        if (S.gegenstaende[k] && S.gegenstaende[k].weg) GEGENSTAENDE[k].weg = S.gegenstaende[k].weg;      // statt "ist jetzt aufgebraucht"
     }
     for (var vi = 0; vi < (S.verstecke || []).length; vi++) if (S.verstecke[vi].length !== 4) fehlt('verstecke[' + vi + '] (Name, Nominativ, Akkusativ, Platz)');
     for (k in HINDERNISSE) {
@@ -2513,7 +2521,7 @@ var Generator = (function () {
     // opt.bild (Server, Spielseite, Probeseite) kommen sie in keiner Partie vor; ohne (Tests, zeige.js) in jeder. Die
     // PC-Sitzung streicht hier einen Eintrag, sobald das Raetsel Modelle und ein Bild hat (ARBEITSTEILUNG.md 3.1f).
     // Raetsel, fuer die die Oberflaeche noch kein Bild hat: der Server laesst sie aus (Tests nehmen sie mit)
-    var NOCH_OHNE_BILD = { mechanismus: 1, wandfackel: 1 };
+    var NOCH_OHNE_BILD = { wandfackel: 1, katze: 1, fisch: 1 };
     function Bau(seed, spieler, stufe, versuch, stil, bild) {
         this.aus = bild ? NOCH_OHNE_BILD : {};
         this.r = Zufall.strom(String(seed), 'partie:' + spieler + ':' + stufe + ':' + versuch);
@@ -2526,7 +2534,7 @@ var Generator = (function () {
             raeume: [], dinge: {}, regeln: [], bedrohungen: [], anforderungen: {}, aktionen: [], tuer: null, start: [],
             stil: stil, platz: this.K.RAUM
         };
-        this.elementeFrei = this.r.mischen(sortiert(this.K.ELEMENTE));
+        this.elementeFrei = this.r.mischen(sortiert(this.K.ELEMENTE).filter(function (k) { return !bild || !NOCH_OHNE_BILD[k]; }));      // ohne Bild: vor dem Mischen weg
         var aus0 = this.aus;
         this.gegenstaendeFrei = this.r.mischen(sortiert(this.K.GEGENSTAENDE).filter(function (k) { return !aus0[k]; }));     // ohne Bild: vor dem Mischen weg, damit der Rest gleich faellt
         this.fixtur = {};
@@ -4844,8 +4852,9 @@ var Generator = (function () {
         };
         // Licht wie Feuer: Ist das Feuer weg (Laterne zerschlagen, Fackel verbaut), darf auch ein Raum, den man vorher geloescht
         // hat, nicht festsitzen (Sackgassen-Suchlauf 2026-10-12, Partie 468/3/1). Darum jeden Fall auch mit jedem Raum dunkel
-        var dunkel = [[]];
-        for (i = 0; i < p.raeume.length; i++) if (p.aktionen.some(function (x) { return x.licht && x.raum === p.raeume[i].id; })) dunkel.push(['licht_aus:' + p.raeume[i].id]);
+        var dunkel = [[]], alle = [];
+        for (i = 0; i < p.raeume.length; i++) if (p.aktionen.some(function (x) { return x.licht && x.raum === p.raeume[i].id; })) { dunkel.push(['licht_aus:' + p.raeume[i].id]); alle.push('licht_aus:' + p.raeume[i].id); }
+        if (alle.length > 1) dunkel.push(alle);
         var loesbar = function (extra) { return dunkel.every(function (d) { return Pruefer.pruefe(p, spieler, mitStart(extra.concat(d))).loesbar; }); };
         for (i = 0; i < p.aktionen.length; i++) {
             a = p.aktionen[i];
@@ -4884,13 +4893,18 @@ var Generator = (function () {
     // Raums loescht, darf sich damit nicht einsperren (Sackgassen-Suchlauf: Partie 390/4/1, eine Bedrohung im Dunkeln und
     // nirgends Feuer). Geprueft vom Start aus, der Raum schon dunkel.
     function dunkelFaehrtFest(p, spieler) {
-        var i, x;
+        var i, x, alle = [], faelle = [];
         for (i = 0; i < p.aktionen.length; i++) {
             var a = p.aktionen[i];
             if (a.art !== 'schalter' || !a.ding || !p.dinge[a.ding].flammen || !a.gibt.length) continue;
+            faelle.push([a.gibt[0]]); alle.push(a.gibt[0]);
+        }
+        // auch alle Raeume zugleich dunkel: Lesen braucht Licht, und das Feuer liegt vielleicht hinter einem Blatt (Partie 1916/3/3)
+        if (alle.length > 1) faelle.push(alle);
+        for (i = 0; i < faelle.length; i++) {
             var f = {};
             for (x = 0; x < p.start.length; x++) f[p.start[x]] = true;
-            f[a.gibt[0]] = true;
+            for (x = 0; x < faelle[i].length; x++) f[faelle[i][x]] = true;
             if (!Pruefer.pruefe(p, spieler, { f: f, schritte: 0 }).loesbar) return true;
         }
         return false;
@@ -6902,7 +6916,7 @@ var Spiel = (function () {
                         if (!items[vb].verbrauch || !w.alt.b) continue;
                         var genutzt = false, ek;
                         for (ek in w.alt.b) if (w.alt.b.hasOwnProperty(ek) && (items[vb].e[ek] || 0) > 0) genutzt = true;
-                        if (genutzt) { s.f['weg:' + items[vb].id] = true; aus.push(m(gross(nom(items[vb])) + ' ist jetzt aufgebraucht.')); }
+                        if (genutzt) { s.f['weg:' + items[vb].id] = true; aus.push(m((KAT.GEGENSTAENDE[items[vb].vorlage] && KAT.GEGENSTAENDE[items[vb].vorlage].weg) || gross(nom(items[vb])) + ' ist jetzt aufgebraucht.')); }
                     }
                     erfolg = true;
                 }
