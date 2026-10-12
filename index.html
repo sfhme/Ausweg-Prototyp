@@ -1021,7 +1021,8 @@ var Setting = (function () {
                         los: 'Ihr zieht H\u00f6lzchen. Das kurze hat {wer}. Bleiben muss trotzdem nur, wer selbst an den Hebel geht.',
                         alt: [{ h: 2, opfer: true, text: 'einer h\u00e4lt den Hebel, die anderen gehen durch' }, { b: { reissfest: 1 }, legt: true, text: 'den Hebel mit einem Seil unten festbinden' }] },
                     // Ausstattung der Stories: was das Modell des Herstellers wirklich zeigt
-                    AUSSTATTUNG: { weinregal: 'Weinfass', waffenstaender: 'Waffenpfeiler', moerser: 'Schale', kolben: 'Kolben', buecherbord: 'Kommode mit B\u00fcchern' },
+                    AUSSTATTUNG: { weinregal: 'Weinfass', waffenstaender: 'Waffenpfeiler', moerser: 'Schale', kolben: 'Kolben', buecherbord: 'Kommode mit B\u00fcchern',
+                        grabplatte: 'Grabstein', knochen: 'Gebeine' },
                     KRUEGE: { becken: { name: 'Messzuber', nom: 'der Messzuber', akk: 'den Messzuber',
                         b: 'Ein Zuber mit einer Kerbe innen und der Inschrift am Rand: genau {n} Ma\u00df. Unten sitzt eine Klappe.' },
                         versickert: 'Das Wasser versickert durch einen Spalt im Zuber. Es waren nicht genau {n} Ma\u00df.' }
@@ -1029,11 +1030,13 @@ var Setting = (function () {
                 raum: {
                     // Ausstattung mit Modell in diesem Stil; die zweite Zeile ist die Ausstattung der Stories (werkzeug/modelle/bau.js)
                     deko: ['regal', 'fass', 'kisten', 'banner', 'stuhl', 'klangflasche',
-                        'pritsche', 'eimer', 'schatztruhe', 'waffenstaender', 'gold', 'muenzen', 'kolben', 'moerser', 'buecher', 'buecherbord', 'weinregal'],
+                        'pritsche', 'eimer', 'schatztruhe', 'waffenstaender', 'gold', 'muenzen', 'kolben', 'moerser', 'buecher', 'buecherbord', 'weinregal',
+                        'sarg', 'grabplatte', 'knochen', 'schaedel'],
                     stand: { schrank_oben: 'wand', paket: 'tisch' },
                     wandhoehe: { schrank_oben: 2.25, doppelhebel: 1.05, hebelpaar: 1.05 },
                     grund: { becken: [1.0, 0.4], puppe: [0.55, 0.3], winde: [0.47, 0.4],
-                        pritsche: [0.9, 0.45], eimer: [0.13, 0.11], schatztruhe: [0.48, 0.4], waffenstaender: [0.5, 0.39], buecher: [0.17, 0.08], buecherbord: [0.28, 0.29], weinregal: [0.65, 0.37] }
+                        pritsche: [0.9, 0.45], eimer: [0.13, 0.11], schatztruhe: [0.48, 0.4], waffenstaender: [0.5, 0.39], buecher: [0.17, 0.08], buecherbord: [0.28, 0.29], weinregal: [0.65, 0.37],
+                        sarg: [0.75, 0.5], grabplatte: [0.44, 0.13], knochen: [0.15, 0.13] }
                 }
             },
             // Quaternius, neue detailreiche Reihe (Fantasy Props MegaKit + Medieval Village MegaKit): Fachwerkhaus statt
