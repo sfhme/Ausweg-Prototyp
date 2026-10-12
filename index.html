@@ -2494,13 +2494,17 @@ var Generator = (function () {
     'use strict';
 
     var STUFE = {
-        1: { tiefe: 2, mindest: 4, schloesser: 1, bedrohung: [0.35, 0], ablenkung: 1, zweiterWeg: 0.55, codeLaenge: 3, frist: 2.6, teile: 0.4, formen: ['ganz', 'ganz', 'symbol', 'folge', 'melodie'],
+        1: { tiefe: 2, mindest: 4, schloesser: 1, bedrohung: [0.35, 0], ablenkung: 0, zweiterWeg: 0.85, codeLaenge: 3, frist: 2.6, teile: 0.4, formen: ['ganz', 'ganz', 'symbol', 'folge', 'melodie'],
             reihen: ['plus'] },
-        2: { tiefe: 3, mindest: 11, schloesser: 2, bedrohung: [0.75, 0], ablenkung: 2, zweiterWeg: 0.65, codeLaenge: 3, frist: 2, teile: 0.6, formen: ['ganz', 'symbol', 'rechnung', 'raten', 'logik', 'folge', 'handbuch', 'melodie', 'nachschlagen'],
+        2: { tiefe: 3, mindest: 11, schloesser: 2, bedrohung: [0.75, 0], ablenkung: 1, zweiterWeg: 0.5, codeLaenge: 3, frist: 2, teile: 0.6, formen: ['ganz', 'symbol', 'rechnung', 'raten', 'logik', 'folge', 'handbuch', 'melodie', 'nachschlagen'],
             reihen: ['plus', 'verschraenkt', 'wachsend'] },
-        3: { tiefe: 3, mindest: 16, schloesser: 3, bedrohung: [1, 0.45], ablenkung: 2, zweiterWeg: 0.75, codeLaenge: 4, frist: 1.6, teile: 0.7, formen: ['ganz', 'symbol', 'rechnung', 'raten', 'logik', 'folge', 'handbuch', 'melodie', 'nachschlagen'],
+        3: { tiefe: 3, mindest: 16, schloesser: 3, bedrohung: [1, 0.45], ablenkung: 2, zweiterWeg: 0.25, codeLaenge: 4, frist: 1.6, teile: 0.7, formen: ['ganz', 'symbol', 'rechnung', 'raten', 'logik', 'folge', 'handbuch', 'melodie', 'nachschlagen'],
             reihen: ['plus', 'verschraenkt', 'wachsend', 'summe', 'doppelt'] }
     };
+    // zweiterWeg: wie oft ein Hindernis einen zweiten ausgelegten Weg bekommt. Mehr Wege machen leichter (GRUNDSAETZE.md,
+    // Entscheidung des Projektinhabers 2026-10-12: "ja bauen"), darum faellt der Anteil mit der Stufe; ab drei Spielern
+    // 10 Punkte mehr, weil getrennte Taschen ein einzelnes Werkzeug zum Engpass machen. Gemessen liegt trotzdem oft ein
+    // zweiter Weg aus: Andere Gegenstaende passen zufaellig mit (Stufe 3 bei 0,25 etwa 70 bis 75 % der Hindernisse).
     // mindest: so viele Schritte braucht der noetige Weg wenigstens, sonst wird neu gewuerfelt (Blindtest Runde 3: 1318 mit
     // 10 Schritten fanden beide Spieler auf Stufe 2 zu leicht, 1316 mit 14 und 1310 mit 20 passend; Stufe 3 mit 19 bis 24
     // fordernd und fair). Verworfen werden so etwa 5, 17 und 10 Prozent der Partien.
@@ -2534,6 +2538,10 @@ var Generator = (function () {
     var SUCHKOSTEN = 3;
     // Stufe 1 ohne leere Verstecke (Blindtest 2026-10-12: zu viel Leerlauf; Entscheidung des Projektinhabers)
     var LEERE = { 1: 0, 2: 2, 3: 2 };
+    // Falsche Faehrten nach Stufe (GRUNDSAETZE.md: rote Heringe hoechstens im harten Modus; Entscheidung 2026-10-12):
+    // ablenkung (Elemente, die sich verhalten, aber nichts bedeuten) 0 / 1 / 2 in STUFE, ein Koeder-Gegenstand mit diesem
+    // Anteil, der Luegner erst ab Stufe 2, die falsche Faehrte erst auf Stufe 3
+    var KOEDER = { 1: 0, 2: 0.3, 3: 0.6 };
     var MAX_VERSUCHE = 60;
     var ANZEICHEN = { 1: 0.6, 2: 0.35, 3: 0.15 };
     var ABDECKUNG = { v_wandbehang: 1, v_wappen: 1, v_laterne: 1 };      // Faecher hinter etwas, das man zur Seite nehmen kann      // Anteil verborgener Faecher mit einem Anzeichen beim Ansehen
@@ -2982,10 +2990,22 @@ var Generator = (function () {
         var i;
         if (tiefe > 0 && arten[0] === 'frei' && this.r.chance(0.6)) arten.push(arten.shift());
         for (i = 0; i < arten.length; i++) {
+            if (this.rolleVoll(arten[i])) continue;
             // was ohnehin frei im Raum liegt, bietet die Steinhand nicht an (PC-Sitzung 2026-10-11: sonst liegt es zweimal da)
             if (this['lege_' + arten[i]](g, tiefe, opt)) { if (arten[i] !== 'frei') this.paktAngebot(g, tiefe); return; }
         }
         this.lege_frei(g, tiefe, opt);
+    };
+
+    // Hoechstens zwei Regeln derselben Rolle je Partie (GRUNDSAETZE.md: Vielfalt statt Wiederholung; Entscheidung
+    // 2026-10-12). Gemeint sind die Rollen, die platziere waehlt (fuenfmal "weist auf ein Versteck" in einer Partie war zu
+    // viel); Code-Teile zaehlen nicht, sie gehoeren zum Meta-Raetsel.
+    var ROLLE_HOECHSTENS = 2;
+    Bau.prototype.rolleVoll = function (art) {
+        if (art === 'hausordnung') art = 'behaelter';                    // die Tafel gibt frei, was im Element steckt
+        if (art !== 'richtung' && art !== 'behaelter' && art !== 'traeger') return false;
+        for (var i = 0, n = 0; i < this.p.regeln.length; i++) if (this.p.regeln[i].art === art) n++;
+        return n >= ROLLE_HOECHSTENS;
     };
 
     // Teilopfer (R152): Neben dem gewohnten Weg bietet manchmal eine Steinhand den Gegenstand gleich an. Der Preis: Wer
@@ -3072,7 +3092,7 @@ var Generator = (function () {
         var m = this.anforderung(v.name, h.alt), alt = this.p.anforderungen[m].alt;
         var reihe = this.r.mischen([0, 1, 2].slice(0, alt.length)), geliefert = 0, i;
         for (i = 0; i < reihe.length && geliefert < 2; i++) {
-            if (geliefert === 1 && !this.r.chance(this.cfg.zweiterWeg)) break;
+            if (geliefert === 1 && !this.zweiterWeg()) break;
             this.liefere(alt[reihe[i]].b, tiefe - 1, opt);
             geliefert++;
         }
@@ -3132,7 +3152,7 @@ var Generator = (function () {
         // nur die Attrappen (leereVerstecke): nur sie lassen sich nach einer Faehrte durchsuchen; die leeren Faecher von Orakel und
         // Zetteln haben ihre eigene Logik
         for (k in this.p.dinge) if (this.p.dinge.hasOwnProperty(k) && this.p.dinge[k].typ === 'versteck' && this.p.dinge[k].leer && this.p.dinge[k].ablenkung) leere.push(this.p.dinge[k]);
-        if (!NZ || !NZ.faehrte || this.aus.faehrte || this.p.stufe < 2 || !leere.length || !this.r.chance(0.15)) return;
+        if (!NZ || !NZ.faehrte || this.aus.faehrte || this.p.stufe < 3 || !leere.length || this.rolleVoll('richtung') || !this.r.chance(0.15)) return;
         var ohneBedarf = function (a) { return (!self.K.AUSLOESER[a].bedarf || self.K.AUSLOESER[a].bedarf === 'nichts') && a !== 'anzahl' && a !== 'abwesenheit' && a !== 'licht_nebenan' && a !== 'laerm_nebenan'; };
         var el = this.nimmElement('richtung', function (f) { return f.aus.some(ohneBedarf); });
         if (!el) return;
@@ -3176,7 +3196,7 @@ var Generator = (function () {
         var SK = this.K.ELEMENTE[el.key].sinken;
         if (art === 'traeger' && aus === 'wasser' && SK && !this.aus.sinken && this.r.chance(0.8)) {
             var ms = this.anforderung(SK.text, [{ text: SK.text, b: { schwer: 2 } }]);
-            if (this.r.chance(this.cfg.zweiterWeg)) this.liefere({ schwer: 2 }, tiefe - 1, opt);
+            if (this.zweiterWeg()) this.liefere({ schwer: 2 }, tiefe - 1, opt);
             var as = this.aktion({ text: SK.text + ' (' + d.name + ')', art: 'benutzen', raum: d.raum, ding: d.id, mittel: ms, gibt: ['hat:' + g.id], schalter: true });
             as.verbrauchtMittel = true;
             as.satz = SK.satz.replace('{ziel}', g.name);
@@ -3498,7 +3518,7 @@ var Generator = (function () {
     }
     Bau.prototype.lege_luegner = function (g, tiefe, opt) {
         var VN = this.K.VERSTECKE, T = this.K.LUEGNER, frei = [], i, j, versuch;
-        if (this.fixtur.luegner || !this.r.chance(0.6)) return false;   // eins je Partie (dieselben Sprecher, derselbe Name), nicht zu oft
+        if (this.fixtur.luegner || this.p.stufe < 2 || !this.r.chance(0.6)) return false;   // eins je Partie (dieselben Sprecher, derselbe Name), nicht zu oft
         for (i = 0; i < VN.length; i++) if (!this.fixtur['name:' + VN[i][0]]) frei.push(VN[i]);
         if (frei.length < 3) return false;
         var namen = this.r.mischen(frei).slice(0, 3), t = this.r.bis(3), l = this.r.bis(3), aussagen = null;
@@ -4387,7 +4407,7 @@ var Generator = (function () {
         d.zone = this.zoneFuer(raum, {});
         var m = this.anforderung(IN.name, IN.alt), alt = this.p.anforderungen[m].alt, reihe = this.r.mischen([0, 1, 2]);
         for (i = 0; i < 2; i++) {
-            if (i === 1 && !this.r.chance(this.cfg.zweiterWeg)) break;
+            if (i === 1 && !this.zweiterWeg()) break;
             this.liefere(alt[reihe[i]].b, tiefe - 1, {});
         }
         var a = this.aktion({ text: IN.name + ' lesbar machen', art: 'benutzen', raum: raum, ding: d.id, mittel: m, gibt: [fakt] });
@@ -4456,7 +4476,7 @@ var Generator = (function () {
             pk.partner = sd.id; sd.partner = pk.id; sd.modell = 'doppelhebel';
             pk.zone = false;               // nie im Bereich einer Bedrohung: beim Ziehen zugleich prueft der Pruefer nur das Schloss
             var mz = this.anforderung(s.name, [s.alt[0]]), mk = this.anforderung(s.name + ' verkeilen', [s.alt[1], s.alt[2]]);
-            if (this.spieler <= 2 || this.r.chance(this.cfg.zweiterWeg)) this.liefere(this.r.waehle([s.alt[1], s.alt[2]]).b, tiefe - 1, {});
+            if (this.spieler <= 2 || this.zweiterWeg()) this.liefere(this.r.waehle([s.alt[1], s.alt[2]]).b, tiefe - 1, {});
             this.aktion({ text: this.K.SCHLOESSER.hebelpaar.aktionBeide, art: 'benutzen', raum: tuerRaum, ding: sd.id, mittel: mz, gibt: ['schloss:' + sd.id] });
             this.aktion({ text: this.K.SCHLOESSER.hebelpaar.aktionKeil, art: 'benutzen', raum: tuerRaum, ding: sd.id, mittel: mk, gibt: ['kette_fest:' + sd.id] });
             this.aktion({ text: this.K.SCHLOESSER.hebelpaar.aktionAndere, art: 'bedienen', raum: drueben, ding: pk.id, braucht: ['kette_fest:' + sd.id], gibt: ['schloss:' + sd.id] });
@@ -4503,7 +4523,7 @@ var Generator = (function () {
         } else {
             var m = this.anforderung(s.name, s.alt), alt = this.p.anforderungen[m].alt, i, mitB = [];
             for (i = 0; i < alt.length; i++) if (alt[i].b) mitB.push(alt[i]);
-            if (this.spieler <= 2 || this.r.chance(this.cfg.zweiterWeg)) this.liefere(this.r.waehle(mitB).b, tiefe - 1, {});
+            if (this.spieler <= 2 || this.zweiterWeg()) this.liefere(this.r.waehle(mitB).b, tiefe - 1, {});
             this.aktion({ text: s.name.charAt(0).toUpperCase() + s.name.slice(1) + ' bedienen', art: 'benutzen', raum: tuerRaum, ding: sd.id,
                 mittel: m, gibt: ['schloss:' + sd.id] });
         }
@@ -4596,6 +4616,10 @@ var Generator = (function () {
     // Zelle liegt, und die eigene Tuer. In einer Zelle liegt das Werkzeug, das die Tueren oeffnet: von innen die eigene,
     // von aussen die der anderen. Der Ausgang braucht alle frei. Pruefer: Aktionen mit zelle gehen von drinnen, alles andere
     // braucht jemanden, der frei ist (Haende = Zahl der Freien).
+    Bau.prototype.zweiterWeg = function () {
+        return this.r.chance(Math.min(1, this.cfg.zweiterWeg + (this.spieler >= 3 ? 0.1 : 0)));
+    };
+
     Bau.prototype.zellenBau = function () {
         var Z = this.K.ZELLEN, p = this.p, k, i, j, key = null;
         p.zellen = { raum: 'r1', n: this.spieler };
@@ -4605,12 +4629,14 @@ var Generator = (function () {
             d.zone = false;
             this.aktion({ text: Z.tuer.name + ' ' + k + ' \u00f6ffnen', art: 'benutzen', raum: 'r1', ding: d.id, mittel: m, gibt: ['frei:' + k] }).zelle = k;
         }
-        // Zwei Wege hinaus (Vorgabe "viele Loesungswege je Problem"): ein Werkzeug fuer einen Weg und, wenn der Satz es hergibt,
-        // ein zweites fuer einen anderen Weg, den das erste nicht kann. Allein liegen beide in der eigenen Zelle, zu mehreren
-        // in zwei verschiedenen Zellen. Gegenstaende ausserhalb erreicht drinnen niemand.
+        // Ein Werkzeug fuer einen Weg hinaus und, wenn der Satz es hergibt, ein zweites fuer einen anderen Weg, den das erste
+        // nicht kann. In der Zelle gibt es nichts anderes zu tun (eine Engstelle ohne parallelen Strang), darum auf Leicht und
+        // Mittel immer, auf Schwer wie jeder zweite Weg (GRUNDSAETZE.md, Regel b). Allein liegen beide in der eigenen Zelle,
+        // zu mehreren in zwei verschiedenen Zellen. Gegenstaende ausserhalb erreicht drinnen niemand.
         var k0 = 1 + this.r.bis(this.spieler), wege = this.r.mischen([0, 1, 2].slice(0, alt.length)), wahl = [], self = this;
+        var zweiZell = this.p.stufe < 3 || this.zweiterWeg();
         var passt = function (gk, w) { return !self.K.GEGENSTAENDE[gk].verbrauch && Pruefer.deckt(self.K.GEGENSTAENDE[gk].e, alt[w].b); };
-        for (i = 0; i < wege.length && wahl.length < 2; i++) for (j = 0; j < this.gegenstaendeFrei.length; j++) {
+        for (i = 0; i < wege.length && wahl.length < (zweiZell ? 2 : 1); i++) for (j = 0; j < this.gegenstaendeFrei.length; j++) {
             var gk = this.gegenstaendeFrei[j];
             if (!passt(gk, wege[i]) || (wahl.length && (gk === wahl[0].key || passt(wahl[0].key, wege[i])))) continue;
             wahl.push({ key: gk, weg: wege[i] }); break;
@@ -4843,7 +4869,7 @@ var Generator = (function () {
                     gibt: ['bei:' + dz + ':' + gz.raum, 'fort:' + dz + ':' + drz], nimmt: ['fort:' + dz + ':' + gz.raum], schalter: true, sicher: true });
             }
         }
-        if (this.gegenstaendeFrei.length && this.r.chance(0.6)) {
+        if (this.gegenstaendeFrei.length && this.r.chance(KOEDER[p.stufe])) {
             var g = this.ding('gegenstand', this.K.GEGENSTAENDE[this.gegenstaendeFrei[0]].name, null,
                 { vorlage: this.gegenstaendeFrei[0], e: kopiere(this.K.GEGENSTAENDE[this.gegenstaendeFrei[0]].e), ablenkung: true,
                   nom: this.K.GEGENSTAENDE[this.gegenstaendeFrei[0]].nom, akk: this.K.GEGENSTAENDE[this.gegenstaendeFrei[0]].akk });
@@ -5018,6 +5044,9 @@ var Generator = (function () {
             // Gegenstand schon in der Hand und sofort verbraucht; faehrt das fest, wird neu gewuerfelt.
             if (verbrauchFaehrtFest(p, spieler)) { gruende.push('Verbrauch faehrt fest'); continue; }
             if (dunkelFaehrtFest(p, spieler)) { gruende.push('Dunkel faehrt fest'); continue; }
+            // Die falsche Faehrte ist nur fair, wenn der Warnzettel zu lesen ist (test_spiel, Partie 563/1/3: dunkler Start,
+            // das einzige Feuer brannte im ersten Raum, der Zettel lag im dunklen zweiten)
+            if (p.faehrte && p.aktionen.some(function (x) { return x.art === 'lesen' && x.braucht[0] === 'hat:' + p.faehrte.zettel && a.fehlt.indexOf(x.id) >= 0; })) { gruende.push('Warnzettel unerreichbar'); continue; }
             // Anzeichen verborgener Faecher (Abwechslung, 2026-10-12): aus einem eigenen Strom, damit der Rest der Partie gleich bleibt;
             // echte und leere gleich oft, auf Stufe 1 oft, auf Stufe 3 selten
             var za = Zufall.strom(String(seed) + ':' + v, 'anzeichen'), ks = Object.keys(p.dinge).sort();
@@ -6712,8 +6741,9 @@ var Spiel = (function () {
     }
 
     // Tipp auf Anfrage (Entscheidung des Projektinhabers 2026-10-12, statt blindem Suchen): Der Pruefer rechnet vom
-    // jetzigen Stand den naechsten noetigen Schritt; je Schritt drei Stufen (wohin schauen, was tun, die Loesung). Jeder
-    // Tipp kostet TIPP_STRAFE Einheiten auf der Uhr. Lesbar fuer den, der fragt (l).
+    // jetzigen Stand den naechsten noetigen Schritt; je Schritt drei Stufen (wohin schauen, was tun, die Loesung). Lesbar
+    // fuer den, der fragt (l). Hilfe ist keine Strafe (GRUNDSAETZE.md; Entscheidung 2026-10-12): Kein Tipp kostet Zeit auf
+    // der Frist; nur die dritte Stufe, die Loesung, zaehlt (s.tippLoesungen) und kostet spaeter in der Wertung (KONZEPT 7).
     // Mechanismus (Entscheidung 2026-10-12): oeffnet das Fach a.fach; der Fund liegt darin. Mit Zeitfenster schliesst es nach
     // FENSTER_SEK (ohne Uhr FENSTER_EINHEITEN) wieder, wenn niemand den Fund genommen hat; dann laesst es sich neu ausloesen.
     var FENSTER_SEK = 20, FENSTER_EINHEITEN = 2;
@@ -6744,7 +6774,6 @@ var Spiel = (function () {
         }
         return aus;
     }
-    var TIPP_STRAFE = 1;
     function tipp(s, nr) {
         var T = KAT.TIPP, r = Pruefer.pruefe(s.partie, aktive(s), { f: s.f, schritte: s.zeit }), i, text;
         var sag = function (t) { var x = m(t, 'tipp'); x.l = t; return [x]; };
@@ -6753,7 +6782,7 @@ var Spiel = (function () {
         for (i = 0; i < s.partie.aktionen.length; i++) if (s.partie.aktionen[i].id === w.aktion) a = s.partie.aktionen[i];
         if (!s.tipps) s.tipps = {};
         var stufe = s.tipps[a.id] = Math.min(3, (s.tipps[a.id] || 0) + 1);
-        kostet(s, TIPP_STRAFE, false);
+        if (stufe === 3) s.tippLoesungen = (s.tippLoesungen || 0) + 1;
         var d = a.ding ? s.partie.dinge[a.ding] : null;
         // ein Fach, das noch keiner entdeckt hat, heisst im Tipp, wie man es sieht (ein Fass ist ein Fass)
         var unbekannt = unentdeckt(s, d);
