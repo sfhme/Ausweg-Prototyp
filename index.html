@@ -463,7 +463,7 @@ var Setting = (function () {
             wecker: { name: 'Kettenb\u00fcndel', nom: 'das Kettenb\u00fcndel', akk: 'das Kettenb\u00fcndel', b: 'Ein B\u00fcndel Eisenketten. Es rasselt bei jeder Bewegung.',
                 zweit: { name: 'lose Kette', nom: 'die lose Kette', akk: 'die lose Kette', b: 'Eine einzelne lange Eisenkette.', verb: 'Entwirren',
                     satz: 'Du entwirrst das B\u00fcndel. \u00dcbrig bleibt eine lange Kette, die nicht mehr rasselt.' } },
-            hantel: { name: 'Steinquader', nom: 'der Steinquader', akk: 'den Steinquader', b: 'Ein behauener Steinquader, sehr schwer.' },
+            hantel: { name: 'Steingewicht', nom: 'das Steingewicht', akk: 'das Steingewicht', b: 'Ein behauener Steinquader mit eisernem Tragb\u00fcgel, sehr schwer.' },
             topf: { name: 'Holzkrug', nom: 'der Holzkrug', akk: 'den Holzkrug', b: 'Ein leichter Krug aus Holz, mit Eisenreifen beschlagen.' },
             pfanne: { name: 'Gusseisenpfanne', nom: 'die Gusseisenpfanne', akk: 'die Gusseisenpfanne', b: 'Eine schwere Pfanne aus Gusseisen.' }
         },
@@ -1055,18 +1055,19 @@ var Setting = (function () {
                         alt: [{ h: 2, opfer: true, text: 'einer h\u00e4lt den Hebel, die anderen gehen durch' }, { b: { reissfest: 1 }, legt: true, text: 'den Hebel mit einem Seil unten festbinden' }] },
                     // Ausstattung der Stories: was das Modell des Herstellers wirklich zeigt
                     AUSSTATTUNG: { weinregal: 'Weinfass', waffenstaender: 'Waffenpfeiler', moerser: 'Schale', kolben: 'Kolben', buecherbord: 'Kommode mit B\u00fcchern',
-                        grabplatte: 'Grabstein', knochen: 'Gebeine' }
+                        grabplatte: 'Grabstein', knochen: 'Gebeine', kette: 'Eisenkugel mit Kette' }
                 },
                 raum: {
                     // Ausstattung mit Modell in diesem Stil; die zweite Zeile ist die Ausstattung der Stories (werkzeug/modelle/bau.js)
                     deko: ['regal', 'fass', 'kisten', 'banner', 'stuhl', 'klangflasche',
                         'pritsche', 'eimer', 'schatztruhe', 'waffenstaender', 'gold', 'muenzen', 'kolben', 'moerser', 'buecher', 'buecherbord', 'weinregal',
-                        'sarg', 'grabplatte', 'knochen', 'schaedel', 'fassstapel', 'lagerfass', 'fassturm', 'saeule'],
+                        'sarg', 'grabplatte', 'knochen', 'schaedel', 'fassstapel', 'lagerfass', 'fassturm', 'saeule', 'kette', 'ruestung', 'kelch'],
                     stand: { schrank_oben: 'wand', paket: 'tisch' },
                     wandhoehe: { schrank_oben: 2.25, doppelhebel: 1.05, hebelpaar: 1.05 },
                     grund: { becken: [1.0, 0.4], puppe: [0.55, 0.3], winde: [0.47, 0.4], tisch: [0.8, 0.42],
                         pritsche: [0.9, 0.45], eimer: [0.13, 0.11], schatztruhe: [0.48, 0.4], waffenstaender: [0.5, 0.39], buecher: [0.17, 0.08], buecherbord: [0.28, 0.29], weinregal: [0.65, 0.37],
-                        sarg: [1.0, 0.36], grabplatte: [0.44, 0.13], knochen: [0.15, 0.13], fassstapel: [0.85, 0.46], lagerfass: [0.57, 0.64], fassturm: [1.3, 0.45], saeule: [0.45, 0.45] }
+                        sarg: [1.0, 0.36], grabplatte: [0.44, 0.13], knochen: [0.15, 0.13], fassstapel: [0.85, 0.46], lagerfass: [0.57, 0.64], fassturm: [1.3, 0.45], saeule: [0.45, 0.45],
+                        kette: [0.49, 0.32], ruestung: [0.3, 0.38] }
                 }
             },
             // Quaternius, neue detailreiche Reihe (Fantasy Props MegaKit + Medieval Village MegaKit): Fachwerkhaus statt
@@ -1084,6 +1085,8 @@ var Setting = (function () {
                     decke: { name: 'Bettdecke', nom: 'die Bettdecke', akk: 'die Bettdecke', b: 'Eine dicke, sehr gro\u00dfe Bettdecke.' },
                     kleiderhaken: { name: 'Hakenleiste', nom: 'die Hakenleiste', akk: 'die Hakenleiste', b: 'Eine Holzleiste mit eisernen Haken.' },
                     pfanne: { name: 'Eisentopf', nom: 'der Eisentopf', akk: 'den Eisentopf', b: 'Ein schwerer Topf aus Eisen.' },
+                    // Blindtest 2026-10-12: Jeder Steinblock dieses Herstellers las sich als Kasten; das schwere Ding ist hier ein Amboss
+                    hantel: { name: 'Amboss', nom: 'der Amboss', akk: 'den Amboss', b: 'Ein kleiner Amboss aus Eisen, sehr schwer.' },
                     // Blindtest 2026-10-12: Das Modell ist eine Kommode mit Schubladen und T\u00fcren, sie steht am Boden
                     vitrine: { name: 'verschlossene Kommode', offen: 'offene Kommode', nom: 'die verschlossene Kommode', akk: 'die verschlossene Kommode',
                         zweit: ['zweite verschlossene Kommode', 'die zweite verschlossene Kommode', 'die zweite verschlossene Kommode'] },
@@ -1094,7 +1097,8 @@ var Setting = (function () {
                 },
                 // ganze Textbloecke, die in diesem Stil anders lauten (werden ueber den Block des Settings gelegt)
                 block: {
-                    AUSSTATTUNG: { kisten: 'Kiste', weinregal: 'Fassgestell', moerser: 'Tiegel', kolben: 'Trank', pritsche: 'Bett', saeule: 'St\u00fctzbalken' },
+                    AUSSTATTUNG: { kisten: 'Kiste', weinregal: 'Fassgestell', moerser: 'Tiegel', kolben: 'Trank', pritsche: 'Bett', saeule: 'St\u00fctzbalken',
+                        gold: 'Goldkiste', sarg: 'Steinsarg', grabplatte: 'Urnenregal', knochen: 'Scherben' },
                     // Das Paket hat weder Zahnrad noch Hebel: Am Ger\u00e4t des Schlosses (R80) sind M\u00fcnzen eingelassen, und ein Schl\u00fcssel
                     // steckt oben oder unten (client/ui.js schlossGeraet)
                     HANDBUCH: { bed: { mehr: 'mehr als {n} M\u00fcnzen eingelassen sind', weniger: 'weniger als {n} M\u00fcnzen eingelassen sind', hebel: 'der Schl\u00fcssel {stand} steckt' },
@@ -1138,13 +1142,15 @@ var Setting = (function () {
                 },
                 raum: {
                     deko: ['regal', 'fass', 'kisten', 'banner', 'stuhl', 'klangflasche',
-                        'kette', 'pritsche', 'eimer', 'waffenstaender', 'muenzen', 'kelch', 'kolben', 'moerser', 'buecher', 'buecherbord', 'weinregal', 'fassstapel', 'fassturm', 'saeule'],
+                        'kette', 'pritsche', 'eimer', 'waffenstaender', 'muenzen', 'kelch', 'kolben', 'moerser', 'buecher', 'buecherbord', 'weinregal', 'fassstapel', 'fassturm', 'saeule',
+                        'schatztruhe', 'gold', 'sarg', 'grabplatte', 'knochen'],
                     geschoss: 2.5,
                     stand: { radio: 'boden' },
                     wandhoehe: { licht: 1.5 },
                     grund: { radio: [0.22, 0.22], holzkiste: [0.49, 0.3], wasser: [0.55, 0.31], schaukelstuhl: [0.28, 0.27], v_fass: [0.36, 0.36],
                         v_urne: [0.23, 0.23], v_schemel: [0.19, 0.19], fass: [0.36, 0.36], kisten: [0.38, 0.4], stuhl: [0.19, 0.19], tisch: [0.61, 0.25],
-                        kette: [0.25, 0.21], pritsche: [0.8, 0.63], eimer: [0.22, 0.2], waffenstaender: [0.55, 0.39], buecher: [0.17, 0.14], buecherbord: [0.52, 0.15], weinregal: [0.7, 0.38], fassstapel: [0.7, 0.46], fassturm: [1.05, 0.46], saeule: [0.17, 0.19] }
+                        kette: [0.25, 0.21], pritsche: [0.8, 0.63], eimer: [0.22, 0.2], waffenstaender: [0.55, 0.39], buecher: [0.17, 0.14], buecherbord: [0.52, 0.15], weinregal: [0.7, 0.38], fassstapel: [0.7, 0.46], fassturm: [1.05, 0.46], saeule: [0.17, 0.19],
+                        schatztruhe: [0.5, 0.43], sarg: [1.0, 0.35], grabplatte: [0.63, 0.19], knochen: [0.32, 0.17] }
                 }
             }
         },
