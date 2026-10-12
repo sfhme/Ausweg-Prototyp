@@ -890,7 +890,7 @@ var Setting = (function () {
         // Spur einer Regel (beim Ansehen, im Notizbuch); danach der Ausloeser und was geschieht
         spur: 'Spuren zeigen, was hier schon \u00f6fter geschehen ist.',
         // freies Versteck, dessen Fach klemmt (R40 mit Hindernis): gefunden, aber erst mit Werkzeug offen
-        fach: { klemmt: 'Es klemmt.', alt: ['das klemmende Fach aufhebeln', 'das klemmende Fach aufschlagen', 'das klemmende Fach aufschneiden'] },
+        fach: { klemmt: 'Es klemmt.', hohl: 'Es klingt hohl, und etwas gibt ein wenig nach, aber es sitzt fest.', alt: ['das klemmende Fach aufhebeln', 'das klemmende Fach aufschlagen', 'das klemmende Fach aufschneiden'] },
         haende: 'Mit blo\u00dfen H\u00e4nden geht das nicht.',
         // doppelter Boden (R42): woran man am offenen Versteck sieht, dass darunter noch etwas ist (Blindtest 2026-10-12: ohne
         // Hinweis fand ihn niemand, zweimal hing eine Partie daran)
@@ -937,6 +937,19 @@ var Setting = (function () {
             kette: 'Ketten', pritsche: 'Pritsche', eimer: 'Eimer', schatztruhe: 'Schatztruhe', waffenstaender: 'Waffenst\u00e4nder', ruestung: 'R\u00fcstung', gold: 'Goldbarren',
             muenzen: 'M\u00fcnzhaufen', kelch: 'Kelch', kolben: 'Destillierkolben', moerser: 'M\u00f6rser', buecher: 'B\u00fccherstapel', sarg: 'Sarg', grabplatte: 'Grabplatte',
             knochen: 'Knochenhaufen', schaedel: 'Sch\u00e4del', weinregal: 'Weinregal', buecherbord: 'B\u00fccherbord' },
+        // Anzeichen eines verborgenen Fachs (Abwechslung, Vorgabe 2026-10-12: "manches anzeigen, manches nicht"): steht beim
+        // Ansehen da, wenn die Partie es so wuerfelt; leere Verstecke bekommen es genauso oft, es beweist also nichts
+        versteckAnzeichen: {
+            mauerstein: 'Die Fugen um einen der Steine sind heller als die \u00fcbrigen, als w\u00e4re der M\u00f6rtel j\u00fcnger.',
+            wandbehang: 'Der Wandbehang h\u00e4ngt an einer Ecke etwas tiefer, als h\u00e4tte ihn jemand oft angehoben.',
+            fass: 'Der Deckel des Fasses sitzt etwas zu tief, und der Rand ist blank gegriffen.',
+            balken: 'An einer Stelle ist die Rinde des Baumstamms abgegriffen und glatt.',
+            laterne: 'Die Halterung der Wandlaterne ist blank gegriffen, als w\u00fcrde sie oft bewegt.',
+            urne: 'Die Urne steht nicht ganz gerade, als s\u00e4\u00dfe ihr Boden lose.',
+            bodenplatte: 'In den Fugen um eine der Bodenplatten fehlt der Staub.',
+            wappen: 'Der Wappenschild h\u00e4ngt ein wenig schief, und darunter ist die Wand heller.',
+            schemel: 'Ein Bein des Schemels hat eine feine Rille, als lie\u00dfe es sich drehen.'
+        },
         verstecke: [
             ['lockerer Mauerstein', 'der lockere Mauerstein', 'den lockeren Mauerstein', 'mauerstein'],
             ['Spalt hinter dem Wandbehang', 'der Spalt hinter dem Wandbehang', 'den Spalt hinter dem Wandbehang', 'wandbehang'],
@@ -1134,6 +1147,30 @@ var Setting = (function () {
                         kette: [0.25, 0.21], pritsche: [0.8, 0.63], eimer: [0.22, 0.2], waffenstaender: [0.55, 0.39], buecher: [0.17, 0.14], buecherbord: [0.52, 0.15], weinregal: [0.7, 0.38], fassstapel: [0.7, 0.46], fassturm: [1.05, 0.46], saeule: [0.17, 0.19] }
                 }
             }
+        },
+        // Tipp auf Anfrage (Entscheidung 2026-10-12): drei Stufen je Schritt (wo, was, Loesung). {nom}/{akk} = das Ding des
+        // Schritts, gross geschrieben am Satzanfang ({Nom}, {Akk}); {nach} = Raum mit Richtung; {wann} = Ausloeser; {weg} =
+        // ein Weg als Infinitiv; {liste} = Gegenstaende; {text} = der Schritt.
+        tipp: {
+            keiner: 'Hier wei\u00df auch der beste Tipp keinen Weg mehr.',
+            raum: 'Geh {nach} und sieh dich dort um.',
+            ding: 'Sieh dir {akk} genauer an.',
+            tasche: 'In deiner Tasche steckt mehr, als du denkst: {akk}.',
+            krach: 'Es ist sehr still hier. Was geschieht wohl, wenn es laut wird?',
+            warten: 'Manchmal hilft es, einfach eine Weile abzuwarten.',
+            dunkel: 'Manches zeigt sich erst im Dunkeln.',
+            hell: 'Mach wieder Licht.',
+            bauen: 'Zwei Dinge in deiner Tasche geh\u00f6ren zusammen.',
+            wann: '{Nom} ver\u00e4ndert sich {wann}.',
+            nehmen: '{Akk} solltest du mitnehmen.',
+            oeffnen: '{Nom} l\u00e4sst sich \u00f6ffnen.',
+            weg: '{Nom}? Versuch: {weg}.',
+            mit: 'Daf\u00fcr brauchst du {liste}.',
+            lesen: 'Lies {akk} genau. Es steht mehr darin, als man beim ersten Mal sieht.',
+            code: '{Nom} braucht eine Eingabe. Was du daf\u00fcr brauchst, hast du im Raum gesehen oder wirst es sehen.',
+            unbekannt: 'das, was hier \u201e{name}\u201c hei\u00dft',
+            schliessen: 'Was du gelesen hast, schlie\u00dft fast alles aus. Wo bleibt nur noch eine M\u00f6glichkeit?',
+            loesung: 'Die L\u00f6sung dieses Schritts: {text}.'
         },
         // Ganzer Satz je Weg (Blindtest Runde 3: "Das Rohr zuschlagen." stand als Etikett da). Schluessel ist der Text des
         // Weges, wie er nach den Ersetzungen des Stils lautet; {nom}/{akk} = das Ding, an dem der Weg geht. Der Katalog
@@ -1528,6 +1565,10 @@ var Katalog = (function () {
     // Raetsel mit Ton. takt (an einer Faehigkeit zahl): Die Ziffern erklingen als Schlaege zum Mitzaehlen, darum ohne Null (R28).
     // KLOPF_AUS: wann ein Versteck zu klopfen beginnt (R26). STAEBE: Klangstaebe an einem Schloss mit Melodie (R27).
     var KLOPF_AUS = ['stille', 'licht_aus', 'laerm'], STAEBE = 5;
+    // Zeit (Vorgabe 2026-10-12: in Sekunden, nicht in Aktionen): Eine Einheit des Pruefers (ein Schritt des Loesungsweges)
+    // sind so viele Sekunden. Startwert, geschaetzt (ein Mensch tut im 3D-Raum etwa vier Handgriffe je noetigem Schritt,
+    // je fuenf bis acht Sekunden); nachstellen mit /ausweg statistik arten. Fristen = Einheiten mal SEK_JE_EINHEIT.
+    var SEK_JE_EINHEIT = 30;
     var KLEIN = ['phiole', 'kreide', 'messer', 'schere', 'saeurehaltig', 'feuerzeug', 'streichhoelzer', 'taschenlampe', 'tuch', 'handspiegel', 'kleiderhaken',
         'schnur', 'wecker', 'schluessel', 'notiz', 'plaettchen'];
 
@@ -1832,15 +1873,17 @@ var Katalog = (function () {
     uebernimm(INSCHRIFT_K, S.inschrift, ['name', 'nom', 'akk', 'b', 'verb'], 'inschrift');
     alternativen(INSCHRIFT_K.alt, S.inschrift.alt, 'inschrift');
     for (i = 0; i < S.stories.length; i++) if (!S.stories[i].raeume || S.stories[i].raeume.length < 2) fehlt('stories[' + i + '].raeume (mindestens zwei)');
+    ['keiner', 'raum', 'ding', 'tasche', 'krach', 'warten', 'dunkel', 'hell', 'bauen', 'wann', 'nehmen', 'oeffnen', 'weg', 'mit', 'lesen', 'code', 'loesung', 'unbekannt', 'schliessen'].forEach(function (x) { if (!S.tipp || !S.tipp[x]) fehlt('tipp.' + x); });
+    for (i = 0; i < S.verstecke.length; i++) if (!S.versteckAnzeichen || !S.versteckAnzeichen[S.verstecke[i][3]]) fehlt('versteckAnzeichen.' + S.verstecke[i][3]);
     for (i = 0; i < S.stories.length; i++) if (!S.stories[i].eile) fehlt('stories[' + i + '].eile (Satz, wenn eine Frist laeuft)');
 
     var BASIS = {
         version: 3, SETTING: S.id, ARTEN: ARTEN, AUSLOESER: AUSLOESER, ELEMENTE: ELEMENTE, GEGENSTAENDE: GEGENSTAENDE,
         EIGENSCHAFT_TEXT: EIGENSCHAFT_TEXT, ZU_WENIG: S.zuWenig, HINDERNISSE: HINDERNISSE, SCHLOESSER: SCHLOESSER, GEGENMITTEL: GEGENMITTEL,
-        VERSTECKE: S.verstecke, SCHLICHT: S.schlicht, AUSSTATTUNG: S.ausstattung, LICHT: S.licht, WASSER: WASSER, SCHLUESSEL: S.schluessel, NOTIZ: S.notiz, STORIES: S.stories, WEG_SATZ: S.wegSatz || {},
+        VERSTECKE: S.verstecke, VERSTECK_ANZEICHEN: S.versteckAnzeichen || {}, SCHLICHT: S.schlicht, AUSSTATTUNG: S.ausstattung, LICHT: S.licht, WASSER: WASSER, SCHLUESSEL: S.schluessel, NOTIZ: S.notiz, STORIES: S.stories, TIPP: S.tipp, WEG_SATZ: S.wegSatz || {}, SEK_JE_EINHEIT: SEK_JE_EINHEIT,
         VERWANDLUNGEN: S.verwandlungen, ZAEHL: S.zaehl, LOGIK: S.logik, LUEGNER: S.luegner, HANDBUCH: S.handbuch, REGAL: S.regal, ZIFFER_JE_KOPF: S.zifferJeKopf, KLEIN: KLEIN, BEWEGLICH: BEWEGLICH, VERRUECKT: S.verrueckt, KLANG: S.klang, KLOPF_AUS: KLOPF_AUS, STAEBE: STAEBE, DURCHREICHE: S.durchreiche, HAUSORDNUNG: S.hausordnung, GEDENKTAFEL: S.gedenktafel, STANDPUNKT: S.standpunkt, STRAHL: S.strahl, WORT: WORT, WACHE: S.wache, KRUEGE: S.kruege, KERBSTEIN: S.kerbstein, BALKENWAAGE: S.balkenwaage, KAEFIG: KAEFIG, PAKT: S.pakt, KREIDE: S.kreide, HOCH: S.hoch, NOTSCHACHT: NOTSCHACHT, SPIEGEL: S.spiegel, HEBELREIHE: S.hebelreihe, ORAKEL: S.orakel, NOTIZEN: S.notizen, TRAENKE: S.traenke, BAUEN: BAUEN, BAUEN_TEXT: S.bauen, GABEN: S.gaben, GABEN_REIHE: ['nachtauge', 'gehoer', 'schrift'], WAAGE: S.waage, WAAGE_SCHWER: WAAGE_SCHWER, FALLGITTER: FALLGITTER_K, ZEICHEN: S.zeichen, FETZEN: S.fetzen, TINTE: TINTE_K, UHR: S.uhr, ZWISCHENTUER: S.zwischentuer, TAFEL: S.tafel, INSCHRIFT: INSCHRIFT_K,
         SCHLOSSTEXT: S.schlosstext, VORBEI: S.vorbei, SPUR: S.spur, HAENDE: S.haende, ZWEITFACH: S.zweitfach, RUHIG: S.ruhig,
-        FACH: { klemmt: S.fach.klemmt, alt: [{ b: { lang: 2, schwer: 2 }, text: S.fach.alt[0] }, { b: { stumpf: 2 }, laerm: true, text: S.fach.alt[1] }, { b: { scharf: 2 }, text: S.fach.alt[2] }] },
+        FACH: { klemmt: S.fach.klemmt, hohl: S.fach.hohl, alt: [{ b: { lang: 2, schwer: 2 }, text: S.fach.alt[0] }, { b: { stumpf: 2 }, laerm: true, text: S.fach.alt[1] }, { b: { scharf: 2 }, text: S.fach.alt[2] }] },
         HELL: S.hell, DUNKEL: S.dunkel
     };
 
@@ -2388,6 +2431,7 @@ var Generator = (function () {
     // Stufe 1 ohne leere Verstecke (Blindtest 2026-10-12: zu viel Leerlauf; Entscheidung des Projektinhabers)
     var LEERE = { 1: 0, 2: 2, 3: 2 };
     var MAX_VERSUCHE = 60;
+    var ANZEICHEN = { 1: 0.6, 2: 0.35, 3: 0.15 };      // Anteil verborgener Faecher mit einem Anzeichen beim Ansehen
     var MAX_AKTIONEN = 70;
     // name, Nominativ und Akkusativ mit Artikel (die Engine beugt keine Namen)
 
@@ -2517,7 +2561,9 @@ var Generator = (function () {
     };
 
     Bau.prototype.regel = function (elDing, f, ausloeser, zielDing) {
-        var text = f.text.replace('{ziel}', zielDing ? zielDing.name : '');
+        // ein verborgenes Fach nennt der Hinweis, wie man die Stelle sieht ("verraet eine Stelle: Wandbehang"); erkennbar wird es erst offen
+        var schlicht = zielDing && zielDing.typ === 'versteck' && zielDing.verborgen && zielDing.modell && this.K.SCHLICHT ? this.K.SCHLICHT[zielDing.modell.replace(/^v_/, '')] : null;
+        var text = f.text.replace('{ziel}', zielDing ? schlicht || zielDing.name : '');
         var rg = { id: this.id('r'), element: elDing.id, art: f.art, ausloeser: ausloeser, text: text,
             ziel: zielDing ? zielDing.id : null, enthuellung: null, privat: null, demo: demoText(f.text) };
         if ((f.art === 'zahl' || f.art === 'richtung' || f.art === 'teil') && this.spieler > 1 && this.r.chance(0.5)) {
@@ -2915,7 +2961,8 @@ var Generator = (function () {
                 var vn = this.r.waehle(frei);
                 this.fixtur['name:' + vn[0]] = true;
                 var v = this.ding('versteck', vn[0], raum, { verborgen: true, leer: true, ablenkung: true, nom: vn[1], akk: vn[2], modell: 'v_' + vn[3] });
-                this.aktion({ text: v.name + ' durchsuchen', art: 'durchsuchen', raum: raum, ding: v.id, gibt: ['durchsucht:' + v.id], kosten: SUCHKOSTEN });
+                // durchsuchen nur, wenn eine falsche Faehrte hierher weist (kein blindes Suchen, Entscheidung 2026-10-12)
+                this.aktion({ text: v.name + ' durchsuchen', art: 'durchsuchen', raum: raum, ding: v.id, braucht: ['faehrte:' + v.id], gibt: ['durchsucht:' + v.id], kosten: SUCHKOSTEN });
             }
         }
     };
@@ -3044,7 +3091,6 @@ var Generator = (function () {
             var v = self.ding('versteck', x[0], g.raum, { verborgen: true, nom: x[1], akk: x[2], modell: 'v_' + x[3] });
             if (n > 0) v.leer = true;
             v.zone = self.zoneFuer(g.raum, opt);
-            self.aktion({ text: v.name + ' durchsuchen', art: 'durchsuchen', raum: g.raum, ding: v.id, gibt: [n ? 'durchsucht:' + v.id : 'versteck:' + v.id], kosten: SUCHKOSTEN });
             vs.push(v);
         });
         this.aktion({ text: vs[0].name + ' \u00f6ffnen', art: 'oeffnen', raum: g.raum, ding: vs[0].id, braucht: ['versteck:' + vs[0].id], gibt: ['hat:' + g.id] });
@@ -3075,8 +3121,6 @@ var Generator = (function () {
         var v = this.ding('versteck', zwei[0][0], g.raum, { verborgen: true, nom: zwei[0][1], akk: zwei[0][2], modell: 'v_' + zwei[0][3] });
         v.zone = this.zoneFuer(g.raum, opt);
         var w = this.ding('versteck', zwei[1][0], this.raum(), { verborgen: true, leer: true, nom: zwei[1][1], akk: zwei[1][2], modell: 'v_' + zwei[1][3] });
-        this.aktion({ text: w.name + ' durchsuchen', art: 'durchsuchen', raum: w.raum, ding: w.id, gibt: ['durchsucht:' + w.id], kosten: SUCHKOSTEN });
-        this.aktion({ text: v.name + ' durchsuchen', art: 'durchsuchen', raum: v.raum, ding: v.id, gibt: ['versteck:' + v.id], kosten: SUCHKOSTEN });
         this.aktion({ text: v.name + ' \u00f6ffnen', art: 'oeffnen', raum: v.raum, ding: v.id, braucht: ['versteck:' + v.id], gibt: ['hat:' + g.id] });
         g.lage = v.name + ' (der Zettel von ' + wer[0] + ' sagt es, ' + wer[1] + ' luegt: ' + w.name + ')';
         var gross1 = function (t) { return t.charAt(0).toUpperCase() + t.slice(1); }, Z = NZ.zettel;
@@ -3091,6 +3135,9 @@ var Generator = (function () {
             var la = self.aktion({ text: n.name + ' lesen', art: 'lesen', raum: n.raum, braucht: ['hat:' + n.id], gibt: ['gelesen:' + n.id], sicher: true });
             la.zettel = true;
         });
+        // gesucht wird, was ein Zettel nennt (kein blindes Suchen, Entscheidung 2026-10-12): wer dem Luegner glaubt, findet nichts
+        this.aktion({ text: w.name + ' durchsuchen', art: 'durchsuchen', raum: w.raum, ding: w.id, braucht: ['gelesen:' + liste[1].id], gibt: ['durchsucht:' + w.id], kosten: SUCHKOSTEN });
+        this.aktion({ text: v.name + ' durchsuchen', art: 'durchsuchen', raum: v.raum, ding: v.id, braucht: ['gelesen:' + liste[0].id], gibt: ['versteck:' + v.id], kosten: SUCHKOSTEN });
         return true;
     };
 
@@ -3178,7 +3225,6 @@ var Generator = (function () {
         this.aktion({ text: 'bemerken, was woanders steht (' + v.name + ')', art: 'ereignis', ausloeser: 'licht_aus', raum: v.raum, ding: v.id, braucht: bedarf,
             kennt: [rg.id], gibt: ['versteck:' + v.id, 'verrueckt:' + v.id], sicher: true });
         // ohne das Dunkel: gruendlich durchsuchen (kostet Zeit)
-        this.aktion({ text: v.name + ' durchsuchen', art: 'durchsuchen', raum: v.raum, ding: v.id, gibt: ['versteck:' + v.id], kosten: SUCHKOSTEN });
         g.lage = v.name + ' (' + V.weg + ')';
         this.aktion({ text: v.name + ' \u00f6ffnen', art: 'oeffnen', raum: v.raum, ding: v.id, braucht: ['versteck:' + v.id], gibt: ['hat:' + g.id] });
         return true;
@@ -3204,7 +3250,6 @@ var Generator = (function () {
         var bedarf = this.ausloeserBedarf(aus, v, tiefe - 1, opt);
         this.aktion({ text: 'dem Klopfen nachgehen (' + v.name + ')', art: 'ereignis', ausloeser: aus, raum: v.raum, ding: v.id, braucht: bedarf,
             kennt: [rg.id], gibt: ['versteck:' + v.id, 'klopft:' + v.id], sicher: true });
-        this.aktion({ text: v.name + ' durchsuchen', art: 'durchsuchen', raum: v.raum, ding: v.id, gibt: ['versteck:' + v.id], kosten: SUCHKOSTEN });
         g.lage = v.name + ' (' + KL.klopfenWeg + ')';
         this.aktion({ text: v.name + ' \u00f6ffnen', art: 'oeffnen', raum: v.raum, ding: v.id, braucht: ['versteck:' + v.id], gibt: ['hat:' + g.id] });
         return true;
@@ -3227,15 +3272,16 @@ var Generator = (function () {
         var nah = aus === 'beruehrung' || aus === 'naehe';
         this.aktion({ text: 'Versteck erkennen (' + d.name + ')', art: 'ereignis', ausloeser: aus, raum: d.raum, ding: d.id, braucht: bedarf, kennt: [rg.id],
             gibt: ['versteck:' + v.id], sicher: !nah });
-        // ohne Hinweis: gruendlich durchsuchen (kostet Zeit)
-        this.aktion({ text: v.name + ' durchsuchen', art: 'durchsuchen', raum: v.raum, ding: v.id, gibt: ['versteck:' + v.id], kosten: SUCHKOSTEN });
         var m = null;
         if (tiefe > 1 && this.r.chance(0.4)) {
             m = this.anforderung(v.name, this.K.FACH.alt);   // dieselben Wege wie die vermoertelte Platte, aber Worte fuer ein Fach
             var alt = this.p.anforderungen[m].alt;
             this.liefere(alt[this.r.bis(alt.length)].b, tiefe - 2, opt);
         }
-        g.lage = v.name + ' (nur zu finden \u00fcber ' + d.name + ')';
+        // Klemmt das Fach, muss man dort selbst Hand anlegen: Dann verraet es sich beim Abtasten (klingt hohl, sitzt fest), und
+        // das Raetsel ist das Werkzeug (Entscheidung des Projektinhabers 2026-10-12). Ohne Klemmen bleibt es beim Hinweis.
+        if (m) this.aktion({ text: v.name + ' abtasten: klingt hohl und klemmt', art: 'durchsuchen', raum: v.raum, ding: v.id, gibt: ['versteck:' + v.id], kosten: 1 }).abtasten = true;
+        g.lage = v.name + (m ? ' (\u00fcber ' + d.name + ' oder durch Abtasten zu finden, klemmt)' : ' (nur zu finden \u00fcber ' + d.name + ')');
         this.aktion({ text: v.name + ' \u00f6ffnen', art: m ? 'benutzen' : 'oeffnen', raum: v.raum, ding: v.id, braucht: ['versteck:' + v.id], mittel: m,
             gibt: ['hat:' + g.id] });
         this.enthuelle(rg, tiefe - 1, opt);
@@ -3311,10 +3357,8 @@ var Generator = (function () {
         a.luegner = true;
         this.aktion({ text: echt.name + ' gezielt durchsuchen', art: 'durchsuchen', raum: g.raum, ding: echt.id, braucht: ['aussagen:' + notiz.id],
             gibt: ['versteck:' + echt.id], kosten: 1 });
-        for (i = 0; i < 3; i++) {
-            if (i === t) this.aktion({ text: vs[i].name + ' durchsuchen', art: 'durchsuchen', raum: g.raum, ding: vs[i].id, gibt: ['versteck:' + vs[i].id], kosten: SUCHKOSTEN });
-            else this.aktion({ text: vs[i].name + ' durchsuchen', art: 'durchsuchen', raum: g.raum, ding: vs[i].id, gibt: ['durchsucht:' + vs[i].id], kosten: SUCHKOSTEN });
-        }
+        // wer falsch schliesst, durchsucht ein leeres (kostet Zeit); ohne die Aussagen gelesen zu haben, sucht man nicht
+        for (i = 0; i < 3; i++) if (i !== t) this.aktion({ text: vs[i].name + ' durchsuchen', art: 'durchsuchen', raum: g.raum, ding: vs[i].id, braucht: ['aussagen:' + notiz.id], gibt: ['durchsucht:' + vs[i].id], kosten: SUCHKOSTEN });
         g.lage = echt.name + ' (eins von drei Verstecken, verraten vom ' + T.name + ')';
         this.aktion({ text: echt.name + ' \u00f6ffnen', art: 'oeffnen', raum: g.raum, ding: echt.id, braucht: ['versteck:' + echt.id], gibt: ['hat:' + g.id] });
         return true;
@@ -4665,6 +4709,10 @@ var Generator = (function () {
             // Kerzenleuchter (R61) und der Wurf in den Schacht (R68, die einzige Spitzhacke). Geprueft vom Start aus, den
             // Gegenstand schon in der Hand und sofort verbraucht; faehrt das fest, wird neu gewuerfelt.
             if (verbrauchFaehrtFest(p, spieler)) { gruende.push('Verbrauch faehrt fest'); continue; }
+            // Anzeichen verborgener Faecher (Abwechslung, 2026-10-12): aus einem eigenen Strom, damit der Rest der Partie gleich bleibt;
+            // echte und leere gleich oft, auf Stufe 1 oft, auf Stufe 3 selten
+            var za = Zufall.strom(String(seed) + ':' + v, 'anzeichen'), ks = Object.keys(p.dinge).sort();
+            for (i = 0; i < ks.length; i++) if (p.dinge[ks[i]].typ === 'versteck' && p.dinge[ks[i]].verborgen && za.chance(ANZEICHEN[stufe])) p.dinge[ks[i]].anzeichen = true;
             // Ab Stufe 2 muss eine Bedrohung etwas bewirken (Blindtest Runde 3: Kronleuchter und Leinwand, an denen man nur
             // vorbeiging); sonst wird neu gewuerfelt.
             if (stufe >= 2 && bedrohungWirkungslos(p, spieler, a)) { gruende.push('Bedrohung wirkungslos'); continue; }
@@ -4814,7 +4862,7 @@ var Protokoll = (function () {
             if (b.gegenmittel) for (j = 0; j < p.anforderungen[b.gegenmittel].alt.length; j++) gt.push(altText(p.anforderungen[b.gegenmittel].alt[j]));
             // eine Frist sperrt nichts: laeuft sie ab, ist die Partie verloren (Vorgabe 2026-10-12)
             z.push('  - Bedrohung ' + raumIn(p, b.raum) + (b.ausloeser === 'laerm' ? ': Jeder L\u00e4rm dort weckt sie, also nur leise Wege.' :
-                b.ausloeser === 'zeit' ? ': Frist, l\u00e4uft bei Schritt ' + b.frist + ' ab, dann ist die Partie verloren.' :
+                b.ausloeser === 'zeit' ? ': Frist, l\u00e4uft nach ' + Math.floor(b.frist * Katalog.SEK_JE_EINHEIT / 60) + ':' + ('0' + Math.round(b.frist * Katalog.SEK_JE_EINHEIT % 60)).slice(-2) + ' ab (' + b.frist + ' Schritte zu ' + Katalog.SEK_JE_EINHEIT + ' s), dann ist die Partie verloren.' :
                 ': sperrt ' + (b.ausloeser === 'licht_aus' ? 'im Dunkeln ' : '') + (bz.length ? bz.join(', ') : 'nichts Wichtiges') + '.') +
                 (gt.length ? ' Gegenmittel: ' + gt.join(' oder ') + '.' : ''));
         }
@@ -4892,6 +4940,19 @@ var Spiel = (function () {
     var HOCH_NAH = 0.55;      // R71: so nah (Mitte) muss etwas Steigbares an der Stelle unter dem hohen Wandbord stehen
     var ZEIT = { bauen: 1, ansehen: 0, anfassen: 1, nehmen: 1, benutzen: 1, krach: 1, eingeben: 1, warten: 3, gehen: 1, verlassen: 0, geben: 0, ablegen: 0, verwandeln: 1, absteigen: 0, schieben: 0 };
     var LAERM_STRAFE = 5;
+    // Zeit in Sekunden (Vorgabe des Projektinhabers 2026-10-12): Live gibt der Server jeder Handlung den Stand seiner Uhr
+    // mit (befehl(s, nr, b, sek)); die Partie folgt dieser Uhr, eine Handlung kostet dann nichts, nur Strafen kosten.
+    // Innen rechnet die Engine weiter in Einheiten (Fristen, Prueferweg); eine Einheit sind SEK Sekunden. Ohne Uhr
+    // (Tests, Pruefer, Probeseite, Blindspiel) kostet jede Handlung ihre Einheiten wie bisher.
+    var SEK = Katalog.SEK_JE_EINHEIT;
+    function sekunden(s) { return Math.ceil(s.zeit * SEK - 1e-9); }
+    function uhrText(sek) { var mi = Math.floor(sek / 60), r = sek - mi * 60; return mi + ':' + (r < 10 ? '0' : '') + r; }
+    // Strafe in Einheiten: allein voll, ohne Uhr zu mehreren ein Anteil (jeder handelt fuer sich)
+    function kostet(s, e, geteilt) {
+        var x = s.echt || !geteilt ? e : e / aktive(s);
+        s.zeit = s.echt ? s.zeit + x : zwoelftel(s.zeit + x);
+        if (s.echt) s.strafe = (s.strafe || 0) + x;
+    }
     // Zu dritt kostet eine Handlung ein Drittel: Die Summe driftet sonst (4.999999999999999 statt 5), und Anzeige und
     // Fristen kippen an der Grenze. Anteile fuer 1 bis 4 Spieler sind alle Zwoelftel, also dort einrasten.
     function zwoelftel(z) { return Math.round(z * 12) / 12; }
@@ -4997,7 +5058,7 @@ var Spiel = (function () {
         s.f['eingestuerzt:' + d.id] = true;
         if (!s.draussen) s.draussen = {};
         s.draussen[nr] = true;
-        aus.push(m(NS.raus + ' Zeit: ' + Math.ceil(s.zeit) + '.', 'erfolg', nr));
+        aus.push(m(NS.raus + ' Zeit: ' + uhrText(sekunden(s)) + '.', 'erfolg', nr));
         for (k = 1; k <= s.partie.spieler; k++) if (k !== nr && s.raum[k] !== null) aus.push(m(NS.fort.split('{wer}').join('{nick' + nr + '}'), 'warnung', k));
         return aus.concat(gehtFort(s, nr, null, null));
     }
@@ -5036,7 +5097,7 @@ var Spiel = (function () {
             if (b.beobachter && haendeImRaum(s, a.raum) >= (haende || 1) + 1) continue;
             var hilft = bannText(s, b) ? ' ' + bannText(s, b) : '';
             // ein Fach, das noch niemand entdeckt hat, heisst hier nicht beim Namen (am Fadenkreuz ist es noch "Fass")
-            if (ding.typ === 'versteck' && ding.verborgen && !s.f['versteck:' + ding.id]) {
+            if (unentdeckt(s, ding)) {
                 if (b.beobachter) return m('Sobald du dich wegdrehst, r\u00fcckt ' + nom(el) + ' n\u00e4her. Allein kommst du so nicht heran.' + hilft, 'warnung');
                 return m(rg.text + ' Daran kommst du so nicht heran.' + hilft, 'warnung');
             }
@@ -5055,7 +5116,7 @@ var Spiel = (function () {
         for (i = 0; i < s.partie.bedrohungen.length; i++) {
             var b = s.partie.bedrohungen[i];
             if (b.raum === raum && b.ausloeser === 'laerm') {
-                s.zeit += LAERM_STRAFE;
+                kostet(s, LAERM_STRAFE, false);
                 aus.push(m(regel(s, b.regel).text + ' Du musst warten, bis sich alles beruhigt. Das kostet Zeit.', 'warnung'));
             }
         }
@@ -5229,7 +5290,7 @@ var Spiel = (function () {
         if (!s.wiegen) s.wiegen = {};
         var w = s.wiegen[d.id] || (s.wiegen[d.id] = { n: 0, letzt: null, moegl: [1, 2, 3, 4, 5, 6, 7, 8, 9] });
         w.n++;
-        if (w.n > 2) { s.zeit = zwoelftel(s.zeit + WIEGE_STRAFE / aktive(s)); aus.push(m(W.klemmt)); }
+        if (w.n > 2) { kostet(s, WIEGE_STRAFE, true); aus.push(m(W.klemmt)); }
         var erg = wiegeSeite(li, re, d.schwer);
         w.letzt = [li, re, erg];
         w.moegl = w.moegl.filter(function (c) { return wiegeSeite(li, re, c) === erg; });
@@ -5295,7 +5356,7 @@ var Spiel = (function () {
                 aus.push(zeigt(m(TR.auf.replace('{farbe}', farbe).replace('{was}', nom(g)), 'erfolg')));
                 return aus;
             }
-            s.zeit = zwoelftel(s.zeit + MISCH_STRAFE / aktive(s));
+            kostet(s, MISCH_STRAFE, true);
             aus.push(zeigt(m(TR.faerbt.replace('{farbe}', farbe))));
             aus.push(m(TR.raucht));                                           // Grund: Zeit verloren
             k.stoffe = [];
@@ -5436,7 +5497,8 @@ var Spiel = (function () {
     // Gleichzeitig (R84): Zieht jemand eine Kette, waehrend die andere unten ist (eben gezogen oder verkeilt), geht der
     // Riegel. "Eben" heisst: hoechstens eine Zeiteinheit vorher (eine Handlung allein, zwei zu zweit). Verkeilen geht
     // an jeder der beiden Ketten; die Fakten fuehren die Aktionen des Pruefers (kette_fest:, schloss:).
-    var KETTE_FENSTER = 1;
+    var KETTE_FENSTER = 1, KETTE_SEK = 3;      // mit Uhr: im selben Augenblick heisst hoechstens 3 s auseinander
+    function ketteFenster(s) { return s.echt ? KETTE_SEK / SEK : KETTE_FENSTER; }
     function kette(s, d, nr, items) {
         var H = KAT.SCHLOESSER.hebelpaar, aus = [], i, schloss = d.typ === 'schloss' ? d : s.partie.dinge[d.partner], anderer = s.partie.dinge[d.partner];
         var l = aktionenAn(s, schloss.id, ['benutzen']), zugleich = null, keil = null, nachziehen = aktionenAn(s, schloss.partner, ['bedienen'])[0];
@@ -5460,12 +5522,12 @@ var Spiel = (function () {
             s.f['kette_fest:' + schloss.id] = true;
             if (w.alt.legt) hinlegen(s, items, nr, d);
             aus.push(zeigt(m(H.geklemmt)));
-            if (s.zug[anderer.id] !== undefined && s.zeit - s.zug[anderer.id] <= KETTE_FENSTER) aus = aus.concat(oeffne(nachziehen, null));
+            if (s.zug[anderer.id] !== undefined && s.zeit - s.zug[anderer.id] <= ketteFenster(s)) aus = aus.concat(oeffne(nachziehen, null));
             return aus;
         }
         s.zug[d.id] = s.zeit;
         if (s.f['geklemmt:' + anderer.id]) return oeffne(nachziehen, null);
-        if (s.zug[anderer.id] !== undefined && s.zeit - s.zug[anderer.id] <= KETTE_FENSTER && s.zug[anderer.id] !== s.zeit) {
+        if (s.zug[anderer.id] !== undefined && s.zeit - s.zug[anderer.id] <= ketteFenster(s) && s.zug[anderer.id] !== s.zeit) {
             return oeffne(zugleich, s.partie.anforderungen[zugleich.mittel].alt[0]);
         }
         return [m(H.allein)];
@@ -5712,7 +5774,8 @@ var Spiel = (function () {
                 t.push(sdg && sdg.an === 'durchgang' ? 'Das Schloss an ' + KAT.ZWISCHENTUER.akk + ' ist offen.' : 'Ein Schloss am Ausgang ist offen.');
             }
             if (a.teilText) t.push(gross(nom(s.partie.dinge[a.ding])) + ' ist jetzt lesbar: ' + a.teilText);
-            if (a.art === 'durchsuchen' && a.gibt[i].indexOf('versteck:') === 0) t.push('Du durchsuchst ' + akk(s.partie.dinge[a.ding]) + ' gr\u00fcndlich und findest ein verborgenes Fach.' + (klemmt(s, a.ding) ? ' ' + KAT.FACH.klemmt : ''));
+            if (a.abtasten && a.gibt[i].indexOf('versteck:') === 0) t.push(KAT.FACH.hohl);       // man merkt, dass da etwas ist, kommt aber nicht dran
+            else if (a.art === 'durchsuchen' && a.gibt[i].indexOf('versteck:') === 0) t.push('Du durchsuchst ' + akk(s.partie.dinge[a.ding]) + ' gr\u00fcndlich und findest ein verborgenes Fach.' + (klemmt(s, a.ding) ? ' ' + KAT.FACH.klemmt : ''));
             if (a.gibt[i].indexOf('durchsucht:') === 0) t.push('Du durchsuchst ' + akk(s.partie.dinge[a.ding]) + ' gr\u00fcndlich. Nichts.');
             if (a.art === 'durchsuchen' && a.gibt[i].indexOf('hat:') === 0) t.push('Darunter ist ein doppelter Boden.');
             if (a.gibt[i].indexOf('offen:') === 0) t.push(tuerText(s).auf + ' Der Weg ' + raumNach(s, a.gibt[i].slice(6)) + ' ist frei.');
@@ -5730,6 +5793,22 @@ var Spiel = (function () {
         return d.name;
     }
     // ein Fach, das sich nur mit Werkzeug oeffnen laesst (R40 mit Hindernis): Wer es findet, merkt, dass es klemmt
+    // Ein verborgenes Fach ist erst erkennbar, wenn es offen ist (Vorgabe des Projektinhabers 2026-10-12: "erst erkennbar,
+    // wenn man den Oeffnen-Mechanismus betaetigt hat"); bis dahin heisst es, wie man es sieht (ein Fass ist ein Fass). Ein
+    // klemmendes Fach, das man gefunden hat, ist erkennbar: Man hat es abgetastet oder sein Hinweis zeigt es, und es sitzt fest.
+    function versteckOffen(s, d) {
+        for (var k = 0; k < s.partie.aktionen.length; k++) {
+            var ak = s.partie.aktionen[k];
+            if (ak.ding === d.id && ak.art !== 'ereignis' && (ak.art !== 'durchsuchen' || d.leer) && erledigt(s, ak)) return true;
+        }
+        return false;
+    }
+    function unentdeckt(s, d) {
+        if (!d || d.typ !== 'versteck' || !d.verborgen) return false;
+        if (d.leer) return !s.f['durchsucht:' + d.id];
+        if (s.f['versteck:' + d.id] && klemmt(s, d.id)) return false;
+        return !versteckOffen(s, d);
+    }
     function klemmt(s, id) {
         return aktionenAn(s, id, ['benutzen']).some(function (x) { return x.mittel && !erledigt(s, x) && (x.braucht || []).indexOf('versteck:' + id) >= 0; });
     }
@@ -5743,6 +5822,7 @@ var Spiel = (function () {
     // Ergebnis einer Handlung als Meldung: Der Raum zeigt es. Gruendlich gesucht und nichts gefunden: nur ein Ruetteln.
     function erg(s, a, alt) {
         var x = zeigt(m(ergebnis(s, a, alt))), i;
+        if (a.abtasten) delete x.z;      // "klingt hohl, sitzt fest" ist der Grund, warum es nicht aufgeht: zu lesen
         for (i = 0; i < a.gibt.length; i++) if (a.gibt[i].indexOf('durchsucht:') === 0) x.n = 1;
         return x;
     }
@@ -5764,6 +5844,7 @@ var Spiel = (function () {
     // ohne Spur, Frist oder Fund, der Katalogtext eines Gegenstands. Alles andere traegt etwas zum Merken (PC-Sitzung,
     // 2026-10-11, Vorgabe des Projektinhabers: Das Notizbuch zeigt nur wichtige Hinweise, kein Ereignislog).
     function schlicht(s, d, text) {
+        if (unentdeckt(s, d)) return !d.anzeichen;      // ein Fach, das sich nicht verraet, ist nur ein Fass: nichts fuers Notizbuch
         if (text === gross(d.name) + '.') return true;
         if (d.typ === 'element') return !!KAT.ELEMENTE[d.vorlage] && text === KAT.ELEMENTE[d.vorlage].b;
         if (d.typ === 'gegenstand') {
@@ -5865,6 +5946,8 @@ var Spiel = (function () {
                 // Funde liegen, wo sie zum Vorschein kommen (legeFund), und werden mit F genommen: kein "Du nimmst ... an dich"
                 // (ein Werkzeug sagt selbst, dass man es mitnehmen kann)
                 if (rg.art === 'richtung') text += ' Die Stelle ist jetzt sichtbar.';
+                // ein Fach, das klemmt, sagt es beim Finden (frueher beim gruendlichen Durchsuchen, das es nicht mehr gibt)
+                for (var kv = 0; kv < a.gibt.length; kv++) if (a.gibt[kv].indexOf('versteck:') === 0 && klemmt(s, a.gibt[kv].slice(9))) text += ' ' + KAT.FACH.klemmt;
                 aus.push(zeigt(m(text, 'ereignis', privatFuer(s, rg))));
                 aus = aus.concat(privat);
                 weiter = true;
@@ -6044,6 +6127,11 @@ var Spiel = (function () {
 
     function ansehenText(s, d, nr) {
         var t, i, k;
+        // ein Fach, das noch keiner offen hatte, sieht aus wie das, worin es steckt (Vorgabe 2026-10-12)
+        if (unentdeckt(s, d)) {
+            var mk = d.modell ? d.modell.replace(/^v_/, '') : '', sl = KAT.SCHLICHT ? KAT.SCHLICHT[mk] : null;
+            return gross(sl || d.name) + '.' + (d.anzeichen && KAT.VERSTECK_ANZEICHEN[mk] ? ' ' + KAT.VERSTECK_ANZEICHEN[mk] : '');      // manches zeigt sich, manches nicht
+        }
         if (d.typ === 'element') {
             var rs = regelVonElement(s, d.id), EL = KAT.ELEMENTE[d.vorlage];
             t = s.f['waerme:' + d.id] && EL.bWarm ? EL.bWarm : EL.bZeit && rs.some(function (r0) { return r0.zeitgeber; }) ? EL.bZeit : EL.b;
@@ -6241,12 +6329,69 @@ var Spiel = (function () {
         return l;
     }
 
-    function befehl(s, nr, b) {
+    // Tipp auf Anfrage (Entscheidung des Projektinhabers 2026-10-12, statt blindem Suchen): Der Pruefer rechnet vom
+    // jetzigen Stand den naechsten noetigen Schritt; je Schritt drei Stufen (wohin schauen, was tun, die Loesung). Jeder
+    // Tipp kostet TIPP_STRAFE Einheiten auf der Uhr. Lesbar fuer den, der fragt (l).
+    var TIPP_STRAFE = 1;
+    function tipp(s, nr) {
+        var T = KAT.TIPP, r = Pruefer.pruefe(s.partie, aktive(s), { f: s.f, schritte: s.zeit }), i, text;
+        var sag = function (t) { var x = m(t, 'tipp'); x.l = t; return [x]; };
+        if (!r.loesbar || !r.noetig.length) return sag(T.keiner);
+        var w = r.noetig[0], a = null;
+        for (i = 0; i < s.partie.aktionen.length; i++) if (s.partie.aktionen[i].id === w.aktion) a = s.partie.aktionen[i];
+        if (!s.tipps) s.tipps = {};
+        var stufe = s.tipps[a.id] = Math.min(3, (s.tipps[a.id] || 0) + 1);
+        kostet(s, TIPP_STRAFE, false);
+        var d = a.ding ? s.partie.dinge[a.ding] : null;
+        // ein Fach, das noch keiner entdeckt hat, heisst im Tipp, wie man es sieht (ein Fass ist ein Fass)
+        var unbekannt = unentdeckt(s, d);
+        var schlicht = unbekannt && d.modell && KAT.SCHLICHT ? KAT.SCHLICHT[d.modell.replace(/^v_/, '')] : null;
+        var dn = d ? (schlicht ? T.unbekannt.replace('{name}', schlicht) : nom(d)) : '', da = d ? (schlicht ? dn : akk(d)) : '';
+        var ein = function (t) { return t.replace('{nom}', dn).replace('{Nom}', gross(dn)).replace('{akk}', da).replace('{Akk}', gross(da)); };
+        // erschlossenes Versteck (Zettel, Aussagen, Faehrte): erst auf das Geschriebene zeigen, dann aufs Schliessen
+        var quelle = (a.braucht || []).filter(function (f) { return f.indexOf('aussagen:') === 0 || f.indexOf('gelesen:') === 0; }).map(function (f) { return f.slice(f.indexOf(':') + 1); })[0];
+        var dinge = function (l) { return l.map(function (id) { return akk(s.partie.dinge[id]); }).join(' und '); };
+        var gehalten = (a.braucht || []).filter(function (f) { return f.indexOf('hat:') === 0; }).map(function (f) { return f.slice(4); });
+        if (stufe < 3 && a.art === 'durchsuchen' && quelle && s.partie.dinge[quelle]) text = stufe === 1 ? T.lesen.replace('{akk}', akk(s.partie.dinge[quelle])) : T.schliessen;
+        else if (stufe === 3) text = T.loesung.replace('{text}', a.text + (w.mittel && w.mittel.length ? ', mit ' + dinge(w.mittel) : ''));
+        else if (stufe === 1 && a.raum !== s.raum[nr]) {
+            var rm = s.partie.raeume.filter(function (x) { return x.id === a.raum; })[0];
+            text = T.raum.replace('{nach}', rm ? rm.nach || rm.in : '');
+        } else if (stufe === 1) {
+            if (a.art === 'krach') text = T.krach;
+            else if (a.art === 'warten') text = T.warten;
+            else if (a.art === 'schalter') text = a.gibt.some(function (f) { return f.indexOf('licht_aus:') === 0; }) ? T.dunkel : T.hell;
+            else if (a.art === 'bauen') text = T.bauen;
+            else if ((a.art === 'verwandeln' || a.art === 'lesen') && (a.ding || gehalten[0])) text = T.tasche.replace('{akk}', akk(s.partie.dinge[a.ding || gehalten[0]]));
+            else text = d ? ein(T.ding) : T.warten;
+        } else {
+            if (a.art === 'ereignis' && a.ausloeser && d) text = ein(T.wann).replace('{wann}', KAT.AUSLOESER[a.ausloeser].text);
+            else if (a.art === 'nehmen' && d) text = ein(T.nehmen);
+            else if ((a.art === 'oeffnen' || a.art === 'bedienen' || a.art === 'durchsuchen') && d) text = ein(T.oeffnen);
+            else if (w.alt && d) text = ein(T.weg).replace('{weg}', w.alt);
+            else if (w.mittel && w.mittel.length) text = T.mit.replace('{liste}', dinge(w.mittel));
+            else if (a.art === 'lesen' && gehalten[0]) text = T.lesen.replace('{akk}', akk(s.partie.dinge[gehalten[0]]));
+            else if (gehalten.length) text = T.mit.replace('{liste}', dinge(gehalten));
+            else if (d && (s.partie.dinge[a.ding].typ === 'schloss' || a.art === 'eingeben' || a.art === 'fragen' || a.art === 'reihe' || a.art === 'nachschlagen' || a.art === 'wiegen')) text = ein(T.code);
+            else if (a.art === 'krach') text = T.krach;
+            else text = d ? ein(T.ding) : T.warten;
+        }
+        return sag(text);
+    }
+
+    function befehl(s, nr, b, sek) {
         kat(s.partie);
         if (s.status !== 'laeuft') return [m('Die Partie ist vorbei.', 'system')];
         if (s.raum[nr] === null) return [m('Du hast die Partie verlassen.', 'system')];
+        // Uhr des Servers (Sekunden seit dem Start): Die Partie springt auf diesen Stand plus die Strafen
+        if (typeof sek === 'number' && sek === sek && sek >= 0) {
+            s.echt = true;
+            var uhr = sek / SEK + (s.strafe || 0);
+            if (uhr > s.zeit) s.zeit = uhr;
+        }
         // Wer geht? (R151): Hoelzchen ziehen vor dem Fallgitter. Das Los zeigt nur auf jemanden; bleiben muss nur, wer
         // selbst die Kette nimmt (nie zwingt die Gruppe einen Einzelnen hinaus). Bestimmt aus Seed und Zahl der Lose.
+        if (b.art === 'tipp') return tipp(s, nr);
         if (b.art === 'lose') return lose(s, nr);
         if (b.art === 'schieben') return schiebe(s, nr, b);
         if (b.art === 'sagen') return sagen(s, nr, b.text);
@@ -6285,7 +6430,7 @@ var Spiel = (function () {
         // Kreide (R41): ein Kreuz malen oder wegwischen kostet keine Zeit; die Durchreiche und die Waage nehmen die Kreide wie alles
         if (b.art === 'benutzen' && kreideAn(s, d, itemsAus(s, b.mit, nr))) return kreuz(s, d, b);
         // Aufheben, was liegt (ein Fund in der Truhe, etwas Abgelegtes), kostet keine Zeit: Das Finden hat sie schon gekostet
-        if (!(b.art === 'nehmen' && d && liegt(s, d.id))) s.zeit = zwoelftel(s.zeit + (ZEIT[b.art] || 0) / aktive(s));
+        if (!s.echt && !(b.art === 'nehmen' && d && liegt(s, d.id))) s.zeit = zwoelftel(s.zeit + (ZEIT[b.art] || 0) / aktive(s));      // mit Uhr kostet die Handlung nichts
 
         switch (b.art) {
             case 'ansehen':
@@ -6337,7 +6482,7 @@ var Spiel = (function () {
                     sp = sperre(s, a, nr, 1);
                     if (sp) { aus.push(sp); getan = true; break; }
                     fuehreAus(s, a, null);
-                    if (a.art === 'durchsuchen') s.zeit = zwoelftel(s.zeit + ((a.kosten || 1) - 1) / aktive(s));      // gruendlich suchen dauert
+                    if (a.art === 'durchsuchen') kostet(s, (a.kosten || 1) - 1, true);      // gruendlich suchen dauert
                     aus.push(a.gibt.indexOf('ausgang') >= 0 ? zeigt(m(s.partie.story.auf, 'erfolg')) : erg(s, a, null));
                     getan = true; break;
                 }
@@ -6366,7 +6511,7 @@ var Spiel = (function () {
                     // hier hilft ein Werkzeug: Das ist ein Grund, kein blosses Anfassen (lesbar, nicht nur ein Wackeln)
                     fass = m(KAT.HAENDE); fass.n = 1; aus.push(fass);
                 }
-                else if (!getan) { fass = nein(m('Du fasst ' + akk(d) + ' an.')); aus.push(fass); }
+                else if (!getan) { fass = nein(m('Du fasst ' + (unentdeckt(s, d) ? 'es' : akk(d)) + ' an.')); aus.push(fass); }      // ein unentdecktes Fach heisst nicht schon so
                 break;
 
             case 'nehmen':
@@ -6571,7 +6716,7 @@ var Spiel = (function () {
         aus = aus.concat(vfd);
         if (s.f.ausgang) {
             s.status = 'gewonnen';
-            var endText = s.partie.story.ende + ' Zeit: ' + Math.ceil(s.zeit) + '.', en;
+            var endText = s.partie.story.ende + ' Zeit: ' + uhrText(sekunden(s)) + '.', en;
             if (s.opfer && s.f.zurueck) {
                 // Niemand bleibt zurueck (R155): die Winde hat ihn geholt, alle sind draussen
                 aus.push(m(endText + ' ' + KAT.FALLGITTER.winde.alle, 'erfolg'));
@@ -6680,7 +6825,7 @@ var Spiel = (function () {
             if (d.typ === 'element' && weg[d.id]) continue;
             if (d.typ === 'gegenstand' && !nehmbar[d.id]) continue;
             // freie Verstecke: von Anfang an da und durchsuchbar (suchen), erst nach Hinweis oder Suche als Fach erkannt
-            var suchen = d.typ === 'versteck' && d.verborgen && (d.leer ? !s.f['durchsucht:' + d.id] && !s.f['faehrte:' + d.id] : !s.f['versteck:' + d.id]);   // falsche Faehrte benennt um wie die echte
+            var suchen = unentdeckt(s, d);      // Hinweis und falsche Faehrte zeigen die Stelle, erkennbar wird das Fach erst offen
             var offen = false;
             if (d.typ === 'schloss') offen = !!s.f['schloss:' + d.id];
             if (d.typ === 'versteck') {
@@ -6748,16 +6893,18 @@ var Spiel = (function () {
         }
         var raeume = [];
         for (i = 0; i < s.partie.raeume.length; i++) raeume.push({ id: s.partie.raeume[i].id, name: s.partie.raeume[i].name, hier: s.partie.raeume[i].id === raum, zu: zugangZu(s, s.partie.raeume[i].id, nr) });
-        var ansicht = { raum: raum, raeume: raeume, dinge: dinge, inventar: inventar, zeit: Math.ceil(s.zeit), licht: !s.f['licht_aus:' + raum],
+        var ansicht = { raum: raum, raeume: raeume, dinge: dinge, inventar: inventar, zeit: sekunden(s), licht: !s.f['licht_aus:' + raum],
             wasser: !!s.f['wasser:' + raum], status: s.draussen && s.draussen[nr] ? 'gewonnen' : s.status, tragen: tragen, laerm: (s.laut && s.laut[raum]) || 0, gaben: meineGaben(s, nr), gefangen: gefangen(s, nr), einhand: einhand(s, nr) };
+        // Der ganze Bereich steht (Oberflaeche, 2026-10-12): Steht die Zwischentuer oder das Gitter offen? Die Oberflaeche zeigt
+        // das Ding auch von der anderen Seite, wo es nicht in der Sicht steht ("zu" je Raum sagt nur, ob dieser Spieler hinueber darf).
+        if (s.partie.durchgang) ansicht.gangOffen = !!s.f['offen:' + s.partie.durchgang.nach];
         // Timer (Wunsch des Projektinhabers 2026-10-12): Laeuft eine echte Frist, zeigt die Oberflaeche, wie viel bleibt.
-        // rest und gesamt in Zeiteinheiten der Partie (eine je Handgriff, drei je Warten; die Oberflaeche wartet nach 20 s
-        // Ruhe von selbst); die naechste ungebannte Frist.
+        // rest und gesamt in Sekunden; die naechste ungebannte Frist. zeit (oben) ist ebenfalls in Sekunden.
         for (i = 0; i < s.partie.bedrohungen.length; i++) {
             var bf = s.partie.bedrohungen[i];
             if (bf.ausloeser !== 'zeit' || !bf.frist || s.f['gebannt:' + bf.id]) continue;
-            var rest = Math.max(0, Math.ceil(bf.frist - s.zeit));
-            if (!ansicht.frist || rest < ansicht.frist.rest) ansicht.frist = { rest: rest, gesamt: bf.frist };
+            var rest = Math.max(0, Math.ceil((bf.frist - s.zeit) * SEK - 1e-9));
+            if (!ansicht.frist || rest < ansicht.frist.rest) ansicht.frist = { rest: rest, gesamt: Math.round(bf.frist * SEK) };
         }
         // Weggestossenes in diesem Raum: wo es jetzt steht
         if (s.koerper) {
@@ -6874,7 +7021,7 @@ var Spiel = (function () {
         return aus;
     }
 
-    return { version: 4, neu: neu, befehl: befehl, sicht: sicht, namen: namen, rahmen: rahmen, hoert: hoert, verdeckt: verdeckt, deckel: deckel, oben: oben, hinauf: hinauf };
+    return { version: 4, SEK: SEK, uhrText: uhrText, neu: neu, befehl: befehl, sicht: sicht, namen: namen, rahmen: rahmen, hoert: hoert, verdeckt: verdeckt, deckel: deckel, oben: oben, hinauf: hinauf };
 })();
 
 if (typeof module !== 'undefined' && module.exports) { module.exports = Spiel; }
