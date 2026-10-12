@@ -1070,6 +1070,9 @@ var Setting = (function () {
                     deko: ['regal', 'fass', 'kisten', 'banner', 'stuhl', 'klangflasche',
                         'pritsche', 'eimer', 'schatztruhe', 'waffenstaender', 'gold', 'muenzen', 'kolben', 'moerser', 'buecher', 'buecherbord', 'weinregal',
                         'sarg', 'grabplatte', 'knochen', 'schaedel', 'fassstapel', 'lagerfass', 'fassturm', 'saeule', 'kette', 'ruestung', 'kelch'],
+                    // Eckpfeiler der Huelle (client/ui.js, huelleKaykit): so weit ragt er ueber den Eckpunkt in den Raum, wenn er
+                    // mitten darauf steht (raum) oder in die Mauer zurueckgesetzt ist (ecke). Am Modell gemessen: 0,413 und 0,163.
+                    pfeiler: { raum: 0.42, ecke: 0.17 },
                     stand: { schrank_oben: 'wand', paket: 'tisch' },
                     wandhoehe: { schrank_oben: 2.25, doppelhebel: 1.05, hebelpaar: 1.05 },
                     grund: { becken: [1.0, 0.4], puppe: [0.55, 0.3], winde: [0.47, 0.4], tisch: [0.8, 0.42],
@@ -2008,7 +2011,8 @@ var Katalog = (function () {
         }
         K.STIL = id; K.STILNAME = st.name || id;
         K.RAUM = { stand: (st.raum && st.raum.stand) || {}, wandhoehe: (st.raum && st.raum.wandhoehe) || {}, grund: (st.raum && st.raum.grund) || {},
-            geschoss: (st.raum && st.raum.geschoss) || 0, deko: (st.raum && st.raum.deko) || ['regal', 'fass', 'kisten', 'banner', 'stuhl'] };
+            geschoss: (st.raum && st.raum.geschoss) || 0, deko: (st.raum && st.raum.deko) || ['regal', 'fass', 'kisten', 'banner', 'stuhl'],
+            pfeiler: (st.raum && st.raum.pfeiler) || null };
         K.maengel = maengelVon(K, st);
         // jeder Weg hat einen ganzen Satz fuer sein Gelingen (setting.wegSatz), auch nach den Ersetzungen dieses Stils
         (function satzFehlt(o, tiefe) {
