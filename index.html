@@ -308,6 +308,8 @@ var Setting = (function () {
             puppe: { name: '\u00dcbungspuppe', nom: 'die \u00dcbungspuppe', akk: 'die \u00dcbungspuppe', verb: 'Ansto\u00dfen',
                 b: 'Eine \u00dcbungspuppe aus Stroh und Sackleinen auf einem Pfahl. Jemand hat ihr ein Gesicht aufgemalt, und es sieht zu wach aus.',
                 // wie man sie aufhaelt, je Ausloeser (Laerm wird nicht gebannt): steht an der Sperre und im Notizbuch, sobald man ihr Verhalten kennt
+                // bannBeob: ab Stufe 2 nur die Beobachtung, ohne den Weg (Blindtest Runde 2: der volle Satz nennt die L\u00f6sung)
+                bannBeob: { wegsehen: 'Sie r\u00fchrt sich nur, solange keiner sie ansieht; ihr Blick geht starr geradeaus.', licht_aus: 'Sie regt sich nur im Dunkeln.' },
                 bann: { wegsehen: 'Sie r\u00fchrt sich nur, solange keiner sie ansieht. Stellte man ihr etwas Spiegelndes vor die Augen, s\u00e4he sie sich selbst an.',
                     licht_aus: 'Sie regt sich nur im Dunkeln. Hielte man ihr ein Licht entgegen, bliebe sie wohl starr.' }, f: [
                 ['richtung', 'Die \u00dcbungspuppe steht jedes Mal ein St\u00fcck weiter. Ihr Ziel: {ziel}.', 'Im Staub vor der \u00dcbungspuppe sind Abdr\u00fccke ihres Pfahls, einer hinter dem anderen in dieselbe Richtung.'],
@@ -331,6 +333,7 @@ var Setting = (function () {
                 // Frist (Bedrohung mit Zeit): woran man sieht, wie man sie aufhaelt (Gegenmittel lang oder stumpf); steht beim Ansehen und an der Sperre
                 ende: 'Das Wasser steht dir bis zur Brust und steigt weiter. Aus diesem Raum kommst du nicht mehr hinaus.',
                 gegen: { zeit: ['den Abfluss freistochern', 'das Rohr zuschlagen'] },
+                bannBeob: 'Unten am Kessel gurgelt ein verstopfter Abfluss, oben rinnt das Wasser aus einem Rohr nach.',
                 bann: 'Unten am Kessel gurgelt ein verstopfter Abfluss, oben rinnt das Wasser aus einem Rohr nach. Mit etwas Langem lie\u00dfe sich der Abfluss freistochern, mit etwas Schwerem das Rohr zuschlagen.',
                 sinken: { text: 'etwas Schweres in den Schacht werfen', satz: 'Es versinkt im Schacht. Das Wasser steigt, und das Holzk\u00e4stchen treibt nach oben. Darin: {ziel}. Du nimmst es heraus.' }, f: [
                 ['bedrohung', 'Das Wasser l\u00e4uft \u00fcber den Rand und flutet den Boden.', 'Am Kessel kleben Kalkr\u00e4nder weit \u00fcber dem Rand: Er ist schon \u00f6fter \u00fcbergelaufen.'],
@@ -352,6 +355,7 @@ var Setting = (function () {
                 b: 'Ein Haufen eiserner Zahnr\u00e4der am Boden, ineinander verhakt. Trotzdem greifen sie, drehen sich und ticken.',
                 ende: 'Die Decke ist so tief gesunken, dass du nur noch kriechen kannst. Aus diesem Raum kommst du nicht mehr hinaus.',
                 gegen: { zeit: ['etwas Langes zwischen die R\u00e4der klemmen', 'die Achse mit einem schweren Schlag verklemmen'] },
+                bannBeob: 'Zwischen zwei gro\u00dfen Zahnr\u00e4dern klafft eine L\u00fccke, und die Achse in der Mitte wackelt bei jedem Schlag.',
                 bann: 'Zwischen zwei gro\u00dfen Zahnr\u00e4dern ist eine L\u00fccke, in die etwas Langes passen w\u00fcrde. Und die Achse in der Mitte sieht aus, als lie\u00dfe sie sich mit einem schweren Schlag verklemmen.', f: [
                 ['zahl', 'Im R\u00e4derwerk schl\u00e4gt ein Zahn hart an. Die Schl\u00e4ge, mit Pausen dazwischen, ergeben die Ziffern.', 'Ein Zahn im R\u00e4derwerk ist blank geschlagen, als schlage er oft hart an.'],
                 ['behaelter', 'Nach einer vollen Umdrehung geben die Zahnr\u00e4der frei, was zwischen ihnen klemmte: {ziel}.', 'Zwischen zwei Zahnr\u00e4dern klemmt etwas, das sich mit der Hand nicht herausziehen l\u00e4sst.'],
@@ -362,6 +366,7 @@ var Setting = (function () {
                 ['zeitgeber', 'Die R\u00e4der laufen immer langsamer. Stehen sie still, ist es zu sp\u00e4t.']] },
             spiegel: { name: 'blanker Schild', nom: 'der blanke Schild', akk: 'den blanken Schild', verb: 'Zur Seite klappen',
                 b: 'Ein blank polierter Schild an der Wand. Man sieht sich darin wie in einem Spiegel.',
+                bannBeob: 'Wer hineinsieht, kann sich nicht mehr r\u00fchren.',
                 bann: 'Wer hineinsieht, kann sich nicht mehr r\u00fchren. Mit einem gro\u00dfen Tuch dar\u00fcber s\u00e4he niemand mehr hinein.', f: [
                 ['zahl', 'Der blanke Schild beschl\u00e4gt, und im Beschlag erscheinen Ziffern.', 'Auf dem blanken Schild sind feine Schlieren, als h\u00e4tte jemand mit dem Finger Ziffern hineingeschrieben.'],
                 ['richtung', 'Im Spiegelbild des Schildes ist eine Stelle markiert, im Raum selbst nicht: {ziel}.', 'Im Spiegelbild des Schildes wirkt der Raum nicht ganz wie der Raum selbst.'],
@@ -385,6 +390,7 @@ var Setting = (function () {
                 ['verwandler', 'Die Kerzen brennen jetzt hell. Daran lie\u00dfe sich etwas anz\u00fcnden.', 'Die Dochte sind schwarz: Die Kerzen haben schon einmal gebrannt.']] },
             gemaelde: { name: 'leere Leinwand', nom: 'die leere Leinwand', akk: 'die leere Leinwand', verb: 'Abtasten',
                 b: 'Ein schwerer Rahmen an der Wand. Die Leinwand darin ist leer, und doch f\u00fchlt man sich von ihr angesehen.',
+                bannBeob: 'Wer in die Augen sieht, kann sich nicht mehr r\u00fchren.',
                 bann: 'Wer in die Augen sieht, kann sich nicht mehr r\u00fchren. Ein gro\u00dfes Tuch \u00fcber dem Rahmen, und sie s\u00e4hen niemanden mehr.', f: [
                 ['richtung', 'Auf der leeren Leinwand erscheinen zwei Augen. Sie wandern zu einer Stelle: {ziel}.', 'Auf der leeren Leinwand sind zwei blasse Kreise zu ahnen, wie Augen, die zur Seite blicken.'],
                 ['zahl', 'Auf der leeren Leinwand leuchten Ziffern.', 'Auf der leeren Leinwand sind blasse Umrisse von Ziffern zu ahnen.'],
@@ -394,6 +400,7 @@ var Setting = (function () {
                 ['teil', 'Auf der leeren Leinwand leuchtet etwas auf. {teil}', 'Auf der leeren Leinwand sind blasse Umrisse eines Zeichens zu ahnen.']] },
             katze: { name: 'Katze', nom: 'die Katze', akk: 'die Katze', verb: 'Streicheln',
                 b: 'Eine Katze. Sie beobachtet dich, als w\u00fcsste sie mehr als du.',
+                bannBeob: 'Sie l\u00e4sst niemanden heran, und vor einem Stock weicht sie zur\u00fcck.',
                 bann: 'Sie l\u00e4sst niemanden heran. L\u00e4rm w\u00fcrde sie verscheuchen, und mit etwas Langem hielte man sie auf Abstand.', f: [
                 ['richtung', 'Die Katze flitzt zu ihrem Versteck: {ziel}.', 'Im Staub sind Pfotenspuren, alle zur selben Stelle hin.'],
                 ['traeger', 'Die Katze bringt etwas und legt es vor dir ab: {ziel}.', 'Die Katze hat Staub im Fell, als hole sie oft etwas aus einem Winkel.'],
@@ -409,6 +416,7 @@ var Setting = (function () {
                 ['teil', 'Das Buch fl\u00fcstert, dann beschreibt eine Stimme etwas. {teil}', 'Am Rand der Seiten ist etwas gekritzelt und wieder ausradiert.']] },
             schaukelstuhl: { name: 'Lehnstuhl', nom: 'der Lehnstuhl', akk: 'den Lehnstuhl', verb: 'Ansto\u00dfen',
                 b: 'Ein Stuhl mit hoher Lehne. Er steht nie ganz still.',
+                bannBeob: { wegsehen: 'Er r\u00fcckt nur, solange ihn keiner im Blick hat; selbst ein Blick \u00fcber eine blanke Fl\u00e4che h\u00e4lt ihn auf.', licht_aus: 'Er r\u00fcckt nur im Dunkeln.' },
                 bann: { wegsehen: 'Er r\u00fcckt nur, solange ihn keiner im Blick hat. Ein Spiegel, der ihn zeigt, h\u00e4tte ihn st\u00e4ndig im Blick.',
                     licht_aus: 'Er r\u00fcckt nur im Dunkeln. Hielte man ein Licht auf ihn, bliebe er wohl stehen.' }, f: [
                 ['zahl', 'Der Lehnstuhl kippelt im Takt. Die Schl\u00e4ge je Pause ergeben die Ziffern.', 'Unter den Beinen des Lehnstuhls sind Kerben im Boden, in Gruppen nebeneinander.'],
@@ -419,7 +427,8 @@ var Setting = (function () {
                 ['teil', 'In die Lehne des Lehnstuhls ist etwas geritzt, das vorher nicht da war. {teil}', 'In die Lehne des Lehnstuhls waren schon einmal Zeichen geritzt, sie sind wieder abgeschabt.']] },
             ventilator: { name: 'Kronleuchter', nom: 'der Kronleuchter', akk: 'den Kronleuchter', verb: 'Am Seil ziehen',
                 b: 'Ein eiserner Kronleuchter an einer langen Kette. Daneben h\u00e4ngt das Seil zum Herablassen.',
-                bann: 'Er h\u00e4ngt so tief, dass er nach jedem schwingt, der darunter geht. Mit etwas Langem lie\u00dfe er sich gegen die Wand klemmen, und das Seil, \u00fcber das seine Kette l\u00e4uft, ist d\u00fcnn genug f\u00fcr eine Klinge.',
+                bannBeob: 'Er schwingt dicht an der Wand entlang, und das Seil, \u00fcber das seine Kette l\u00e4uft, ist d\u00fcnn.',
+                bann: 'Mit etwas Langem lie\u00dfe er sich gegen die Wand klemmen, und das Seil, \u00fcber das seine Kette l\u00e4uft, ist d\u00fcnn genug f\u00fcr eine Klinge.',
                 // eigene Gegenmittel (katalog.js gegen): kein Weglocken mit L\u00e4rm wie bei der Katze
                 gegen: { naehe: ['mit etwas Langem gegen die Wand klemmen', 'das Seil kappen, dann kracht er herunter'] }, f: [
                 ['traeger', 'Der Kronleuchter ger\u00e4t ins Schwingen und fegt vom Sims, was oben lag: {ziel}.', 'Auf dem Sims unter dem Kronleuchter sind Schrammen, so weit schwingt er manchmal aus.'],
@@ -884,7 +893,7 @@ var Setting = (function () {
             schwer: 'zu leicht', stumpf: 'nicht wuchtig genug', lang: 'zu kurz', scharf: 'nicht scharf genug',
             saeurehaltig: 'nicht \u00e4tzend genug', entzuendend: 'nicht zum Anz\u00fcnden geeignet', licht: 'nicht hell genug',
             deckend: 'zu klein zum Abdecken', saugfaehig: 'nicht saugf\u00e4hig genug', spiegelnd: 'kein brauchbarer Spiegel',
-            haken: 'damit l\u00e4sst sich nichts greifen', reissfest: 'nicht rei\u00dffest genug', laut: 'nicht laut genug'
+            haken: 'damit l\u00e4sst sich nichts greifen', reissfest: 'nicht rei\u00dffest genug', laut: 'nicht laut genug', steif: 'zu biegsam'
         },
         // zweit: Name, Nominativ, Akkusativ, wenn dieselbe Art ein zweites Mal im Raum vorkommt
         // offen (wahlweise): wie das Ding am Fadenkreuz heisst, sobald es offen ist (eine offene Truhe ist nicht mehr verschlossen)
@@ -966,7 +975,9 @@ var Setting = (function () {
             b: 'Eine Eisenklappe am Luftschacht. Ohne Zugluft ersticken die Fackeln.', an: 'Die Klappe ist offen.', aus: 'Die Klappe ist zu.',
             schliessen: 'Luftklappe schlie\u00dfen', oeffnen: 'Luftklappe \u00f6ffnen',
             wirdDunkel: 'Du schlie\u00dft die Luftklappe. Die Fackeln ersticken, es ist dunkel.', wirdHell: 'Du \u00f6ffnest die Luftklappe. Die Fackeln flammen wieder auf.' },
+        // laeuft: wer den offenen Hahn noch einmal anfasst (Blindtest: zweimal gefragt, ob man ihn zudrehen kann)
         wasser: { name: 'Wasserfass', nom: 'das Wasserfass', akk: 'das Wasserfass', verb: 'Zapfhahn aufdrehen', tun: 'Zapfhahn aufdrehen',
+            laeuft: 'Der Zapfhahn klemmt offen. Zudrehen l\u00e4sst er sich nicht mehr.',
             rost: { name: 'Wasserfass mit festgerostetem Zapfhahn', nom: 'das Wasserfass mit festgerostetem Zapfhahn', akk: 'das Wasserfass mit festgerostetem Zapfhahn',
                 alt: ['mit Gewalt aufdrehen', 'Rost weg\u00e4tzen'] } },
         // STILE: Dasselbe Setting in den Modellen verschiedener Hersteller. Ein Stil ist immer EIN Hersteller, nie gemischt.
@@ -1295,7 +1306,7 @@ var Katalog = (function () {
             { art: 'teil', aus: ['licht_aus', 'licht_an'] },
             { art: 'zeitgeber', aus: ['zeit'] }
         ] },
-        becken: { gegen: { zeit: { alt: [{ b: { lang: 2 } }, { b: { stumpf: 2 }, laerm: true }] } }, f: [
+        becken: { gegen: { zeit: { alt: [{ b: { lang: 2, steif: 1 } }, { b: { stumpf: 2 }, laerm: true }] } }, f: [
             { art: 'bedrohung', aus: ['zeit'] },
             { art: 'traeger', aus: ['wasser'] },
             { art: 'zahl', aus: ['wasser'] },
@@ -1313,7 +1324,7 @@ var Katalog = (function () {
             { art: 'melodie', aus: ['beruehrung', 'zeit', 'stille'] }       // R27: spielt die Folge fuer die Klangstaebe am Schloss
         ] },
         // Frist: der lange Stab bleibt zwischen den Raedern stecken; am Kessel stochert man nur oder schlaegt zu
-        standuhr: { gegen: { zeit: { alt: [{ b: { lang: 2 }, legt: true }, { b: { stumpf: 2 }, laerm: true }] } }, f: [
+        standuhr: { gegen: { zeit: { alt: [{ b: { lang: 2, steif: 1 }, legt: true }, { b: { stumpf: 2 }, laerm: true }] } }, f: [
             { art: 'zahl', aus: ['zeit', 'beruehrung', 'stille'], takt: true },
             { art: 'behaelter', aus: ['zeit'] },
             { art: 'richtung', aus: ['beruehrung'] },
@@ -1339,7 +1350,7 @@ var Katalog = (function () {
             { art: 'teil', aus: ['waerme', 'zeit'] },
             { art: 'werkzeug', aus: ['waerme'], e: { licht: 1, entzuendend: 1 } },
             { art: 'zeitgeber', aus: ['zeit'] },
-            { art: 'verwandler', aus: ['waerme'], rezept: { b: { lang: 2 }, e: { licht: 1, entzuendend: 1, lang: 2 }, zu: 'fackel' } }
+            { art: 'verwandler', aus: ['waerme'], rezept: { b: { lang: 2, steif: 1 }, e: { licht: 1, entzuendend: 1, lang: 2, steif: 1 }, zu: 'fackel' } }
         ] },
         gemaelde: { f: [
             { art: 'richtung', aus: ['naehe', 'hinsehen', 'anzahl', 'abwesenheit'] },
@@ -1373,7 +1384,7 @@ var Katalog = (function () {
         ] },
         // gegen: eigene Gegenmittel dieses Dings statt der allgemeinen je Ausloeser (GEGENMITTEL). Den Kronleuchter lockt
         // kein Laerm weg: Man klemmt ihn mit etwas Langem fest oder kappt sein Seil.
-        ventilator: { gegen: { naehe: { alt: [{ b: { lang: 2 }, legt: true }, { b: { scharf: 2 } }] } }, f: [
+        ventilator: { gegen: { naehe: { alt: [{ b: { lang: 2, steif: 1 }, legt: true }, { b: { scharf: 2 } }] } }, f: [
             { art: 'traeger', aus: ['beruehrung'] },
             { art: 'richtung', aus: ['beruehrung'] },
             { art: 'bedrohung', aus: ['naehe'] },
@@ -1396,7 +1407,8 @@ var Katalog = (function () {
     };
     var GEGENSTAENDE = {
         hammer:       { e: { schwer: 2, stumpf: 2, laut: 1 } },
-        brechstange:  { e: { schwer: 2, lang: 2, stumpf: 1, laut: 1 } },
+        // steif: zum Klemmen, Verkeilen, Stochern und Hebeln (Blindtest Runde 2: der Wurfhaken ist lang, aber ein Seil)
+        brechstange:  { e: { schwer: 2, lang: 2, stumpf: 1, laut: 1, steif: 1 } },
         messer:       { e: { scharf: 2 } },
         schere:       { e: { scharf: 1 } },
         saeurehaltig: { e: { saeurehaltig: 2 }, verbrauch: true },
@@ -1406,9 +1418,9 @@ var Katalog = (function () {
         tuch:         { e: { deckend: 2, saugfaehig: 1 }, zweit: { e: { reissfest: 1 } } },
         decke:        { e: { deckend: 3 } },
         handspiegel:  { e: { spiegelnd: 2 } },
-        besen:        { e: { lang: 3 } },
+        besen:        { e: { lang: 3, steif: 1 } },
         kleiderhaken: { e: { haken: 1 } },
-        angel:        { e: { lang: 3, haken: 1 } },
+        angel:        { e: { lang: 3, haken: 1, steif: 1 } },
         schnur:       { e: { reissfest: 2 } },
         wecker:       { e: { laut: 2 }, zweit: { e: { reissfest: 2 } } },
         hantel:       { e: { schwer: 3, stumpf: 2, laut: 1 } },
@@ -1430,7 +1442,7 @@ var Katalog = (function () {
     var EIGENSCHAFT_TEXT = {
         schwer: 'schwer', stumpf: 'stumpf', laut: 'laut', lang: 'lang', scharf: 'scharf', saeurehaltig: '\u00e4tzend',
         entzuendend: 'entz\u00fcndend', licht: 'Licht', deckend: 'deckend', saugfaehig: 'saugf\u00e4hig', spiegelnd: 'spiegelnd',
-        haken: 'Haken', reissfest: 'rei\u00dffest', schluessel: 'Schl\u00fcssel'
+        haken: 'Haken', reissfest: 'rei\u00dffest', schluessel: 'Schl\u00fcssel', steif: 'steif'
     };
 
     // Verstecke. Jede Alternative ist ein Loesungsweg: b = Bedingung (Eigenschaft: Mindeststaerke), h = Haende,
@@ -1441,7 +1453,7 @@ var Katalog = (function () {
         paket: { alt: [{ b: { scharf: 1 } }, { b: { entzuendend: 1 } }, { b: { saeurehaltig: 1 } }] },
         vitrine: { alt: [{ b: { stumpf: 2 }, laerm: true }, { b: { lang: 2, schwer: 2 } }, { b: { saeurehaltig: 1 } }] },
         diele: { alt: [{ b: { lang: 2, schwer: 2 } }, { b: { stumpf: 2 }, laerm: true }, { b: { scharf: 2 } }] },
-        schrank_oben: { alt: [{ b: { lang: 3, haken: 1 } }, { b: { lang: 3 }, laerm: true }] },
+        schrank_oben: { alt: [{ b: { lang: 3, haken: 1 } }, { b: { lang: 3, steif: 1 }, laerm: true }] },
         bodenschacht: { alt: [{ b: { lang: 2, haken: 1 } }, { b: { reissfest: 1, haken: 1 } }] }
     };
 
@@ -1453,11 +1465,11 @@ var Katalog = (function () {
         buchstabenschloss: { art: 'code', buchstaben: true },
         schluesselloch: { art: 'schluessel' },
         // legt: Wer das tut, laesst den Gegenstand dort (festgebunden, verkeilt, daraufgelegt); er laesst sich wieder nehmen
-        doppelhebel: { art: 'anforderung', alt: [{ h: 2 }, { b: { reissfest: 1 }, legt: true }, { b: { lang: 2 }, legt: true }] },
+        doppelhebel: { art: 'anforderung', alt: [{ h: 2 }, { b: { reissfest: 1 }, legt: true }, { b: { lang: 2, steif: 1 }, legt: true }] },
         druckplatte: { art: 'anforderung', alt: [{ b: { schwer: 3 }, legt: true }, { h: 2 }] },
         // Gleichzeitig (R84): je Raum eine Zugkette, beide im selben Augenblick unten (zweiRaeume: je einer in jedem Raum),
         // oder eine verkeilen bzw. beschweren und dann die andere ziehen. Nur in Partien mit zwei Raeumen.
-        hebelpaar: { art: 'anforderung', zweiRaeume: true, alt: [{ h: 2, zweiRaeume: true }, { b: { lang: 2 }, legt: true }, { b: { schwer: 2 }, legt: true }] },
+        hebelpaar: { art: 'anforderung', zweiRaeume: true, alt: [{ h: 2, zweiRaeume: true }, { b: { lang: 2, steif: 1 }, legt: true }, { b: { schwer: 2 }, legt: true }] },
         // Waage aus Menschen (R85): zwei Trittplatten, jede will genau so viel Last, wie Spuren eingemeisselt sind. Ein
         // Spieler zaehlt eins, ebenso ein Gegenstand, der mindestens WAAGE_SCHWER schwer ist.
         waage: { art: 'waage' }
@@ -1465,8 +1477,8 @@ var Katalog = (function () {
     var WAAGE_SCHWER = 2;
     // Der Gefangene (R154): Wege, den Kaefig aufzubrechen (wie ein Hindernis, Idee 12)
     // Das Rettungsboot (R157): Wege, das Gitter vor dem Notschacht abzunehmen
-    var NOTSCHACHT = { alt: [{ b: { scharf: 2 } }, { b: { lang: 2 } }] };
-    var KAEFIG = { alt: [{ b: { lang: 2 } }, { b: { saeurehaltig: 1 } }, { b: { stumpf: 2 }, laerm: true }] };
+    var NOTSCHACHT = { alt: [{ b: { scharf: 2 } }, { b: { lang: 2, steif: 1 } }] };
+    var KAEFIG = { alt: [{ b: { lang: 2, steif: 1 } }, { b: { saeurehaltig: 1 } }, { b: { stumpf: 2 }, laerm: true }] };
 
     // Gegenmittel je Ausloeser einer Bedrohung. beobachter = ein freier Spieler haelt sie in Schach (wegsehen).
     // null bei laerm: Laerm-Bedrohungen werden nicht gebannt, man muss leise Wege nehmen.
@@ -1475,8 +1487,8 @@ var Katalog = (function () {
         hinsehen: { alt: [{ b: { deckend: 2 }, legt: true }] },
         licht_aus: { alt: [{ b: { licht: 1 }, legt: true }] },
         laerm: null,
-        naehe: { alt: [{ b: { laut: 1 }, laerm: true }, { b: { lang: 2 } }] },
-        zeit: { alt: [{ b: { lang: 2 } }, { b: { stumpf: 2 }, laerm: true }] }
+        naehe: { alt: [{ b: { laut: 1 }, laerm: true }, { b: { lang: 2, steif: 1 } }] },
+        zeit: { alt: [{ b: { lang: 2, steif: 1 } }, { b: { stumpf: 2 }, laerm: true }] }
     };
     // Verwitterte Inschrift (Traeger eines Code-Teils): Wege, sie lesbar zu machen
     var INSCHRIFT = [{ b: { licht: 1 } }, { b: { saugfaehig: 1 } }, { b: { scharf: 1 } }];
@@ -1519,6 +1531,7 @@ var Katalog = (function () {
             for (var ga in ELEMENTE[k].gegen) if (ELEMENTE[k].gegen.hasOwnProperty(ga)) alternativen(ELEMENTE[k].gegen[ga].alt, se.gegen && se.gegen[ga], 'elemente.' + k + '.gegen.' + ga);
         }
         ELEMENTE[k].bann = {};
+        ELEMENTE[k].bannBeob = {};
         for (i = 0; i < ELEMENTE[k].f.length; i++) {
             if (ELEMENTE[k].f[i].art !== 'bedrohung') continue;
             for (var ai = 0; ai < ELEMENTE[k].f[i].aus.length; ai++) {
@@ -1527,6 +1540,9 @@ var Katalog = (function () {
                 var bt = typeof se.bann === 'string' ? se.bann : se.bann && se.bann[au];
                 if (typeof bt !== 'string') fehlt('elemente.' + k + '.bann.' + au);
                 ELEMENTE[k].bann[au] = bt;
+                var bb = typeof se.bannBeob === 'string' ? se.bannBeob : se.bannBeob && se.bannBeob[au];
+                if (typeof bb !== 'string') fehlt('elemente.' + k + '.bannBeob.' + au);
+                ELEMENTE[k].bannBeob[au] = bb;
             }
             if (ELEMENTE[k].f[i].aus.indexOf('zeit') >= 0 && !se.ende) fehlt('elemente.' + k + '.ende');
         }
@@ -1564,7 +1580,8 @@ var Katalog = (function () {
         if (k === 'hebelpaar') uebernimm(SCHLOESSER[k], S.schloesser[k], ['b', 'allein', 'geklemmt', 'unten', 'nichtFest', 'aktionBeide', 'aktionKeil', 'aktionAndere'], 'schloesser.hebelpaar');
     }
     for (k in GEGENMITTEL) if (GEGENMITTEL.hasOwnProperty(k) && GEGENMITTEL[k]) alternativen(GEGENMITTEL[k].alt, S.gegenmittel[k], 'gegenmittel.' + k);
-    var WASSER = { name: S.wasser.name, nom: S.wasser.nom, akk: S.wasser.akk, verb: S.wasser.verb, tun: S.wasser.tun,
+    if (typeof S.wasser.laeuft !== 'string') fehlt('wasser.laeuft');
+    var WASSER = { name: S.wasser.name, nom: S.wasser.nom, akk: S.wasser.akk, verb: S.wasser.verb, tun: S.wasser.tun, laeuft: S.wasser.laeuft,
         rost: { name: S.wasser.rost.name, nom: S.wasser.rost.nom, akk: S.wasser.rost.akk, alt: ROST } };
     alternativen(WASSER.rost.alt, S.wasser.rost.alt, 'wasser.rost');
     if (!S.stories || !S.stories.length) fehlt('stories');
@@ -1701,7 +1718,7 @@ var Katalog = (function () {
     for (k in S.zaehl) if (S.zaehl.hasOwnProperty(k)) uebernimm({}, S.zaehl[k], ['name', 'nom', 'akk', 'b', 'zeichen'], 'zaehl.' + k);
     var FALLGITTER_K = { alt: FALLGITTER };
     // Niemand bleibt zurueck (R155): die Winde jenseits des Fallgitters (Kurbel fehlt, Achse festgerostet)
-    var WINDE = { alt: [{ b: { lang: 2 } }, { b: { stumpf: 2 }, laerm: true }] };
+    var WINDE = { alt: [{ b: { lang: 2, steif: 1 } }, { b: { stumpf: 2 }, laerm: true }] };
     if (!S.fallgitter.winde) fehlt('fallgitter.winde');
     else { uebernimm(WINDE, S.fallgitter.winde, ['name', 'nom', 'akk', 'verb', 'b', 'zurueck', 'nachkommen', 'alle', 'offen'], 'fallgitter.winde'); alternativen(WINDE.alt, S.fallgitter.winde.alt, 'fallgitter.winde'); }
     FALLGITTER_K.winde = WINDE;
@@ -4841,7 +4858,8 @@ var Spiel = (function () {
 
     // wie man eine Bedrohung aufhaelt (Setting bann je Ausloeser); leer, wenn sie gebannt ist oder sich nicht bannen laesst
     function bannText(s, b) {
-        var bt = KAT.ELEMENTE[s.partie.dinge[b.element].vorlage].bann;
+        // ab Stufe 2 nur die Beobachtung (verstopfter Abfluss, die Augen), auf Stufe 1 auch der Weg
+        var bt = KAT.ELEMENTE[s.partie.dinge[b.element].vorlage][s.partie.stufe > 1 ? 'bannBeob' : 'bann'];
         return !s.f['gebannt:' + b.id] && bt && bt[b.ausloeser] || '';
     }
 
@@ -6156,6 +6174,7 @@ var Spiel = (function () {
                     if (!getan && mehrHaende) { aus.push(m('Allein bekommst du das so nicht hin. Daf\u00fcr br\u00e4uchte es mehr H\u00e4nde.')); getan = true; }
                 }
                 if (!getan && d.vorlage === 'ausgang') aus.push(sieh(s, d, nr));
+                else if (!getan && d.vorlage === 'wasser' && s.f['wasser:' + d.raum]) { fass = m(KAT.WASSER.laeuft); fass.n = 1; aus.push(fass); }   // lesbarer Grund
                 else if (!getan && aktionenAn(s, d.id, ['benutzen']).some(function (x) { return x.mittel && !erledigt(s, x) && brauchtErfuellt(s, x); })) {
                     // hier hilft ein Werkzeug: Das ist ein Grund, kein blosses Anfassen (lesbar, nicht nur ein Wackeln)
                     fass = m(KAT.HAENDE); fass.n = 1; aus.push(fass);
@@ -6352,11 +6371,12 @@ var Spiel = (function () {
             legeFunde(s);
             aus = aus.concat(verteile(s, i));
         }
-        // angefasst: zeigt das Ding gerade seine Vorfuehrung, war das kein Fehlversuch
-        var vfd = fass ? naechsteVorfuehrung(s, nr, b.ding) : [];
-        if (vfd.length && aus.indexOf(fass) >= 0) aus.splice(aus.indexOf(fass), 1);
-        if (vfd.length) aus = aus.concat(vfd);
-        else if (b.art !== 'gehen') aus = aus.concat(naechsteVorfuehrung(s, nr));
+        // Vorfuehrungen nur am Ding selbst (Entscheidung des Projektinhabers nach dem Blindtest, Runde 2): wer es ansieht
+        // (siehe ansehen) oder anfasst, sieht sie; die erste beim Betreten (betrete). Bei fremden Handgriffen wirkte sie wie
+        // deren Folge. Angefasst und vorgefuehrt ist kein Fehlversuch.
+        var vfd = b.art === 'anfassen' && b.ding ? naechsteVorfuehrung(s, nr, b.ding) : [];
+        if (vfd.length && fass && aus.indexOf(fass) >= 0) aus.splice(aus.indexOf(fass), 1);
+        aus = aus.concat(vfd);
         if (s.f.ausgang) {
             s.status = 'gewonnen';
             var endText = s.partie.story.ende + ' Zeit: ' + Math.ceil(s.zeit) + '.', en;
