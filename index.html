@@ -892,7 +892,7 @@ var Setting = (function () {
         ausstattung: { tisch: 'Tisch', regal: 'Wandbord', fass: 'Fass', kisten: 'Kistenstapel', banner: 'Banner', stuhl: 'Schemel', klangflasche: 'Flasche',
             kette: 'Ketten', pritsche: 'Pritsche', eimer: 'Eimer', schatztruhe: 'Schatztruhe', waffenstaender: 'Waffenst\u00e4nder', ruestung: 'R\u00fcstung', gold: 'Goldbarren',
             muenzen: 'M\u00fcnzhaufen', kelch: 'Kelch', kolben: 'Destillierkolben', moerser: 'M\u00f6rser', buecher: 'B\u00fccherstapel', sarg: 'Sarg', grabplatte: 'Grabplatte',
-            knochen: 'Knochenhaufen', schaedel: 'Sch\u00e4del', weinregal: 'Weinregal' },
+            knochen: 'Knochenhaufen', schaedel: 'Sch\u00e4del', weinregal: 'Weinregal', buecherbord: 'B\u00fccherbord' },
         verstecke: [
             ['lockerer Mauerstein', 'der lockere Mauerstein', 'den lockeren Mauerstein', 'mauerstein'],
             ['Spalt hinter dem Wandbehang', 'der Spalt hinter dem Wandbehang', 'den Spalt hinter dem Wandbehang', 'wandbehang'],
@@ -992,15 +992,20 @@ var Setting = (function () {
                         wer: 'Das Gitter h\u00e4lt nur, solange jemand den Hebel unten h\u00e4lt. Einer muss bleiben. Wer, entscheidet ihr; wer sich nicht einigt, zieht Lose.',
                         los: 'Ihr zieht H\u00f6lzchen. Das kurze hat {wer}. Bleiben muss trotzdem nur, wer selbst an den Hebel geht.',
                         alt: [{ h: 2, opfer: true, text: 'einer h\u00e4lt den Hebel, die anderen gehen durch' }, { b: { reissfest: 1 }, text: 'den Hebel mit einem Seil unten festbinden' }] },
+                    // Ausstattung der Stories: was das Modell des Herstellers wirklich zeigt
+                    AUSSTATTUNG: { weinregal: 'Weinfass', waffenstaender: 'Waffenpfeiler', moerser: 'Schale', kolben: 'Kolben', buecherbord: 'Kommode mit B\u00fcchern' },
                     KRUEGE: { becken: { name: 'Messzuber', nom: 'der Messzuber', akk: 'den Messzuber',
                         b: 'Ein Zuber mit einer Kerbe innen und der Inschrift am Rand: genau {n} Ma\u00df. Unten sitzt eine Klappe.' },
                         versickert: 'Das Wasser versickert durch einen Spalt im Zuber. Es waren nicht genau {n} Ma\u00df.' }
                 },
                 raum: {
-                    deko: ['regal', 'fass', 'kisten', 'banner', 'stuhl', 'klangflasche'],      // Ausstattung mit Modell in diesem Stil
+                    // Ausstattung mit Modell in diesem Stil; die zweite Zeile ist die Ausstattung der Stories (werkzeug/modelle/bau.js)
+                    deko: ['regal', 'fass', 'kisten', 'banner', 'stuhl', 'klangflasche',
+                        'pritsche', 'eimer', 'schatztruhe', 'waffenstaender', 'gold', 'muenzen', 'kolben', 'moerser', 'buecher', 'buecherbord', 'weinregal'],
                     stand: { schrank_oben: 'wand', paket: 'tisch' },
                     wandhoehe: { schrank_oben: 2.25, doppelhebel: 1.05, hebelpaar: 1.05 },
-                    grund: { becken: [1.0, 0.4], puppe: [0.55, 0.3], winde: [0.47, 0.4] }
+                    grund: { becken: [1.0, 0.4], puppe: [0.55, 0.3], winde: [0.47, 0.4],
+                        pritsche: [0.9, 0.45], eimer: [0.13, 0.11], schatztruhe: [0.48, 0.4], waffenstaender: [0.5, 0.39], buecher: [0.17, 0.08], buecherbord: [0.28, 0.29], weinregal: [0.65, 0.37] }
                 }
             },
             // Quaternius, neue detailreiche Reihe (Fantasy Props MegaKit + Medieval Village MegaKit): Fachwerkhaus statt
@@ -1025,7 +1030,7 @@ var Setting = (function () {
                 },
                 // ganze Textbloecke, die in diesem Stil anders lauten (werden ueber den Block des Settings gelegt)
                 block: {
-                    AUSSTATTUNG: { kisten: 'Kiste' },
+                    AUSSTATTUNG: { kisten: 'Kiste', weinregal: 'Fassgestell', moerser: 'Tiegel', kolben: 'Trank', pritsche: 'Bett' },
                     // Das Paket hat weder Zahnrad noch Hebel: Am Ger\u00e4t des Schlosses (R80) sind M\u00fcnzen eingelassen, und ein Schl\u00fcssel
                     // steckt oben oder unten (client/ui.js schlossGeraet)
                     HANDBUCH: { bed: { mehr: 'mehr als {n} M\u00fcnzen eingelassen sind', weniger: 'weniger als {n} M\u00fcnzen eingelassen sind', hebel: 'der Schl\u00fcssel {stand} steckt' },
@@ -1068,12 +1073,14 @@ var Setting = (function () {
                     }
                 },
                 raum: {
-                    deko: ['regal', 'fass', 'kisten', 'banner', 'stuhl', 'klangflasche'],
+                    deko: ['regal', 'fass', 'kisten', 'banner', 'stuhl', 'klangflasche',
+                        'kette', 'pritsche', 'eimer', 'waffenstaender', 'muenzen', 'kelch', 'kolben', 'moerser', 'buecher', 'buecherbord', 'weinregal'],
                     geschoss: 2.5,
                     stand: { radio: 'boden' },
                     wandhoehe: { licht: 1.5 },
                     grund: { radio: [0.22, 0.22], holzkiste: [0.49, 0.3], wasser: [0.55, 0.31], schaukelstuhl: [0.28, 0.27], v_fass: [0.36, 0.36],
-                        v_urne: [0.23, 0.23], v_schemel: [0.19, 0.19], fass: [0.36, 0.36], kisten: [0.38, 0.4], stuhl: [0.19, 0.19], tisch: [0.61, 0.25] }
+                        v_urne: [0.23, 0.23], v_schemel: [0.19, 0.19], fass: [0.36, 0.36], kisten: [0.38, 0.4], stuhl: [0.19, 0.19], tisch: [0.61, 0.25],
+                        kette: [0.25, 0.21], pritsche: [0.8, 0.63], eimer: [0.22, 0.2], waffenstaender: [0.55, 0.39], buecher: [0.17, 0.14], buecherbord: [0.52, 0.15], weinregal: [0.7, 0.38] }
                 }
             }
         },
@@ -1096,7 +1103,7 @@ var Setting = (function () {
                 intro: 'Der Alchemist ist seit Tagen verschwunden. Du wolltest nur nachsehen, da schlug die T\u00fcr zu. Du bist {in}, und irgendwo brodelt noch sein letzter Versuch.',
                 ende: 'Du bist drau\u00dfen. Hinter dir zischt es noch.',
                 ausgang: { name: 'Labort\u00fcr', nom: 'die Labort\u00fcr', akk: 'die Labort\u00fcr', verb: 'T\u00fcr \u00f6ffnen', auf: 'Die Labort\u00fcr schwingt auf.' },
-                ausstattung: { wand: ['regal', 'kolben', 'buecher', 'regal', 'fass', 'kolben', 'regal'], tisch: ['kolben', 'moerser', 'klangflasche', 'buecher'] },
+                ausstattung: { wand: ['regal', 'buecherbord', 'regal', 'fass', 'eimer', 'buecherbord', 'regal'], tisch: ['kolben', 'moerser', 'klangflasche', 'buecher'] },      // Kolben und B\u00fccher auf den Tischen (die Modelle sind klein), am Boden B\u00fccherborde
                 raeume: [{ name: 'Labor', in: 'im Labor', nach: 'ins Labor' }, { name: 'Kr\u00e4uterkammer', in: 'in der Kr\u00e4uterkammer', nach: 'in die Kr\u00e4uterkammer' },
                     { name: 'Studierstube', in: 'in der Studierstube', nach: 'in die Studierstube' }, { name: 'Destillierkeller', in: 'im Destillierkeller', nach: 'in den Destillierkeller' }] },
             { id: 'gruft', titel: 'Die Gruft', stile: ['kaykit'],
