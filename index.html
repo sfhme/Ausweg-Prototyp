@@ -4605,16 +4605,25 @@ var Generator = (function () {
             d.zone = false;
             this.aktion({ text: Z.tuer.name + ' ' + k + ' \u00f6ffnen', art: 'benutzen', raum: 'r1', ding: d.id, mittel: m, gibt: ['frei:' + k] }).zelle = k;
         }
-        var k0 = 1 + this.r.bis(this.spieler), wege = this.r.mischen([0, 1, 2].slice(0, alt.length));
-        for (i = 0; i < wege.length && !key; i++) for (j = 0; j < this.gegenstaendeFrei.length; j++) {
+        // Zwei Wege hinaus (Vorgabe "viele Loesungswege je Problem"): ein Werkzeug fuer einen Weg und, wenn der Satz es hergibt,
+        // ein zweites fuer einen anderen Weg, den das erste nicht kann. Allein liegen beide in der eigenen Zelle, zu mehreren
+        // in zwei verschiedenen Zellen. Gegenstaende ausserhalb erreicht drinnen niemand.
+        var k0 = 1 + this.r.bis(this.spieler), wege = this.r.mischen([0, 1, 2].slice(0, alt.length)), wahl = [], self = this;
+        var passt = function (gk, w) { return !self.K.GEGENSTAENDE[gk].verbrauch && Pruefer.deckt(self.K.GEGENSTAENDE[gk].e, alt[w].b); };
+        for (i = 0; i < wege.length && wahl.length < 2; i++) for (j = 0; j < this.gegenstaendeFrei.length; j++) {
             var gk = this.gegenstaendeFrei[j];
-            if (!this.K.GEGENSTAENDE[gk].verbrauch && Pruefer.deckt(this.K.GEGENSTAENDE[gk].e, alt[wege[i]].b)) { key = gk; break; }
+            if (!passt(gk, wege[i]) || (wahl.length && (gk === wahl[0].key || passt(wahl[0].key, wege[i])))) continue;
+            wahl.push({ key: gk, weg: wege[i] }); break;
         }
-        if (!key) throw new Fehlschlag('kein Werkzeug fuer die Zelle');
-        var g = this.reserviere(key);
-        g.raum = 'r1'; g.zelle = k0; g.lage = 'liegt in der Zelle';
-        this.aktion({ text: g.name + ' in der Zelle aufheben', art: 'nehmen', raum: 'r1', ding: g.id, gibt: ['hat:' + g.id] }).zelle = k0;
-        p.zellen.werkzeug = g.id;
+        if (!wahl.length) throw new Fehlschlag('kein Werkzeug fuer die Zelle');
+        p.zellen.werkzeuge = [];
+        for (i = 0; i < wahl.length; i++) {
+            var kz = i === 0 || this.spieler === 1 ? k0 : k0 % this.spieler + 1, g = this.reserviere(wahl[i].key);
+            g.raum = 'r1'; g.zelle = kz; g.lage = 'liegt in der Zelle';
+            this.aktion({ text: g.name + ' in der Zelle aufheben', art: 'nehmen', raum: 'r1', ding: g.id, gibt: ['hat:' + g.id] }).zelle = kz;
+            p.zellen.werkzeuge.push(g.id);
+        }
+        p.zellen.werkzeug = p.zellen.werkzeuge[0];
     };
 
     Bau.prototype.baue = function () {
