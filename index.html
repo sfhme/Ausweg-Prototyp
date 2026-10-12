@@ -2557,7 +2557,7 @@ var Generator = (function () {
     // opt.bild (Server, Spielseite, Probeseite) kommen sie in keiner Partie vor; ohne (Tests, zeige.js) in jeder. Die
     // PC-Sitzung streicht hier einen Eintrag, sobald das Raetsel Modelle und ein Bild hat (ARBEITSTEILUNG.md 3.1f).
     // Raetsel, fuer die die Oberflaeche noch kein Bild hat: der Server laesst sie aus (Tests nehmen sie mit)
-    var NOCH_OHNE_BILD = { wandfackel: 1, katze: 1, fisch: 1, zellen: 1 };
+    var NOCH_OHNE_BILD = { wandfackel: 1, zellen: 1 };
     function Bau(seed, spieler, stufe, versuch, stil, bild) {
         this.aus = bild ? NOCH_OHNE_BILD : {};
         this.r = Zufall.strom(String(seed), 'partie:' + spieler + ':' + stufe + ':' + versuch);
