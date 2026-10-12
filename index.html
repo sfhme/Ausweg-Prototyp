@@ -392,16 +392,16 @@ var Setting = (function () {
                 ['werkzeug', 'Die Kerzen brennen jetzt. Man kann sie mitnehmen.', 'Die Dochte sind schwarz: Die Kerzen haben schon einmal gebrannt.', 'Die Dochte glimmen kurz auf und verl\u00f6schen.'],
                 ['zeitgeber', 'Die Kerzen brennen herunter, eine Kerbe nach der anderen. Sind sie aus, ist es zu sp\u00e4t.'],
                 ['verwandler', 'Die Kerzen brennen jetzt hell. Daran lie\u00dfe sich etwas anz\u00fcnden.', 'Die Dochte sind schwarz: Die Kerzen haben schon einmal gebrannt.']] },
-            gemaelde: { name: 'leere Leinwand', nom: 'die leere Leinwand', akk: 'die leere Leinwand', verb: 'Abtasten',
-                b: 'Ein schwerer Rahmen an der Wand. Die Leinwand darin ist leer, und doch f\u00fchlt man sich von ihr angesehen.',
-                bannBeob: 'Wer in die Augen sieht, kann sich nicht mehr r\u00fchren. Wo ein Fetzen Stoff \u00fcber dem Rahmen h\u00e4ngt, ist die Leinwand dunkel.',
+            gemaelde: { name: 'dunkle Leinwand', nom: 'die dunkle Leinwand', akk: 'die dunkle Leinwand', verb: 'Abtasten',
+                b: 'Ein schwerer Rahmen an der Wand. Die Leinwand darin ist dunkel und ohne Bild, und doch f\u00fchlt man sich von ihr angesehen.',
+                bannBeob: 'Wer in die Augen sieht, kann sich nicht mehr r\u00fchren. Wo ein Fetzen Stoff \u00fcber dem Rahmen h\u00e4ngt, sind keine Augen zu sehen.',
                 bann: 'Wer in die Augen sieht, kann sich nicht mehr r\u00fchren. Ein gro\u00dfes Tuch \u00fcber dem Rahmen, und sie s\u00e4hen niemanden mehr.', f: [
-                ['richtung', 'Auf der leeren Leinwand erscheinen zwei Augen. Sie wandern zu einer Stelle: {ziel}.', 'Auf der leeren Leinwand sind zwei blasse Kreise zu ahnen, wie Augen, die zur Seite blicken.'],
-                ['zahl', 'Auf der leeren Leinwand leuchten Ziffern.', 'Auf der leeren Leinwand sind blasse Umrisse von Ziffern zu ahnen.'],
+                ['richtung', 'Auf der dunklen Leinwand erscheinen zwei Augen. Sie wandern zu einer Stelle: {ziel}.', 'Auf der dunklen Leinwand sind zwei blasse Kreise zu ahnen, wie Augen, die zur Seite blicken.'],
+                ['zahl', 'Auf der dunklen Leinwand leuchten Ziffern.', 'Auf der dunklen Leinwand sind blasse Umrisse von Ziffern zu ahnen.'],
                 ['behaelter', 'Hinter dem Rahmen klemmt etwas: {ziel}.', 'Der Rahmen steht unten ein St\u00fcck von der Wand ab.', 'Der Rahmen klappert gegen die Wand, als stecke etwas dahinter.'],
-                ['bedrohung', 'Auf der Leinwand gl\u00fchen zwei Augen. Wer hineinsieht, kann sich nicht mehr r\u00fchren.', 'Auf der leeren Leinwand sind zwei dunkle Brandflecken, wie Augen.'],
+                ['bedrohung', 'Auf der Leinwand gl\u00fchen zwei Augen. Wer hineinsieht, kann sich nicht mehr r\u00fchren.', 'Auf der dunklen Leinwand sind zwei dunkle Brandflecken, wie Augen.'],
                 ['keine', 'Die Leinwand bleibt leer.'],
-                ['teil', 'Auf der leeren Leinwand leuchtet etwas auf. {teil}', 'Auf der leeren Leinwand sind blasse Umrisse eines Zeichens zu ahnen.']] },
+                ['teil', 'Auf der dunklen Leinwand leuchtet etwas auf. {teil}', 'Auf der dunklen Leinwand sind blasse Umrisse eines Zeichens zu ahnen.']] },
             katze: { name: 'Katze', nom: 'die Katze', akk: 'die Katze', verb: 'Streicheln',
                 b: 'Eine Katze. Sie beobachtet dich, als w\u00fcsste sie mehr als du.',
                 bannBeob: 'Sie l\u00e4sst niemanden heran, und vor einem Stock weicht sie zur\u00fcck.',
@@ -448,7 +448,7 @@ var Setting = (function () {
             saeurehaltig: { name: 'Phiole Scheidewasser', nom: 'die Phiole Scheidewasser', akk: 'die Phiole Scheidewasser', b: 'Eine Phiole Scheidewasser. Es frisst sich zischend durch Metall.' },
             feuerzeug: { name: 'Feuerstahl', nom: 'der Feuerstahl', akk: 'den Feuerstahl', b: 'Feuerstein und Stahl. Ein Schlag gibt Funken.' },
             streichhoelzer: { name: 'Zunderb\u00fcchse', nom: 'die Zunderb\u00fcchse', akk: 'die Zunderb\u00fcchse', b: 'Eine Zunderb\u00fcchse mit glimmendem Schwamm.' },
-            taschenlampe: { name: 'Laterne', nom: 'die Laterne', akk: 'die Laterne', b: 'Eine Blendlaterne mit kr\u00e4ftigem Schein.',
+            taschenlampe: { name: 'Laterne', nom: 'die Laterne', akk: 'die Laterne', b: 'Eine Blendlaterne; hinter der Klappe brennt eine kr\u00e4ftige Flamme.',
                 zweit: { name: 'Glasscherbe', nom: 'die Glasscherbe', akk: 'die Glasscherbe', b: 'Eine scharfe Scherbe aus dem Glas einer Laterne.', verb: 'Zerschlagen',
                     satz: 'Du schl\u00e4gst das Glas der Laterne ein. \u00dcbrig bleibt eine scharfe Scherbe, Licht gibt sie keins mehr.' } },
             tuch: { name: 'Leintuch', nom: 'das Leintuch', akk: 'das Leintuch', b: 'Ein gro\u00dfes Leintuch. Es nimmt auch etwas Wasser auf.',
@@ -933,7 +933,7 @@ var Setting = (function () {
             bodenplatte: 'Bodenplatte', wappen: 'Wappenschild', schemel: 'Schemel' },
         // Ausstattung: Name am Fadenkreuz. Die zweite Zeile ist, was die Stories wollen und noch kein Modell hat (ARBEITSTEILUNG
         // Abschnitt 5); welche ein Stil hat, steht in stile.<stil>.raum.deko
-        ausstattung: { tisch: 'Tisch', regal: 'Wandbord', fass: 'Fass', kisten: 'Kistenstapel', banner: 'Banner', stuhl: 'Schemel', klangflasche: 'Flasche',
+        ausstattung: { saeule: 'S\u00e4ule', fassturm: 'Fassstapel', fassstapel: 'Fassstapel', lagerfass: 'Lagerfass', tisch: 'Tisch', regal: 'Wandbord', fass: 'Fass', kisten: 'Kistenstapel', banner: 'Banner', stuhl: 'Schemel', klangflasche: 'Flasche',
             kette: 'Ketten', pritsche: 'Pritsche', eimer: 'Eimer', schatztruhe: 'Schatztruhe', waffenstaender: 'Waffenst\u00e4nder', ruestung: 'R\u00fcstung', gold: 'Goldbarren',
             muenzen: 'M\u00fcnzhaufen', kelch: 'Kelch', kolben: 'Destillierkolben', moerser: 'M\u00f6rser', buecher: 'B\u00fccherstapel', sarg: 'Sarg', grabplatte: 'Grabplatte',
             knochen: 'Knochenhaufen', schaedel: 'Sch\u00e4del', weinregal: 'Weinregal', buecherbord: 'B\u00fccherbord' },
@@ -1048,12 +1048,12 @@ var Setting = (function () {
                     // Ausstattung mit Modell in diesem Stil; die zweite Zeile ist die Ausstattung der Stories (werkzeug/modelle/bau.js)
                     deko: ['regal', 'fass', 'kisten', 'banner', 'stuhl', 'klangflasche',
                         'pritsche', 'eimer', 'schatztruhe', 'waffenstaender', 'gold', 'muenzen', 'kolben', 'moerser', 'buecher', 'buecherbord', 'weinregal',
-                        'sarg', 'grabplatte', 'knochen', 'schaedel'],
+                        'sarg', 'grabplatte', 'knochen', 'schaedel', 'fassstapel', 'lagerfass', 'fassturm', 'saeule'],
                     stand: { schrank_oben: 'wand', paket: 'tisch' },
                     wandhoehe: { schrank_oben: 2.25, doppelhebel: 1.05, hebelpaar: 1.05 },
                     grund: { becken: [1.0, 0.4], puppe: [0.55, 0.3], winde: [0.47, 0.4], tisch: [0.8, 0.42],
                         pritsche: [0.9, 0.45], eimer: [0.13, 0.11], schatztruhe: [0.48, 0.4], waffenstaender: [0.5, 0.39], buecher: [0.17, 0.08], buecherbord: [0.28, 0.29], weinregal: [0.65, 0.37],
-                        sarg: [1.0, 0.36], grabplatte: [0.44, 0.13], knochen: [0.15, 0.13] }
+                        sarg: [1.0, 0.36], grabplatte: [0.44, 0.13], knochen: [0.15, 0.13], fassstapel: [0.85, 0.46], lagerfass: [0.57, 0.64], fassturm: [1.3, 0.45], saeule: [0.45, 0.45] }
                 }
             },
             // Quaternius, neue detailreiche Reihe (Fantasy Props MegaKit + Medieval Village MegaKit): Fachwerkhaus statt
@@ -1081,7 +1081,7 @@ var Setting = (function () {
                 },
                 // ganze Textbloecke, die in diesem Stil anders lauten (werden ueber den Block des Settings gelegt)
                 block: {
-                    AUSSTATTUNG: { kisten: 'Kiste', weinregal: 'Fassgestell', moerser: 'Tiegel', kolben: 'Trank', pritsche: 'Bett' },
+                    AUSSTATTUNG: { kisten: 'Kiste', weinregal: 'Fassgestell', moerser: 'Tiegel', kolben: 'Trank', pritsche: 'Bett', saeule: 'St\u00fctzbalken' },
                     // Das Paket hat weder Zahnrad noch Hebel: Am Ger\u00e4t des Schlosses (R80) sind M\u00fcnzen eingelassen, und ein Schl\u00fcssel
                     // steckt oben oder unten (client/ui.js schlossGeraet)
                     HANDBUCH: { bed: { mehr: 'mehr als {n} M\u00fcnzen eingelassen sind', weniger: 'weniger als {n} M\u00fcnzen eingelassen sind', hebel: 'der Schl\u00fcssel {stand} steckt' },
@@ -1125,33 +1125,110 @@ var Setting = (function () {
                 },
                 raum: {
                     deko: ['regal', 'fass', 'kisten', 'banner', 'stuhl', 'klangflasche',
-                        'kette', 'pritsche', 'eimer', 'waffenstaender', 'muenzen', 'kelch', 'kolben', 'moerser', 'buecher', 'buecherbord', 'weinregal'],
+                        'kette', 'pritsche', 'eimer', 'waffenstaender', 'muenzen', 'kelch', 'kolben', 'moerser', 'buecher', 'buecherbord', 'weinregal', 'fassstapel', 'fassturm', 'saeule'],
                     geschoss: 2.5,
                     stand: { radio: 'boden' },
                     wandhoehe: { licht: 1.5 },
                     grund: { radio: [0.22, 0.22], holzkiste: [0.49, 0.3], wasser: [0.55, 0.31], schaukelstuhl: [0.28, 0.27], v_fass: [0.36, 0.36],
                         v_urne: [0.23, 0.23], v_schemel: [0.19, 0.19], fass: [0.36, 0.36], kisten: [0.38, 0.4], stuhl: [0.19, 0.19], tisch: [0.61, 0.25],
-                        kette: [0.25, 0.21], pritsche: [0.8, 0.63], eimer: [0.22, 0.2], waffenstaender: [0.55, 0.39], buecher: [0.17, 0.14], buecherbord: [0.52, 0.15], weinregal: [0.7, 0.38] }
+                        kette: [0.25, 0.21], pritsche: [0.8, 0.63], eimer: [0.22, 0.2], waffenstaender: [0.55, 0.39], buecher: [0.17, 0.14], buecherbord: [0.52, 0.15], weinregal: [0.7, 0.38], fassstapel: [0.7, 0.46], fassturm: [1.05, 0.46], saeule: [0.17, 0.19] }
                 }
             }
         },
+        // Ganzer Satz je Weg (Blindtest Runde 3: "Das Rohr zuschlagen." stand als Etikett da). Schluessel ist der Text des
+        // Weges, wie er nach den Ersetzungen des Stils lautet; {nom}/{akk} = das Ding, an dem der Weg geht. Der Katalog
+        // verlangt fuer jeden Weg einen Satz.
+        wegSatz: {
+            // auch Wege, die der Generator selbst baut (Waerme, Verwandeln, Laerm, Schacht)
+            'mit einer Flamme erw\u00e4rmen': 'Du h\u00e4ltst eine Flamme an {akk}.',
+            'eine Fackel anz\u00fcnden': 'Du h\u00e4ltst das Ende in die Flammen, bis es Feuer f\u00e4ngt.',
+            'L\u00e4rm machen': 'Du machst ordentlich Krach.',
+            'etwas Schweres in den Schacht werfen': 'Du wirfst etwas Schweres in den Schacht.',
+            'den Abfluss freistochern': 'Du stocherst den Abfluss frei.',
+            'das Rohr zuschlagen': 'Du schl\u00e4gst das Rohr zu.',
+            'etwas Langes zwischen die R\u00e4der klemmen': 'Du klemmst etwas Langes zwischen die R\u00e4der.',
+            'die Achse mit einem schweren Schlag verklemmen': 'Ein schwerer Schlag, und die Achse sitzt fest.',
+            'mit etwas Langem gegen die Wand klemmen': 'Du klemmst {akk} gegen die Wand.',
+            'das Seil kappen, dann kracht er herunter': 'Du kappst das Seil, und {nom} kracht herunter.',
+            'einer h\u00e4lt die Kette, die anderen gehen durch': 'Einer h\u00e4lt die Kette, die anderen gehen durch.',
+            'die Kette an einem Haken festbinden': 'Du bindest die Kette an einem Haken fest.',
+            'einer h\u00e4lt den Hebel, die anderen gehen durch': 'Einer h\u00e4lt den Hebel, die anderen gehen durch.',
+            'den Hebel mit einem Seil unten festbinden': 'Du bindest den Hebel mit dem Seil unten fest.',
+            'die Kurbel mit einer Stange als Hebel losbrechen': 'Mit der Stange als Hebel bricht die Kurbel los.',
+            'die festgerostete Achse freischlagen': 'Du schl\u00e4gst die festgerostete Achse frei.',
+            'die St\u00e4be mit etwas Langem auseinanderhebeln': 'Du hebelst die St\u00e4be auseinander.',
+            'das Schloss weg\u00e4tzen': 'Die S\u00e4ure frisst das Schloss weg.',
+            'das Schloss abschlagen': 'Du schl\u00e4gst das Schloss ab.',
+            'die rostigen Schrauben des Gitters mit einer Klinge l\u00f6sen': 'Du drehst die rostigen Schrauben mit der Klinge heraus.',
+            'das Gitter mit etwas Langem aufhebeln': 'Du hebelst das Gitter auf.',
+            'schr\u00e4g anleuchten, bis die Rillen Schatten werfen': 'Du leuchtest schr\u00e4g darauf, und die Rillen werfen Schatten.',
+            'mit einem feuchten Tuch den Schmutz abreiben': 'Du reibst den Schmutz mit dem feuchten Tuch ab.',
+            'das Moos aus den Rillen kratzen': 'Du kratzt das Moos aus den Rillen.',
+            'vorsichtig \u00fcber eine Flamme halten': 'Du h\u00e4ltst das Blatt vorsichtig \u00fcber die Flamme.',
+            'mit etwas Feuchtem benetzen': 'Du benetzt das Blatt.',
+            'das klemmende Fach aufhebeln': 'Du hebelst das klemmende Fach auf.',
+            'das klemmende Fach aufschlagen': 'Du schl\u00e4gst das klemmende Fach auf.',
+            'das klemmende Fach aufschneiden': 'Du schneidest das klemmende Fach auf.',
+            'aufbrechen': 'Du brichst {akk} auf.',
+            'Schloss weg\u00e4tzen': 'Die S\u00e4ure frisst das Schloss weg.',
+            'Deckel aufhebeln': 'Du hebelst den Deckel auf.',
+            'aufschneiden': 'Du schneidest die Schnur auf.',
+            'Verschn\u00fcrung durchbrennen': 'Die Schnur brennt durch.',
+            'die Schnur weg\u00e4tzen': 'Die S\u00e4ure zerfrisst die Schnur.',
+            'T\u00fcr einschlagen': 'Du schl\u00e4gst die T\u00fcr ein.',
+            'T\u00fcr aufhebeln': 'Du hebelst die T\u00fcr auf.',
+            'aufhebeln': 'Du hebelst {akk} auf.',
+            'zertr\u00fcmmern': 'Du zertr\u00fcmmerst {akk}.',
+            'Fugen auskratzen': 'Du kratzt die Fugen aus.',
+            'N\u00e4gel herausschneiden': 'Du schneidest die N\u00e4gel heraus.',
+            'herunterangeln': 'Du angelst es herunter.',
+            'herunterschubsen': 'Du schubst es herunter.',
+            'herausangeln': 'Du angelst es heraus.',
+            'mit Seil und etwas Greifendem herausfischen': 'Mit Seil und Haken fischst du es heraus.',
+            'zu zweit gleichzeitig ziehen': 'Ihr zieht zu zweit im selben Augenblick.',
+            'die erste Kette mit einem Seil festbinden und beim Ziehen der zweiten mitziehen': 'Du bindest die erste Kette mit dem Seil fest und ziehst sie mit der zweiten.',
+            'die erste Kette mit etwas Langem unten verkeilen und dann die zweite ziehen': 'Du verkeilst die erste Kette unten und ziehst die zweite.',
+            'den ersten Hebel mit einem Seil unten festbinden und dann den zweiten ziehen': 'Du bindest den ersten Hebel mit dem Seil unten fest und ziehst den zweiten.',
+            'den ersten Hebel mit etwas Langem unten verkeilen und dann den zweiten ziehen': 'Du verkeilst den ersten Hebel unten und ziehst den zweiten.',
+            'mit etwas sehr Schwerem beschweren': 'Du beschwerst die Platte mit etwas sehr Schwerem.',
+            'zu zweit draufstellen': 'Ihr stellt euch zu zweit darauf.',
+            'zu zweit, je einer in jedem Raum, im selben Augenblick ziehen': 'Ihr zieht beide im selben Augenblick, je einer in jedem Raum.',
+            'eine Kette mit etwas Langem verkeilen und dann die andere ziehen': 'Du verkeilst die eine Kette und ziehst die andere.',
+            'eine Kette mit etwas Schwerem beschweren und dann die andere ziehen': 'Du beschwerst die eine Kette und ziehst die andere.',
+            'einen Hebel mit etwas Langem verkeilen und dann den anderen ziehen': 'Du verkeilst den einen Hebel und ziehst den anderen.',
+            'einen Hebel mit etwas Schwerem beschweren und dann den anderen ziehen': 'Du beschwerst den einen Hebel und ziehst den anderen.',
+            'etwas Spiegelndes davor aufstellen': 'Du stellst etwas Spiegelndes vor {akk}.',
+            'abdecken': 'Du deckst {akk} ab.',
+            'ein Licht darauf richten': 'Du richtest ein Licht auf {akk}.',
+            'mit L\u00e4rm verscheuchen': 'Du verscheuchst {akk} mit L\u00e4rm.',
+            'mit etwas Langem auf Abstand halten': 'Du h\u00e4ltst {akk} mit etwas Langem auf Abstand.',
+            'aufhalten (Abfluss freistochern, R\u00e4der blockieren)': 'Du h\u00e4ltst {akk} auf.',
+            'mit Gewalt stoppen': 'Du stoppst {akk} mit Gewalt.',
+            'mit Gewalt aufdrehen': 'Du drehst {akk} mit Gewalt auf.',
+            'Rost weg\u00e4tzen': 'Die S\u00e4ure frisst den Rost weg.'
+        },
+        // intro: immer; eile: nur, wenn eine Frist laeuft (Blindtest Runde 3: Glocke und Rauch versprachen Eile, die es nicht gab)
         stories: [
             { id: 'verlies', titel: 'Das Verlies', stile: ['kaykit'],          // Steingew\u00f6lbe: nicht im Fachwerkhaus
-                intro: 'Die Wache hat dich ins Verlies geworfen. Zur n\u00e4chsten Glocke holen sie dich. Du bist {in}, und die Kerkert\u00fcr ist verriegelt.',
+                intro: 'Die Wache hat dich ins Verlies geworfen. Du bist {in}, und die Kerkert\u00fcr ist verriegelt.',
+                eile: 'Zur n\u00e4chsten Glocke holen sie dich.',
                 ende: 'Du bist drau\u00dfen, bevor die Wache kommt.',
                 ausgang: { name: 'Kerkert\u00fcr', nom: 'die Kerkert\u00fcr', akk: 'die Kerkert\u00fcr', verb: 'T\u00fcr \u00f6ffnen', auf: 'Die Kerkert\u00fcr schwingt auf.' },
                 ausstattung: { wand: ['kette', 'pritsche', 'eimer', 'stuhl', 'kisten', 'kette', 'fass'], tisch: ['eimer'] },
                 raeume: [{ name: 'Zelle', in: 'in der Zelle', nach: 'in die Zelle' }, { name: 'Wachstube', in: 'in der Wachstube', nach: 'in die Wachstube' },
                     { name: 'Kerkergang', in: 'im Kerkergang', nach: 'in den Kerkergang' }, { name: 'Vorratskammer', in: 'in der Vorratskammer', nach: 'in die Vorratskammer' }] },
             { id: 'schatzkammer', titel: 'Die Schatzkammer',
-                intro: 'Du bist in die Schatzkammer des Burgherrn eingestiegen. Hinter dir ist die Kammert\u00fcr ins Schloss gefallen. Du bist {in}, und bis zum Morgen musst du hier raus sein.',
+                intro: 'Du bist in die Schatzkammer des Burgherrn eingestiegen. Hinter dir ist die Kammert\u00fcr ins Schloss gefallen. Du bist {in}.',
+                eile: 'Bis zum Morgen musst du hier raus sein.',
                 ende: 'Du bist drau\u00dfen, und niemand hat dich gesehen.',
                 ausgang: { name: 'Kammert\u00fcr', nom: 'die Kammert\u00fcr', akk: 'die Kammert\u00fcr', verb: 'T\u00fcr \u00f6ffnen', auf: 'Die Kammert\u00fcr schwingt auf.' },
-                ausstattung: { wand: ['schatztruhe', 'waffenstaender', 'ruestung', 'banner', 'kisten', 'schatztruhe', 'banner'], tisch: ['gold', 'muenzen', 'kelch'] },
+                ausstattung: { wand: ['schatztruhe', 'waffenstaender', 'ruestung', 'banner', 'kisten', 'schatztruhe', 'banner', 'waffenstaender', 'kisten'], tisch: ['gold', 'muenzen', 'kelch'],
+                    dicht: 12, mitte: ['schatztruhe', 'kisten'], reihen: 2 },
                 raeume: [{ name: 'Schatzkammer', in: 'in der Schatzkammer', nach: 'in die Schatzkammer' }, { name: 'Vorkammer', in: 'in der Vorkammer', nach: 'in die Vorkammer' },
                     { name: 'R\u00fcstkammer', in: 'in der R\u00fcstkammer', nach: 'in die R\u00fcstkammer' }, { name: 'Schreibstube', in: 'in der Schreibstube', nach: 'in die Schreibstube' }] },
             { id: 'labor', titel: 'Das Labor des Alchemisten',
                 intro: 'Der Alchemist ist seit Tagen verschwunden. Du wolltest nur nachsehen, da schlug die T\u00fcr zu. Du bist {in}, und irgendwo brodelt noch sein letzter Versuch.',
+                eile: 'Lange geht das nicht mehr gut.',
                 ende: 'Du bist drau\u00dfen. Hinter dir zischt es noch.',
                 ausgang: { name: 'Labort\u00fcr', nom: 'die Labort\u00fcr', akk: 'die Labort\u00fcr', verb: 'T\u00fcr \u00f6ffnen', auf: 'Die Labort\u00fcr schwingt auf.' },
                 ausstattung: { wand: ['regal', 'buecherbord', 'regal', 'fass', 'eimer', 'buecherbord', 'regal'], tisch: ['kolben', 'moerser', 'klangflasche', 'buecher'] },      // Kolben und B\u00fccher auf den Tischen (die Modelle sind klein), am Boden B\u00fccherborde
@@ -1159,16 +1236,21 @@ var Setting = (function () {
                     { name: 'Studierstube', in: 'in der Studierstube', nach: 'in die Studierstube' }, { name: 'Destillierkeller', in: 'im Destillierkeller', nach: 'in den Destillierkeller' }] },
             { id: 'gruft', titel: 'Die Gruft', stile: ['kaykit'],
                 intro: 'Du solltest nur eine Urkunde aus der Gruft unter der Kapelle holen. Dann fiel hinter dir die Gruftt\u00fcr zu. Du bist {in}.',
+                eile: 'Hier unten bleibt dir nicht viel Zeit.',
                 ende: 'Du bist drau\u00dfen, oben in der Kapelle, und atmest durch.',
                 ausgang: { name: 'Gruftt\u00fcr', nom: 'die Gruftt\u00fcr', akk: 'die Gruftt\u00fcr', verb: 'T\u00fcr \u00f6ffnen', auf: 'Die Gruftt\u00fcr schwingt auf.' },
-                ausstattung: { wand: ['sarg', 'grabplatte', 'knochen', 'banner', 'sarg', 'kisten', 'banner'], tisch: ['schaedel', 'knochen'] },
+                ausstattung: { wand: ['sarg', 'grabplatte', 'knochen', 'banner', 'sarg', 'kisten', 'banner', 'grabplatte', 'sarg'], tisch: ['schaedel', 'knochen'],
+                    dicht: 12, mitte: ['sarg'], reihen: 2 },
                 raeume: [{ name: 'Gruft', in: 'in der Gruft', nach: 'in die Gruft' }, { name: 'Beinhaus', in: 'im Beinhaus', nach: 'ins Beinhaus' },
                     { name: 'Vorraum', in: 'im Vorraum', nach: 'in den Vorraum' }, { name: 'Sakristeikeller', in: 'im Sakristeikeller', nach: 'in den Sakristeikeller' }] },
             { id: 'weinkeller', titel: 'Der Weinkeller',
-                intro: 'Die Burg wird belagert, oben brennt es. Du hast dich in den Keller gerettet, aber die Kellert\u00fcr hat sich hinter dir verkeilt. Du bist {in}, und der Rauch kommt n\u00e4her.',
+                intro: 'Die Burg wird belagert, oben brennt es. Du hast dich in den Keller gerettet, aber die Kellert\u00fcr hat sich hinter dir verkeilt. Du bist {in}.',
+                eile: 'Der Rauch kommt n\u00e4her.',
                 ende: 'Du bist drau\u00dfen, im Burggraben, an der frischen Luft.',
                 ausgang: { name: 'Kellert\u00fcr', nom: 'die Kellert\u00fcr', akk: 'die Kellert\u00fcr', verb: 'T\u00fcr \u00f6ffnen', auf: 'Die Kellert\u00fcr schwingt auf.' },
-                ausstattung: { wand: ['fass', 'weinregal', 'fass', 'kisten', 'fass', 'weinregal', 'fass'], tisch: ['klangflasche', 'klangflasche'] },
+                // ein Weinkeller ist voll: zwoelf Stuecke an den Waenden, dazu Reihen von Faessern mitten im Raum (Gaenge dazwischen)
+                ausstattung: { wand: ['fassstapel', 'weinregal', 'fass', 'lagerfass', 'kisten', 'fassstapel', 'weinregal', 'fass', 'lagerfass', 'fass', 'weinregal', 'fassstapel'],
+                    tisch: ['klangflasche', 'klangflasche'], dicht: 24, mitte: ['lagerfass', 'fassstapel', 'weinregal', 'fassstapel'], reihen: 6, hoch: ['fassturm'] },
                 raeume: [{ name: 'Weinkeller', in: 'im Weinkeller', nach: 'in den Weinkeller' }, { name: 'Vorratskeller', in: 'im Vorratskeller', nach: 'in den Vorratskeller' },
                     { name: 'Fasslager', in: 'im Fasslager', nach: 'ins Fasslager' }, { name: 'Eiskeller', in: 'im Eiskeller', nach: 'in den Eiskeller' }] }
         ]
@@ -1424,7 +1506,8 @@ var Katalog = (function () {
         saeurehaltig: { e: { saeurehaltig: 2 }, verbrauch: true },
         feuerzeug:    { e: { entzuendend: 1 } },
         streichhoelzer: { e: { entzuendend: 1 } },
-        taschenlampe: { e: { licht: 2 }, zweit: { e: { scharf: 1 } } },
+        // die Laterne brennt: Daran laesst sich etwas anzuenden (Blindtest Runde 3)
+        taschenlampe: { e: { licht: 2, entzuendend: 1 }, zweit: { e: { scharf: 1 } } },
         tuch:         { e: { deckend: 2, saugfaehig: 1 }, zweit: { e: { reissfest: 1 } } },
         decke:        { e: { deckend: 3 } },
         handspiegel:  { e: { spiegelnd: 2 } },
@@ -1656,7 +1739,7 @@ var Katalog = (function () {
     }
     if (!S.hoch || !S.hoch.zuHoch) fehlt('hoch.zuHoch');
     // Ausstattung je Story: jedes Stueck braucht einen Namen am Fadenkreuz
-    for (i = 0; i < S.stories.length; i++) if (S.stories[i].ausstattung) ['wand', 'tisch'].forEach(function (wo) {
+    for (i = 0; i < S.stories.length; i++) if (S.stories[i].ausstattung) ['wand', 'tisch', 'mitte', 'hoch'].forEach(function (wo) {
         (S.stories[i].ausstattung[wo] || []).forEach(function (m0) { if (!S.ausstattung[m0]) fehlt('ausstattung.' + m0 + ' (Story ' + S.stories[i].id + ')'); });
     });
     if (!S.kreide) fehlt('kreide'); else uebernimm({}, S.kreide, ['name', 'nom', 'akk', 'b', 'kreuz', 'weg', 'sicht'], 'kreide');
@@ -1749,11 +1832,12 @@ var Katalog = (function () {
     uebernimm(INSCHRIFT_K, S.inschrift, ['name', 'nom', 'akk', 'b', 'verb'], 'inschrift');
     alternativen(INSCHRIFT_K.alt, S.inschrift.alt, 'inschrift');
     for (i = 0; i < S.stories.length; i++) if (!S.stories[i].raeume || S.stories[i].raeume.length < 2) fehlt('stories[' + i + '].raeume (mindestens zwei)');
+    for (i = 0; i < S.stories.length; i++) if (!S.stories[i].eile) fehlt('stories[' + i + '].eile (Satz, wenn eine Frist laeuft)');
 
     var BASIS = {
         version: 3, SETTING: S.id, ARTEN: ARTEN, AUSLOESER: AUSLOESER, ELEMENTE: ELEMENTE, GEGENSTAENDE: GEGENSTAENDE,
         EIGENSCHAFT_TEXT: EIGENSCHAFT_TEXT, ZU_WENIG: S.zuWenig, HINDERNISSE: HINDERNISSE, SCHLOESSER: SCHLOESSER, GEGENMITTEL: GEGENMITTEL,
-        VERSTECKE: S.verstecke, SCHLICHT: S.schlicht, AUSSTATTUNG: S.ausstattung, LICHT: S.licht, WASSER: WASSER, SCHLUESSEL: S.schluessel, NOTIZ: S.notiz, STORIES: S.stories,
+        VERSTECKE: S.verstecke, SCHLICHT: S.schlicht, AUSSTATTUNG: S.ausstattung, LICHT: S.licht, WASSER: WASSER, SCHLUESSEL: S.schluessel, NOTIZ: S.notiz, STORIES: S.stories, WEG_SATZ: S.wegSatz || {},
         VERWANDLUNGEN: S.verwandlungen, ZAEHL: S.zaehl, LOGIK: S.logik, LUEGNER: S.luegner, HANDBUCH: S.handbuch, REGAL: S.regal, ZIFFER_JE_KOPF: S.zifferJeKopf, KLEIN: KLEIN, BEWEGLICH: BEWEGLICH, VERRUECKT: S.verrueckt, KLANG: S.klang, KLOPF_AUS: KLOPF_AUS, STAEBE: STAEBE, DURCHREICHE: S.durchreiche, HAUSORDNUNG: S.hausordnung, GEDENKTAFEL: S.gedenktafel, STANDPUNKT: S.standpunkt, STRAHL: S.strahl, WORT: WORT, WACHE: S.wache, KRUEGE: S.kruege, KERBSTEIN: S.kerbstein, BALKENWAAGE: S.balkenwaage, KAEFIG: KAEFIG, PAKT: S.pakt, KREIDE: S.kreide, HOCH: S.hoch, NOTSCHACHT: NOTSCHACHT, SPIEGEL: S.spiegel, HEBELREIHE: S.hebelreihe, ORAKEL: S.orakel, NOTIZEN: S.notizen, TRAENKE: S.traenke, BAUEN: BAUEN, BAUEN_TEXT: S.bauen, GABEN: S.gaben, GABEN_REIHE: ['nachtauge', 'gehoer', 'schrift'], WAAGE: S.waage, WAAGE_SCHWER: WAAGE_SCHWER, FALLGITTER: FALLGITTER_K, ZEICHEN: S.zeichen, FETZEN: S.fetzen, TINTE: TINTE_K, UHR: S.uhr, ZWISCHENTUER: S.zwischentuer, TAFEL: S.tafel, INSCHRIFT: INSCHRIFT_K,
         SCHLOSSTEXT: S.schlosstext, VORBEI: S.vorbei, SPUR: S.spur, HAENDE: S.haende, ZWEITFACH: S.zweitfach, RUHIG: S.ruhig,
         FACH: { klemmt: S.fach.klemmt, alt: [{ b: { lang: 2, schwer: 2 }, text: S.fach.alt[0] }, { b: { stumpf: 2 }, laerm: true, text: S.fach.alt[1] }, { b: { scharf: 2 }, text: S.fach.alt[2] }] },
@@ -1868,6 +1952,13 @@ var Katalog = (function () {
         K.RAUM = { stand: (st.raum && st.raum.stand) || {}, wandhoehe: (st.raum && st.raum.wandhoehe) || {}, grund: (st.raum && st.raum.grund) || {},
             geschoss: (st.raum && st.raum.geschoss) || 0, deko: (st.raum && st.raum.deko) || ['regal', 'fass', 'kisten', 'banner', 'stuhl'] };
         K.maengel = maengelVon(K, st);
+        // jeder Weg hat einen ganzen Satz fuer sein Gelingen (setting.wegSatz), auch nach den Ersetzungen dieses Stils
+        (function satzFehlt(o, tiefe) {
+            if (!o || typeof o !== 'object' || tiefe > 6) return;
+            if (o instanceof Array) { for (var q = 0; q < o.length; q++) satzFehlt(o[q], tiefe + 1); return; }
+            if (o.alt instanceof Array) for (var a0 = 0; a0 < o.alt.length; a0++) if (o.alt[a0] && typeof o.alt[a0].text === 'string' && !K.WEG_SATZ.hasOwnProperty(o.alt[a0].text)) fehlt('wegSatz[' + o.alt[a0].text + '] (Stil ' + id + ')');
+            for (var kk in o) if (o.hasOwnProperty(kk) && kk !== 'WEG_SATZ' && kk !== 'STORIES') satzFehlt(o[kk], tiefe + 1);
+        })(K, 0);
         STILCACHE[id] = K;
         return K;
     }
@@ -2262,13 +2353,16 @@ var Generator = (function () {
     'use strict';
 
     var STUFE = {
-        1: { tiefe: 2, schloesser: 1, bedrohung: [0.35, 0], ablenkung: 1, zweiterWeg: 0.55, codeLaenge: 3, frist: 2.6, teile: 0.4, formen: ['ganz', 'ganz', 'symbol', 'folge', 'melodie'],
+        1: { tiefe: 2, mindest: 4, schloesser: 1, bedrohung: [0.35, 0], ablenkung: 1, zweiterWeg: 0.55, codeLaenge: 3, frist: 2.6, teile: 0.4, formen: ['ganz', 'ganz', 'symbol', 'folge', 'melodie'],
             reihen: ['plus'] },
-        2: { tiefe: 3, schloesser: 2, bedrohung: [0.75, 0], ablenkung: 2, zweiterWeg: 0.65, codeLaenge: 3, frist: 2, teile: 0.6, formen: ['ganz', 'symbol', 'rechnung', 'raten', 'logik', 'folge', 'handbuch', 'melodie', 'nachschlagen'],
+        2: { tiefe: 3, mindest: 11, schloesser: 2, bedrohung: [0.75, 0], ablenkung: 2, zweiterWeg: 0.65, codeLaenge: 3, frist: 2, teile: 0.6, formen: ['ganz', 'symbol', 'rechnung', 'raten', 'logik', 'folge', 'handbuch', 'melodie', 'nachschlagen'],
             reihen: ['plus', 'verschraenkt', 'wachsend'] },
-        3: { tiefe: 3, schloesser: 3, bedrohung: [1, 0.45], ablenkung: 2, zweiterWeg: 0.75, codeLaenge: 4, frist: 1.6, teile: 0.7, formen: ['ganz', 'symbol', 'rechnung', 'raten', 'logik', 'folge', 'handbuch', 'melodie', 'nachschlagen'],
+        3: { tiefe: 3, mindest: 16, schloesser: 3, bedrohung: [1, 0.45], ablenkung: 2, zweiterWeg: 0.75, codeLaenge: 4, frist: 1.6, teile: 0.7, formen: ['ganz', 'symbol', 'rechnung', 'raten', 'logik', 'folge', 'handbuch', 'melodie', 'nachschlagen'],
             reihen: ['plus', 'verschraenkt', 'wachsend', 'summe', 'doppelt'] }
     };
+    // mindest: so viele Schritte braucht der noetige Weg wenigstens, sonst wird neu gewuerfelt (Blindtest Runde 3: 1318 mit
+    // 10 Schritten fanden beide Spieler auf Stufe 2 zu leicht, 1316 mit 14 und 1310 mit 20 passend; Stufe 3 mit 19 bis 24
+    // fordernd und fair). Verworfen werden so etwa 5, 17 und 10 Prozent der Partien.
     // teile: Anteil der Ziffernschloesser, deren Code aus Teilen besteht (Metaraetsel, RAETSEL.md R120) statt an einem Ding
     // ganz zu stehen. Aufteilung der Stellen je Codelaenge; eine Drei steht nur als Zeigerstellung (R2) an einer Uhr.
     // formen: Wie ein Code ohne Teile dasteht. ganz = ein Element zeigt ihn, symbol = am Schloss Zeichen, ein Pergament
@@ -2446,6 +2540,11 @@ var Generator = (function () {
                 gibt: ['kennt:' + rg.id], sicher: true });
             rg.enthuellung = { art: 'notiz', notiz: notiz.id };
         } else if (x < 0.6) {
+            this.p.start.push('kennt:' + rg.id);
+            rg.enthuellung = { art: 'spur' };
+        } else if (this.p.stufe >= 2 && rg.spur && (rg.ausloeser === 'beruehrung' || rg.ausloeser === 'naehe')) {
+            // Wer es anfasst oder nahe kommt, loest es aus: Eine Vorfuehrung dabei zeigte die Loesung woertlich (Blindtest
+            // Runde 3, 1320); ab Stufe 2 verraet es sich nur durch eine Spur
             this.p.start.push('kennt:' + rg.id);
             rg.enthuellung = { art: 'spur' };
         } else if (el.vorlage === 'kerze' && rg.ausloeser === 'waerme') {
@@ -4267,10 +4366,11 @@ var Generator = (function () {
         if (!stories.length) throw new Error('Generator: keine Story fuer den Stil ' + stil);
         var story = this.r.waehle(stories), namen = this.r.mischen(story.raeume.slice());
         p.setting = this.K.SETTING;
-        p.story = { id: story.id, titel: story.titel, intro: story.intro, ende: story.ende, auf: story.ausgang.auf, verb: story.ausgang.verb };
+        p.story = { id: story.id, titel: story.titel, intro: story.intro, eile: story.eile || null, ende: story.ende, auf: story.ausgang.auf, verb: story.ausgang.verb };
         // Ausstattung der Story (Schatzkammer: Truhen und Gold, Weinkeller: Faesser): nur, was es in diesem Stil als Modell gibt
         var deko = this.K.RAUM.deko || [], nurDa = function (l) { return (l || []).filter(function (m0) { return deko.indexOf(m0) >= 0; }); };
-        if (story.ausstattung) p.story.ausstattung = { wand: nurDa(story.ausstattung.wand), tisch: nurDa(story.ausstattung.tisch) };
+        if (story.ausstattung) p.story.ausstattung = { wand: nurDa(story.ausstattung.wand), tisch: nurDa(story.ausstattung.tisch),
+            mitte: nurDa(story.ausstattung.mitte), hoch: nurDa(story.ausstattung.hoch), dicht: story.ausstattung.dicht || 0, reihen: story.ausstattung.reihen || 0 };
         var zwei = this.spieler > 1 ? this.r.chance(0.45) : this.r.chance(0.12);
         p.raeume.push({ id: 'r1', name: namen[0].name, in: namen[0].in, nach: namen[0].nach });
         if (zwei) p.raeume.push({ id: 'r2', name: namen[1].name, in: namen[1].in, nach: namen[1].nach });
@@ -4481,6 +4581,31 @@ var Generator = (function () {
         }
     }
 
+    // Eine bannbare Bedrohung ist wirkungslos, wenn der Weg ohne ihren Bann genauso geht. Hinsehen, Naehe, Wegsehen: ohne
+    // Bann unloesbar (wer zu zweit ist, haelt die Puppe im Blick: das ist ihr Weg, geprueft wird dann nichts). Licht aus:
+    // Der Weg braucht dort Dunkelheit und ein Ding im Bereich, man muss also die Reihenfolge bedenken oder bannen. Fristen
+    // und Laerm zaehlen nicht (die Frist verliert die Partie, Laerm verbietet Wege).
+    function bedrohungWirkungslos(p, spieler, a) {
+        var i, j, k;
+        for (i = 0; i < p.bedrohungen.length; i++) {
+            var b = p.bedrohungen[i];
+            if (!b.gegenmittel || b.ausloeser === 'zeit' || b.ausloeser === 'laerm' || (b.beobachter && spieler >= 2)) continue;
+            var q = JSON.parse(JSON.stringify(p));
+            q.aktionen = q.aktionen.filter(function (x) { return x.gibt.indexOf('gebannt:' + b.id) < 0; });
+            if (!Pruefer.pruefe(q, spieler).loesbar) continue;
+            if (b.ausloeser !== 'licht_aus') return true;
+            var nachId = {}, dunkel = false, imBereich = false;
+            for (j = 0; j < p.aktionen.length; j++) nachId[p.aktionen[j].id] = p.aktionen[j];
+            for (j = 0; j < a.noetig.length; j++) {
+                var x = nachId[a.noetig[j].aktion];
+                for (k = 0; k < x.gibt.length; k++) if (x.gibt[k] === 'licht_aus:' + b.raum) dunkel = true;
+                if (x.ding && p.dinge[x.ding] && p.dinge[x.ding].zone && p.dinge[x.ding].raum === b.raum && !x.sicher) imBereich = true;
+            }
+            if (!dunkel || !imBereich) return true;
+        }
+        return false;
+    }
+
     function verbrauchFaehrtFest(p, spieler) {
         var i, j, k, a, z;
         var mitStart = function (extra) {
@@ -4521,6 +4646,7 @@ var Generator = (function () {
             catch (e) { if (e && e.fehlschlag) { gruende.push(e.grund); continue; } throw e; }
             var a = Pruefer.pruefe(p, spieler), b = spieler > 1 ? Pruefer.pruefe(p, spieler - 1) : null;
             if (!a.loesbar || (b && !b.loesbar)) { gruende.push(!a.loesbar ? 'unloesbar' : 'unloesbar mit einem weniger'); continue; }
+            if (a.schritteNoetig < STUFE[stufe].mindest) { gruende.push('zu kurz'); continue; }
             var hatFrist = false, i;
             for (i = 0; i < p.bedrohungen.length; i++) if (p.bedrohungen[i].ausloeser === 'zeit') hatFrist = true;
             if (hatFrist) {
@@ -4539,6 +4665,9 @@ var Generator = (function () {
             // Kerzenleuchter (R61) und der Wurf in den Schacht (R68, die einzige Spitzhacke). Geprueft vom Start aus, den
             // Gegenstand schon in der Hand und sofort verbraucht; faehrt das fest, wird neu gewuerfelt.
             if (verbrauchFaehrtFest(p, spieler)) { gruende.push('Verbrauch faehrt fest'); continue; }
+            // Ab Stufe 2 muss eine Bedrohung etwas bewirken (Blindtest Runde 3: Kronleuchter und Leinwand, an denen man nur
+            // vorbeiging); sonst wird neu gewuerfelt.
+            if (stufe >= 2 && bedrohungWirkungslos(p, spieler, a)) { gruende.push('Bedrohung wirkungslos'); continue; }
             p.pruefung = {
                 versuche: v + 1, verworfen: gruende,
                 mit: { spieler: spieler, schritte: a.schritte, schritteNoetig: a.schritteNoetig, weg: a.noetig },
@@ -4676,13 +4805,17 @@ var Protokoll = (function () {
         }
         for (i = 0; i < p.bedrohungen.length; i++) {
             var b = p.bedrohungen[i], bz = [];
-            for (k in p.dinge) if (p.dinge.hasOwnProperty(k) && p.dinge[k].zone && p.dinge[k].raum === b.raum) bz.push(p.dinge[k].name);
+            // gesperrt ist nur, woran eine Handlung haengt (ein Gegenstand in einer Truhe hat seine Zone umsonst: man oeffnet die Truhe)
+            var ziel = {};
+            for (j = 0; j < p.aktionen.length; j++) if (p.aktionen[j].ding && !p.aktionen[j].sicher) ziel[p.aktionen[j].ding] = true;
+            for (k in p.dinge) if (p.dinge.hasOwnProperty(k) && p.dinge[k].zone && p.dinge[k].raum === b.raum && ziel[k]) bz.push(p.dinge[k].name);
             var gt = [];
             if (b.beobachter) gt.push('ein Spieler h\u00e4lt sie im Blick');
             if (b.gegenmittel) for (j = 0; j < p.anforderungen[b.gegenmittel].alt.length; j++) gt.push(altText(p.anforderungen[b.gegenmittel].alt[j]));
+            // eine Frist sperrt nichts: laeuft sie ab, ist die Partie verloren (Vorgabe 2026-10-12)
             z.push('  - Bedrohung ' + raumIn(p, b.raum) + (b.ausloeser === 'laerm' ? ': Jeder L\u00e4rm dort weckt sie, also nur leise Wege.' :
-                ': sperrt ' + (bz.length ? bz.join(', ') : 'nichts Wichtiges') + '.') +
-                (b.frist ? ' Wird ab Schritt ' + b.frist + ' wirksam.' : '') +
+                b.ausloeser === 'zeit' ? ': Frist, l\u00e4uft bei Schritt ' + b.frist + ' ab, dann ist die Partie verloren.' :
+                ': sperrt ' + (b.ausloeser === 'licht_aus' ? 'im Dunkeln ' : '') + (bz.length ? bz.join(', ') : 'nichts Wichtiges') + '.') +
                 (gt.length ? ' Gegenmittel: ' + gt.join(' oder ') + '.' : ''));
         }
         z.push('');
@@ -5568,7 +5701,9 @@ var Spiel = (function () {
     // Was eine Aktion sichtbar bewirkt, als Satz
     function ergebnis(s, a, alt) {
         var t = [], i, g = [];
-        if (alt) t.push(gross(alt.text) + '.');
+        // ganzer Satz je Weg (setting.wegSatz); {nom}/{akk} ist das Ding, an dem der Weg geht
+        var dg = a.ding ? s.partie.dinge[a.ding] : null;
+        if (alt) t.push(KAT.WEG_SATZ && KAT.WEG_SATZ[alt.text] ? KAT.WEG_SATZ[alt.text].replace('{nom}', dg ? nom(dg) : 'es').replace('{akk}', dg ? akk(dg) : 'es') : gross(alt.text) + '.');
         for (i = 0; i < a.gibt.length; i++) {
             if (a.gibt[i].indexOf('hat:') === 0) g.push(s.partie.dinge[a.gibt[i].slice(4)].name);
             if (a.gibt[i].indexOf('gebannt:') === 0) t.push(gross(nom(s.partie.dinge[a.ding])) + ' kann dir jetzt nichts mehr anhaben.');
@@ -5891,7 +6026,9 @@ var Spiel = (function () {
         for (i = 0; i < partie.start.length; i++) s.f[partie.start[i]] = true;
         verteile(s, 1);
         var start1 = partie.getrennt && partie.getrennt.r2.indexOf(1) >= 0 ? 'r2' : 'r1';
-        var aus = [m(partie.story.intro.replace('{in}', raumIn(s, start1)), 'system')];
+        // Eile nur, wenn eine Frist laeuft (Blindtest Runde 3)
+        var frist = partie.bedrohungen.some(function (b) { return b.ausloeser === 'zeit'; });
+        var aus = [m(partie.story.intro.replace('{in}', raumIn(s, start1)) + (frist && partie.story.eile ? ' ' + partie.story.eile : ''), 'system')];
         // Der Gefangene (R154): er erfaehrt es, die anderen auch
         if (partie.gefangener) for (i = 1; i <= partie.spieler; i++) aus.push(m(i === partie.gefangener ? KAT.KAEFIG.start : KAT.KAEFIG.andere.split('{wer}').join('{nick' + partie.gefangener + '}'), 'system', i));
         // Verteilte Sinne (R86): jeder erfaehrt seine Gaben, nur er, gleich nach der Einleitung
@@ -6613,6 +6750,15 @@ var Spiel = (function () {
         for (i = 0; i < s.partie.raeume.length; i++) raeume.push({ id: s.partie.raeume[i].id, name: s.partie.raeume[i].name, hier: s.partie.raeume[i].id === raum, zu: zugangZu(s, s.partie.raeume[i].id, nr) });
         var ansicht = { raum: raum, raeume: raeume, dinge: dinge, inventar: inventar, zeit: Math.ceil(s.zeit), licht: !s.f['licht_aus:' + raum],
             wasser: !!s.f['wasser:' + raum], status: s.draussen && s.draussen[nr] ? 'gewonnen' : s.status, tragen: tragen, laerm: (s.laut && s.laut[raum]) || 0, gaben: meineGaben(s, nr), gefangen: gefangen(s, nr), einhand: einhand(s, nr) };
+        // Timer (Wunsch des Projektinhabers 2026-10-12): Laeuft eine echte Frist, zeigt die Oberflaeche, wie viel bleibt.
+        // rest und gesamt in Zeiteinheiten der Partie (eine je Handgriff, drei je Warten; die Oberflaeche wartet nach 20 s
+        // Ruhe von selbst); die naechste ungebannte Frist.
+        for (i = 0; i < s.partie.bedrohungen.length; i++) {
+            var bf = s.partie.bedrohungen[i];
+            if (bf.ausloeser !== 'zeit' || !bf.frist || s.f['gebannt:' + bf.id]) continue;
+            var rest = Math.max(0, Math.ceil(bf.frist - s.zeit));
+            if (!ansicht.frist || rest < ansicht.frist.rest) ansicht.frist = { rest: rest, gesamt: bf.frist };
+        }
         // Weggestossenes in diesem Raum: wo es jetzt steht
         if (s.koerper) {
             var planS = planVon(s), gk;
