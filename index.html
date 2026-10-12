@@ -1013,6 +1013,9 @@ var Setting = (function () {
                         bZeit: 'Drei dicke Kerzen, zu einem B\u00fcndel zusammengeschmolzen. Sie brennen langsam herunter, Kerbe um Kerbe.' },
                     // Blindtest 2026-10-12: Namen, die dem Bild dieses Herstellers folgen
                     kleiderhaken: { name: 'Eisenkralle', nom: 'die Eisenkralle', akk: 'die Eisenkralle', b: 'Eine eiserne Kralle mit gebogenen Zinken. Sie hakt sich fest.' },
+                    streichhoelzer: { name: 'Gluttopf', nom: 'der Gluttopf', akk: 'den Gluttopf', b: 'Ein kleiner Topf mit Deckel. Darin glimmt Glut.' },
+                    // die zerrissenen Streifen sind hier ein helles, geknotetes Seil: Stoffseil (nur Woerter getauscht, die Eigenschaften bleiben)
+                    tuch: { ersetze: [['Lange Stoffstreifen, fest zusammengeknotet.', 'Lange Streifen aus Stoff, zu einem Seil zusammengeknotet.'], ['die Stoffstreifen', 'das Stoffseil'], ['Stoffstreifen', 'Stoffseil']] },
                     schrank_oben: { name: 'hohes Wandbord', nom: 'das hohe Wandbord', akk: 'das hohe Wandbord',
                         zweit: ['zweites hohes Wandbord', 'das zweite hohe Wandbord', 'das zweite hohe Wandbord'] },
                     // KayKit hat keine Kette, aber einen Wandhebel: Hier zieht man Hebel
@@ -1048,7 +1051,7 @@ var Setting = (function () {
                         'sarg', 'grabplatte', 'knochen', 'schaedel'],
                     stand: { schrank_oben: 'wand', paket: 'tisch' },
                     wandhoehe: { schrank_oben: 2.25, doppelhebel: 1.05, hebelpaar: 1.05 },
-                    grund: { becken: [1.0, 0.4], puppe: [0.55, 0.3], winde: [0.47, 0.4],
+                    grund: { becken: [1.0, 0.4], puppe: [0.55, 0.3], winde: [0.47, 0.4], tisch: [0.8, 0.42],
                         pritsche: [0.9, 0.45], eimer: [0.13, 0.11], schatztruhe: [0.48, 0.4], waffenstaender: [0.5, 0.39], buecher: [0.17, 0.08], buecherbord: [0.28, 0.29], weinregal: [0.65, 0.37],
                         sarg: [1.0, 0.36], grabplatte: [0.44, 0.13], knochen: [0.15, 0.13] }
                 }
@@ -1065,7 +1068,7 @@ var Setting = (function () {
                     streichhoelzer: { name: 'Kerzenstummel', nom: 'der Kerzenstummel', akk: 'den Kerzenstummel', b: 'Ein Kerzenstummel. Er brennt noch.' },
                     taschenlampe: { name: 'Handleuchter', nom: 'der Handleuchter', akk: 'den Handleuchter', b: 'Ein Handleuchter mit kr\u00e4ftiger Flamme.', zweit: null },
                     tuch: { name: 'Tuch', nom: 'das Tuch', akk: 'das Tuch', b: 'Ein gro\u00dfes Tuch. Es nimmt auch etwas Wasser auf.' },
-                    decke: { name: 'Wolldecke', nom: 'die Wolldecke', akk: 'die Wolldecke', b: 'Eine dicke, sehr gro\u00dfe Wolldecke.' },
+                    decke: { name: 'Bettdecke', nom: 'die Bettdecke', akk: 'die Bettdecke', b: 'Eine dicke, sehr gro\u00dfe Bettdecke.' },
                     kleiderhaken: { name: 'Hakenleiste', nom: 'die Hakenleiste', akk: 'die Hakenleiste', b: 'Eine Holzleiste mit eisernen Haken.' },
                     pfanne: { name: 'Eisentopf', nom: 'der Eisentopf', akk: 'den Eisentopf', b: 'Ein schwerer Topf aus Eisen.' },
                     // Blindtest 2026-10-12: Das Modell ist eine Kommode mit Schubladen und T\u00fcren, sie steht am Boden
