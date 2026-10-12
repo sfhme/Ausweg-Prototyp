@@ -290,7 +290,7 @@ var Setting = (function () {
         spurWann: {
             hinsehen: 'Davor ist der Boden blank getreten, als h\u00e4tten schon viele lange davorgestanden und hingesehen.',
             wegsehen: 'Die Spuren sind frisch, und doch hat niemand je gesehen, wie sich hier etwas bewegt.',
-            licht_aus: 'Die Luftklappe ist ru\u00dfgeschw\u00e4rzt, als w\u00fcrde sie hier oft geschlossen.',
+            licht_aus: 'Die Halter der Wandfackeln sind ru\u00dfgeschw\u00e4rzt, als w\u00fcrden die Fackeln hier oft gel\u00f6scht.',
             laerm: 'Ringsum ist Putz aus den Fugen gebr\u00f6ckelt, wie nach lautem Poltern.',
             beruehrung: 'Eine Stelle daran ist blank gegriffen, als h\u00e4tten sie schon viele angefasst.',
             waerme: 'Ru\u00df und alte Brandflecken zeigen, dass schon einmal eine Flamme daran war.',
@@ -446,6 +446,7 @@ var Setting = (function () {
             messer: { name: 'Dolch', nom: 'der Dolch', akk: 'den Dolch', b: 'Ein Dolch mit frisch geschliffener Klinge.' },
             schere: { name: 'Schere', nom: 'die Schere', akk: 'die Schere', b: 'Eine alte Schneiderschere, stumpf geworden.' },
             saeurehaltig: { name: 'Phiole Scheidewasser', nom: 'die Phiole Scheidewasser', akk: 'die Phiole Scheidewasser', b: 'Eine Phiole Scheidewasser. Es frisst sich zischend durch Metall.' },
+            wandfackel: { name: 'Wandfackel', nom: 'die Wandfackel', akk: 'die Wandfackel', b: 'Eine Fackel mit pechgetr\u00e4nktem Kopf. Sie brennt hell.' },
             feuerzeug: { name: 'Feuerstahl', nom: 'der Feuerstahl', akk: 'den Feuerstahl', b: 'Feuerstein und Stahl. Ein Schlag gibt Funken.' },
             streichhoelzer: { name: 'Zunderb\u00fcchse', nom: 'die Zunderb\u00fcchse', akk: 'die Zunderb\u00fcchse', b: 'Eine Zunderb\u00fcchse mit glimmendem Schwamm.' },
             taschenlampe: { name: 'Laterne', nom: 'die Laterne', akk: 'die Laterne', b: 'Eine Blendlaterne; hinter der Klappe brennt eine kr\u00e4ftige Flamme.',
@@ -998,11 +999,23 @@ var Setting = (function () {
             naehe: ['mit L\u00e4rm verscheuchen', 'mit etwas Langem auf Abstand halten'],
             zeit: ['aufhalten (Abfluss freistochern, R\u00e4der blockieren)', 'mit Gewalt stoppen']
         },
-        // feste Einrichtung jedes Raums: womit man es dunkel macht und wo Wasser herkommt
-        licht: { name: 'Luftklappe', nom: 'die Luftklappe', akk: 'die Luftklappe', verb: 'Klappe bewegen',
-            b: 'Eine Eisenklappe am Luftschacht. Ohne Zugluft ersticken die Fackeln.', an: 'Die Klappe ist offen.', aus: 'Die Klappe ist zu.',
-            schliessen: 'Luftklappe schlie\u00dfen', oeffnen: 'Luftklappe \u00f6ffnen',
-            wirdDunkel: 'Du schlie\u00dft die Luftklappe. Die Fackeln ersticken, es ist dunkel.', wirdHell: 'Du \u00f6ffnest die Luftklappe. Die Fackeln flammen wieder auf.' },
+        // feste Einrichtung jedes Raums: womit man es dunkel macht und wo Wasser herkommt.
+        // flammen (Vorgabe des Projektinhabers 2026-10-12, "kerzen funktionieren nicht nach lichtschalter"): Das Licht sind
+        // die Wandfackeln selbst. Loeschen geht immer (ersticken), anzuenden nur mit Feuer (alt). Ein Setting ohne Flammen
+        // (elektrisch, Gaslicht) laesst flammen weg und hat einen Schalter: schliessen/oeffnen, beides frei.
+        licht: { flammen: true, name: 'Wandfackeln', nom: 'die Wandfackeln', akk: 'die Wandfackeln', verb: 'Fackeln l\u00f6schen',
+            b: 'Fackeln in eisernen Haltern an der Wand.', an: 'Sie brennen.', aus: 'Sie sind aus.',
+            schliessen: 'Fackeln l\u00f6schen', oeffnen: 'Fackeln anz\u00fcnden', alt: [{ text: 'mit einer Flamme anz\u00fcnden', b: { entzuendend: 1 } }],
+            ohneFeuer: 'Ohne Feuer brennen sie nicht wieder.',
+            // die lose Wandfackel (Gegenstand wandfackel): steckt in einem eigenen Halter; manchmal klemmt ein Splint sie fest
+            lose: 'Sie steckt lose im Halter.', fest: 'Ein eiserner Splint klemmt sie im Halter fest.',
+            festSitzt: 'Die Fackel sitzt fest im Halter. Ein eiserner Splint h\u00e4lt sie.',
+            loesen: 'Wandfackel aus dem Halter l\u00f6sen', halter: [{ text: 'den Splint herausschlagen', b: { stumpf: 1 } }, { text: 'den Halter aufbiegen', b: { steif: 1 } }],
+            brenntWeiter: 'Eine Fackel steckt lose im Halter und brennt weiter. Nimm sie erst heraus.',
+            stecken: 'Du steckst {akk} zur\u00fcck in ihren Halter.', keinHalter: 'Hier ist kein Halter frei.',
+            // Eine Leuchte belegt eine Hand: Festhalten und zur Seite nehmen geht nur mit beiden
+            beideHaende: 'Daf\u00fcr brauchst du beide H\u00e4nde. Leg erst {akk} ab.',
+            wirdDunkel: 'Du erstickst die Fackeln. Es ist dunkel.', wirdHell: 'Die Fackeln brennen wieder.' },
         // laeuft: wer den offenen Hahn noch einmal anfasst (Blindtest: zweimal gefragt, ob man ihn zudrehen kann)
         wasser: { name: 'Wasserfass', nom: 'das Wasserfass', akk: 'das Wasserfass', verb: 'Zapfhahn aufdrehen', tun: 'Zapfhahn aufdrehen',
             laeuft: 'Der Zapfhahn klemmt offen. Zudrehen l\u00e4sst er sich nicht mehr.',
@@ -1073,6 +1086,7 @@ var Setting = (function () {
                     // Eckpfeiler der Huelle (client/ui.js, huelleKaykit): so weit ragt er ueber den Eckpunkt in den Raum, wenn er
                     // mitten darauf steht (raum) oder in die Mauer zurueckgesetzt ist (ecke). Am Modell gemessen: 0,413 und 0,163.
                     pfeiler: { raum: 0.42, ecke: 0.17 },
+                    fenster: 'hoch',                                     // Kellerfenster in der oberen Wandreihe hoher Raeume (kern/raumplan.js, fenster)
                     stand: { schrank_oben: 'wand', paket: 'tisch' },
                     wandhoehe: { schrank_oben: 2.25, doppelhebel: 1.05, hebelpaar: 1.05 },
                     grund: { becken: [1.0, 0.4], puppe: [0.55, 0.3], winde: [0.47, 0.4], tisch: [0.8, 0.42],
@@ -1156,6 +1170,7 @@ var Setting = (function () {
                         'kette', 'pritsche', 'eimer', 'waffenstaender', 'muenzen', 'kelch', 'kolben', 'moerser', 'buecher', 'buecherbord', 'weinregal', 'fassstapel', 'fassturm', 'saeule',
                         'schatztruhe', 'gold', 'sarg', 'grabplatte', 'knochen'],
                     geschoss: 2.5,
+                    fenster: 'wand',                                     // Fenster auf Augenhoehe, wo an der Wand nichts steht (kern/raumplan.js, fenster)
                     stand: { radio: 'boden' },
                     wandhoehe: { licht: 1.5 },
                     grund: { radio: [0.22, 0.22], holzkiste: [0.49, 0.3], wasser: [0.55, 0.31], schaukelstuhl: [0.28, 0.27], v_fass: [0.36, 0.36],
@@ -1196,6 +1211,9 @@ var Setting = (function () {
         wegSatz: {
             // auch Wege, die der Generator selbst baut (Waerme, Verwandeln, Laerm, Schacht)
             'mit einer Flamme erw\u00e4rmen': 'Du h\u00e4ltst eine Flamme an {akk}.',
+            'mit einer Flamme anz\u00fcnden': 'Du h\u00e4ltst eine Flamme an {akk}. Sie brennen wieder.',
+            'den Splint herausschlagen': 'Du schl\u00e4gst den Splint heraus und ziehst die Fackel aus dem Halter.',
+            'den Halter aufbiegen': 'Du biegst den Halter auf und ziehst die Fackel heraus.',
             'eine Fackel anz\u00fcnden': 'Du h\u00e4ltst das Ende in die Flammen, bis es Feuer f\u00e4ngt.',
             'L\u00e4rm machen': 'Du machst ordentlich Krach.',
             'etwas Schweres in den Schacht werfen': 'Du wirfst etwas Schweres in den Schacht.',
@@ -1560,6 +1578,8 @@ var Katalog = (function () {
         schere:       { e: { scharf: 1 } },
         saeurehaltig: { e: { saeurehaltig: 2 }, verbrauch: true },
         feuerzeug:    { e: { entzuendend: 1 } },
+        // eine Fackel, die lose in einem Wandhalter steckt (2026-10-12): Licht und Feuer zum Mitnehmen; liegt immer im Halter
+        wandfackel:   { e: { licht: 2, entzuendend: 1 } },
         streichhoelzer: { e: { entzuendend: 1 } },
         // die Laterne brennt: Daran laesst sich etwas anzuenden (Blindtest Runde 3)
         taschenlampe: { e: { licht: 2, entzuendend: 1 }, zweit: { e: { scharf: 1 } } },
@@ -2012,7 +2032,7 @@ var Katalog = (function () {
         K.STIL = id; K.STILNAME = st.name || id;
         K.RAUM = { stand: (st.raum && st.raum.stand) || {}, wandhoehe: (st.raum && st.raum.wandhoehe) || {}, grund: (st.raum && st.raum.grund) || {},
             geschoss: (st.raum && st.raum.geschoss) || 0, deko: (st.raum && st.raum.deko) || ['regal', 'fass', 'kisten', 'banner', 'stuhl'],
-            pfeiler: (st.raum && st.raum.pfeiler) || null };
+            pfeiler: (st.raum && st.raum.pfeiler) || null, fenster: (st.raum && st.raum.fenster) || null };
         K.maengel = maengelVon(K, st);
         // jeder Weg hat einen ganzen Satz fuer sein Gelingen (setting.wegSatz), auch nach den Ersetzungen dieses Stils
         (function satzFehlt(o, tiefe) {
@@ -2472,7 +2492,7 @@ var Generator = (function () {
     // opt.bild (Server, Spielseite, Probeseite) kommen sie in keiner Partie vor; ohne (Tests, zeige.js) in jeder. Die
     // PC-Sitzung streicht hier einen Eintrag, sobald das Raetsel Modelle und ein Bild hat (ARBEITSTEILUNG.md 3.1f).
     // Raetsel, fuer die die Oberflaeche noch kein Bild hat: der Server laesst sie aus (Tests nehmen sie mit)
-    var NOCH_OHNE_BILD = { mechanismus: 1 };
+    var NOCH_OHNE_BILD = { mechanismus: 1, wandfackel: 1 };
     function Bau(seed, spieler, stufe, versuch, stil, bild) {
         this.aus = bild ? NOCH_OHNE_BILD : {};
         this.r = Zufall.strom(String(seed), 'partie:' + spieler + ':' + stufe + ':' + versuch);
@@ -2486,7 +2506,8 @@ var Generator = (function () {
             stil: stil, platz: this.K.RAUM
         };
         this.elementeFrei = this.r.mischen(sortiert(this.K.ELEMENTE));
-        this.gegenstaendeFrei = this.r.mischen(sortiert(this.K.GEGENSTAENDE));
+        var aus0 = this.aus;
+        this.gegenstaendeFrei = this.r.mischen(sortiert(this.K.GEGENSTAENDE).filter(function (k) { return !aus0[k]; }));     // ohne Bild: vor dem Mischen weg, damit der Rest gleich faellt
         this.fixtur = {};
         // was es nur einmal je Partie gibt, gilt als schon vergeben, wenn es noch kein Bild hat
         if (this.aus.spiegel) this.fixtur.spiegel = true;
@@ -2627,9 +2648,14 @@ var Generator = (function () {
     Bau.prototype.licht = function (raum) {
         if (this.fixtur['licht:' + raum]) return;
         var L = this.K.LICHT, s = this.ding('fixtur', L.name, raum, { vorlage: 'licht', nom: L.nom, akk: L.akk });
+        if (L.flammen) s.flammen = true;
         this.aktion({ text: L.schliessen, art: 'schalter', raum: raum, ding: s.id, gibt: ['licht_aus:' + raum], schalter: true, sicher: true });
-        // wer wieder Licht macht, setzt "wieder hell" (Ausloeser licht_an); das geht nur, wenn es dunkel war
-        this.aktion({ text: L.oeffnen, art: 'schalter', raum: raum, ding: s.id, braucht: ['licht_aus:' + raum], nimmt: ['licht_aus:' + raum],
+        // wer wieder Licht macht, setzt "wieder hell" (Ausloeser licht_an); das geht nur, wenn es dunkel war.
+        // Flammen (Vorgabe 2026-10-12): Anzuenden braucht Feuer, das man in der Hand hat (Feuerstahl, Zunderbuechse, Laterne,
+        // brennende Fackel). Darum ein Benutzen mit Mittel; der Pruefer kennt es wie jeden anderen Weg.
+        if (L.flammen) this.aktion({ text: L.oeffnen, art: 'benutzen', raum: raum, ding: s.id, braucht: ['licht_aus:' + raum], nimmt: ['licht_aus:' + raum],
+            mittel: this.anforderung('Feuer', L.alt), gibt: ['wieder_hell:' + raum], schalter: true, sicher: true }).licht = true;
+        else this.aktion({ text: L.oeffnen, art: 'schalter', raum: raum, ding: s.id, braucht: ['licht_aus:' + raum], nimmt: ['licht_aus:' + raum],
             gibt: ['wieder_hell:' + raum], schalter: true, sicher: true });
         this.fixtur['licht:' + raum] = s.id;
     };
@@ -2883,6 +2909,7 @@ var Generator = (function () {
     // Wo ein Ding liegt und was man tun muss, um es zu bekommen
     Bau.prototype.platziere = function (g, tiefe, opt) {
         opt = opt || {};
+        if (g.vorlage === 'wandfackel') { this.lege_halter(g, tiefe, opt); return; }        // steckt immer in einem Wandhalter
         g.raum = g.raum || this.raum();
         g.zone = this.zoneFuer(g.raum, opt);
         var arten = tiefe <= 0 ? ['frei'] : this.r.mischen(['frei', 'hindernis', 'hindernis', 'hindernis', 'behaelter', 'behaelter',
@@ -2915,6 +2942,28 @@ var Generator = (function () {
         d.zone = false;
         this.aktion({ text: PK.name + ': ' + g.name + ' gegen eine Hand', art: 'pakt', raum: g.raum, ding: d.id, gibt: ['hat:' + zw.id, 'einhand'], schalter: true, sicher: true });
         this.p.pakt = d.id;
+    };
+
+    // Lose Wandfackel (2026-10-12, "kann ich wandfackeln auch ins inventar nehmen?"): Die meisten Fackeln sitzen fest, eine
+    // steckt manchmal lose in einem eigenen Halter neben den festen. Mal nimmt man sie einfach heraus, mal klemmt ein Splint
+    // sie fest (schlagen oder aufbiegen). Solange sie im Raum steckt, wird es dort nicht dunkel (der Pruefer: Loeschen braucht
+    // sie heraus, siehe baue).
+    Bau.prototype.lege_halter = function (g, tiefe, opt) {
+        var L = this.K.LICHT;
+        g.raum = g.raum || this.raum();
+        g.zone = this.zoneFuer(g.raum, opt || {});
+        g.halter = true;
+        g.lage = 'steckt in einem Wandhalter';
+        if (tiefe > 0 && this.r.chance(0.5)) {
+            var m = this.anforderung('Wandhalter', L.halter), alt = this.p.anforderungen[m].alt;
+            this.liefere(this.r.waehle(alt).b, tiefe - 1, opt);
+            g.fest = true;
+            this.aktion({ text: L.loesen, art: 'benutzen', raum: g.raum, ding: g.id, mittel: m, gibt: ['hat:' + g.id, 'heraus:' + g.id] });
+            // zurueckgesteckt ist sie nicht mehr festgeklemmt: wieder herausnehmen ohne Werkzeug (fuer den Pruefer; die Engine
+            // nimmt sie dann wie alles, was liegt)
+            this.aktion({ text: g.name + ' wieder aus dem Halter nehmen', art: 'wiedernehmen', raum: g.raum, ding: g.id, braucht: ['hat:' + g.id], gibt: ['heraus:' + g.id] });
+        } else this.aktion({ text: g.name + ' aus dem Halter nehmen', art: 'nehmen', raum: g.raum, ding: g.id, gibt: ['hat:' + g.id, 'heraus:' + g.id] });
+        return true;
     };
 
     Bau.prototype.lege_frei = function (g) {
@@ -4631,7 +4680,22 @@ var Generator = (function () {
                 var gd = p.dinge[dk], seite = p.durchreiche.dinge[0];
                 if (p.dinge[seite].raum !== gd.raum) seite = p.durchreiche.dinge[1];
                 this.aktion({ text: gd.name + ' durch ' + p.dinge[seite].akk + ' reichen', art: 'durchreichen', raum: gd.raum, ding: seite,
-                    braucht: ['hat:' + dk], gibt: ['bei:' + dk + ':' + gd.hinueber, 'fort:' + dk + ':' + gd.raum], schalter: true, sicher: true });
+                    braucht: ['hat:' + dk], gibt: ['bei:' + dk + ':' + gd.hinueber, 'fort:' + dk + ':' + gd.raum], nimmt: ['fort:' + dk + ':' + gd.hinueber], schalter: true, sicher: true });
+                // in beide Richtungen auch zurueck (Sackgassen-Suchlauf 2026-10-12, Partie 766/4/2: der Handleuchter, den beide
+                // Seiten brauchen, ging zu frueh hinueber; die Engine liess ihn zurueck, der Pruefer kannte den Weg nicht)
+                if (p.durchreiche.richtung === 'beide') this.aktion({ text: gd.name + ' zur\u00fcckreichen', art: 'durchreichen', raum: gd.hinueber,
+                    ding: p.durchreiche.dinge[p.durchreiche.dinge[0] === seite ? 1 : 0], braucht: ['hat:' + dk, 'bei:' + dk + ':' + gd.hinueber],
+                    gibt: ['bei:' + dk + ':' + gd.raum, 'fort:' + dk + ':' + gd.hinueber], nimmt: ['fort:' + dk + ':' + gd.raum], schalter: true, sicher: true });
+            }
+            // Was sonst durch die Mauer passt, laesst die Engine ebenso hinueber; wer es zu frueh hinueberreicht, bekommt es zurueck.
+            // Nur diese Richtung (vom Fundort weg geht es nicht von selbst): Am Anfang ist sie nicht moeglich, der Pruefer
+            // verzweigt also erst, wenn ein Spielstand der Engine es drueben hat.
+            if (p.durchreiche.richtung === 'beide') for (var dz in p.dinge) {
+                var gz = p.dinge[dz];
+                if (!p.dinge.hasOwnProperty(dz) || gz.typ !== 'gegenstand' || gz.hinueber || this.K.KLEIN.indexOf(gz.vorlage) < 0 || (gz.raum !== 'r1' && gz.raum !== 'r2')) continue;
+                var drz = gz.raum === 'r1' ? 'r2' : 'r1', sz = p.dinge[p.durchreiche.dinge[0]].raum === drz ? p.durchreiche.dinge[0] : p.durchreiche.dinge[1];
+                this.aktion({ text: gz.name + ' zur\u00fcckreichen', art: 'durchreichen', raum: drz, ding: sz, braucht: ['hat:' + dz, 'bei:' + dz + ':' + drz],
+                    gibt: ['bei:' + dz + ':' + gz.raum, 'fort:' + dz + ':' + drz], nimmt: ['fort:' + dz + ':' + gz.raum], schalter: true, sicher: true });
             }
         }
         if (this.gegenstaendeFrei.length && this.r.chance(0.6)) {
@@ -4663,6 +4727,15 @@ var Generator = (function () {
             if (zh.chance(HOCH_ANTEIL)) {
                 var hk = sortiert(p.dinge).filter(function (k) { var x = p.dinge[k]; return x.typ === 'gegenstand' && x.lage === 'liegt offen herum' && x.vorlage !== 'kreide'; });
                 if (hk.length) p.hoch = zh.waehle(hk);
+            }
+        }
+        // Zuletzt, wenn alle Gegenstaende liegen (auch die Ablenkung, Partie 9/1/3): Eine lose Wandfackel brennt weiter,
+        // solange sie im Halter steckt; dunkel wird der Raum erst, wenn sie heraus ist
+        for (var hk0 in p.dinge) if (p.dinge.hasOwnProperty(hk0) && p.dinge[hk0].halter) {
+            for (var lh = 0; lh < p.aktionen.length; lh++) {
+                var la = p.aktionen[lh];
+                // heraus, nicht hat: Beim getrennten Start darf sie danach durch die Mauer gewandert sein (Partie 766/4/2)
+                if (la.art === 'schalter' && la.ding === this.fixtur['licht:' + p.dinge[hk0].raum] && la.gibt[0] === 'licht_aus:' + p.dinge[hk0].raum) la.braucht.push('heraus:' + hk0);
             }
         }
         return p;
@@ -4740,6 +4813,22 @@ var Generator = (function () {
         return false;
     }
 
+    // Licht wie Feuer (2026-10-12): Loeschen geht immer, anzuenden nur mit Feuer. Wer gleich zu Anfang die Fackeln eines
+    // Raums loescht, darf sich damit nicht einsperren (Sackgassen-Suchlauf: Partie 390/4/1, eine Bedrohung im Dunkeln und
+    // nirgends Feuer). Geprueft vom Start aus, der Raum schon dunkel.
+    function dunkelFaehrtFest(p, spieler) {
+        var i, x;
+        for (i = 0; i < p.aktionen.length; i++) {
+            var a = p.aktionen[i];
+            if (a.art !== 'schalter' || !a.ding || !p.dinge[a.ding].flammen || !a.gibt.length) continue;
+            var f = {};
+            for (x = 0; x < p.start.length; x++) f[p.start[x]] = true;
+            f[a.gibt[0]] = true;
+            if (!Pruefer.pruefe(p, spieler, { f: f, schritte: 0 }).loesbar) return true;
+        }
+        return false;
+    }
+
     function erzeuge(seed, opt) {
         var spieler = opt.spieler, stufe = opt.stufe, v, gruende = [];
         if (!(spieler >= 1 && spieler <= 4) || !STUFE[stufe]) throw new Error('Generator.erzeuge: spieler 1..4, stufe 1..3');
@@ -4771,6 +4860,7 @@ var Generator = (function () {
             // Kerzenleuchter (R61) und der Wurf in den Schacht (R68, die einzige Spitzhacke). Geprueft vom Start aus, den
             // Gegenstand schon in der Hand und sofort verbraucht; faehrt das fest, wird neu gewuerfelt.
             if (verbrauchFaehrtFest(p, spieler)) { gruende.push('Verbrauch faehrt fest'); continue; }
+            if (dunkelFaehrtFest(p, spieler)) { gruende.push('Dunkel faehrt fest'); continue; }
             // Anzeichen verborgener Faecher (Abwechslung, 2026-10-12): aus einem eigenen Strom, damit der Rest der Partie gleich bleibt;
             // echte und leere gleich oft, auf Stufe 1 oft, auf Stufe 3 selten
             var za = Zufall.strom(String(seed) + ':' + v, 'anzeichen'), ks = Object.keys(p.dinge).sort();
@@ -5314,6 +5404,24 @@ var Spiel = (function () {
     }
     // Teilopfer (R152): mit nur einer Hand traegt man ein Ding
     function einhand(s, nr) { return !!(s.einhand && s.einhand[nr]); }
+    // Eine Leuchte in der Hand (Laterne, Fackel, Kerzen: alles mit Licht) belegt eine Hand (2026-10-12)
+    function leuchteVon(s, nr) {
+        var k;
+        for (k in s.wer) if (s.wer.hasOwnProperty(k) && s.wer[k] === nr && !s.f['weg:' + k] && s.partie.dinge[k] && s.partie.dinge[k].e && s.partie.dinge[k].e.licht > 0) return s.partie.dinge[k];
+        return null;
+    }
+    // Lose Wandfackeln, die in ihrem Halter in diesem Raum stecken (noch nie herausgenommen oder zurueckgesteckt; Fakt
+    // heraus: fehlt dann): Solange eine brennt, wird es dort nicht dunkel
+    function steckendeFackel(s, licht) {
+        var k, g;
+        for (k in s.partie.dinge) {
+            if (!s.partie.dinge.hasOwnProperty(k)) continue;
+            g = s.partie.dinge[k];
+            if (g.vorlage !== 'wandfackel' || s.f['weg:' + k]) continue;
+            if (g.halter && g.raum === licht.raum && !s.f['heraus:' + k]) return g;
+        }
+        return null;
+    }
     function handVoll(s, nr) {
         if (!einhand(s, nr)) return false;
         var k;
@@ -6200,6 +6308,7 @@ var Spiel = (function () {
 
     function ansehenText(s, d, nr) {
         var t, i, k;
+        if (d.halter && !s.f['hat:' + d.id]) return beschreibung(d, s, nr) + ' ' + (d.fest ? KAT.LICHT.fest : KAT.LICHT.lose);      // lose Wandfackel im Halter
         if (d.vorlage === 'mechanismus' && KAT.MECHANISMEN[d.form]) return KAT.MECHANISMEN[d.form].b + (d.anzeichen ? ' ' + KAT.MECHANISMEN[d.form].anzeichen : '');
         // ein Fach, das noch keiner offen hatte, sieht aus wie das, worin es steckt (Vorgabe 2026-10-12)
         if (unentdeckt(s, d)) {
@@ -6464,7 +6573,7 @@ var Spiel = (function () {
         } else if (stufe === 1) {
             if (a.art === 'krach') text = T.krach;
             else if (a.art === 'warten') text = T.warten;
-            else if (a.art === 'schalter') text = a.gibt.some(function (f) { return f.indexOf('licht_aus:') === 0; }) ? T.dunkel : T.hell;
+            else if (a.art === 'schalter' || a.licht) text = a.gibt.some(function (f) { return f.indexOf('licht_aus:') === 0; }) ? T.dunkel : T.hell;
             else if (a.art === 'bauen') text = T.bauen;
             else if ((a.art === 'verwandeln' || a.art === 'lesen') && (a.ding || gehalten[0])) text = T.tasche.replace('{akk}', akk(s.partie.dinge[a.ding || gehalten[0]]));
             else text = d ? ein(T.ding) : T.warten;
@@ -6503,6 +6612,8 @@ var Spiel = (function () {
         // Festhalten und Bewegen (bedien 'halten'): Abdeckung zur Seite, Buch gezogen, Halter gedreht. Das Ding bleibt stehen;
         // fuer die Engine ist es ein Anfassen, das nur so wirkt (F allein verraet nichts)
         if (b.art === 'schieben' && s.partie.dinge.hasOwnProperty(String(b.ding)) && s.partie.dinge[String(b.ding)].bedien === 'halten') b = { art: 'anfassen', ding: String(b.ding), halten: true };
+        // festhalten und zur Seite nehmen braucht beide Haende: mit einer Leuchte in der Hand erst ablegen
+        if (b.halten && leuchteVon(s, nr) && !gefangen(s, nr)) { var bh = m(KAT.LICHT.beideHaende.replace('{akk}', akk(leuchteVon(s, nr)))); bh.n = 1; return [bh]; }
         if (b.art === 'schieben') return schiebe(s, nr, b);
         if (b.art === 'sagen') return sagen(s, nr, b.text);
         if (b.art === 'verlassen') return [m('Du verl\u00e4sst die Partie. Die anderen spielen ohne dich weiter.', 'system')].concat(gehtFort(s, nr, b.x, b.z));
@@ -6585,6 +6696,7 @@ var Spiel = (function () {
                         var aus_ = s.f['licht_aus:' + a.raum];
                         var macheDunkel = a.gibt.some(function (f) { return f.indexOf('licht_aus:') === 0; });
                         if ((macheDunkel && aus_) || (!macheDunkel && !aus_)) continue;
+                        if (macheDunkel && d.flammen && steckendeFackel(s, d)) { fass = m(KAT.LICHT.brenntWeiter); fass.n = 1; aus.push(fass); getan = true; break; }
                         fuehreAus(s, a, null);
                         aus.push(zeigt(m(aus_ ? KAT.LICHT.wirdHell : KAT.LICHT.wirdDunkel)));
                         getan = true; break;
@@ -6616,7 +6728,9 @@ var Spiel = (function () {
                     }
                     if (!getan && mehrHaende) { aus.push(m('Allein bekommst du das so nicht hin. Daf\u00fcr br\u00e4uchte es mehr H\u00e4nde.')); getan = true; }
                 }
-                if (!getan && d.vorlage === 'ausgang') aus.push(sieh(s, d, nr));
+                if (!getan && d.halter && d.fest && !s.f['hat:' + d.id]) { fass = m(KAT.LICHT.festSitzt); fass.n = 1; aus.push(fass); }    // lesbarer Grund
+                else if (!getan && d.vorlage === 'licht' && d.flammen && s.f['licht_aus:' + d.raum]) { fass = m(KAT.LICHT.ohneFeuer); fass.n = 1; aus.push(fass); }    // lesbarer Grund
+                else if (!getan && d.vorlage === 'ausgang') aus.push(sieh(s, d, nr));
                 else if (!getan && d.vorlage === 'wasser' && s.f['wasser:' + d.raum]) { fass = m(KAT.WASSER.laeuft); fass.n = 1; aus.push(fass); }   // lesbarer Grund
                 else if (!getan && aktionenAn(s, d.id, ['benutzen']).some(function (x) { return x.mittel && !erledigt(s, x) && brauchtErfuellt(s, x); })) {
                     // hier hilft ein Werkzeug: Das ist ein Grund, kein blosses Anfassen (lesbar, nicht nur ein Wackeln)
@@ -6627,8 +6741,9 @@ var Spiel = (function () {
 
             case 'nehmen':
                 if (handVoll(s, nr) && !traegt(s, d.id, nr)) { aus.push(m(KAT.PAKT.voll)); break; }     // R152
-                if (liegt(s, d.id)) { s.wer[d.id] = nr; aus.push(zeigt(m('Du nimmst ' + akk(d) + '.'))); break; }
+                if (liegt(s, d.id)) { s.wer[d.id] = nr; if (d.halter) s.f['heraus:' + d.id] = true; aus.push(zeigt(m('Du nimmst ' + akk(d) + '.'))); break; }
                 l = aktionenAn(s, d.id, ['nehmen']);
+                if (!l.length && d.halter && d.fest && !s.f['hat:' + d.id]) { fass = m(KAT.LICHT.festSitzt); fass.n = 1; aus.push(fass); break; }
                 if (!l.length || erledigt(s, l[0])) { aus.push(nein(m('Das kannst du nicht mitnehmen.'))); break; }
                 sp = sperre(s, l[0], nr, 1);
                 if (sp) { aus.push(sp); break; }
@@ -6644,10 +6759,19 @@ var Spiel = (function () {
                 if (d.vorlage === 'hausordnung') { aus = aus.concat(einsetzen(s, d, nr, itemsAus(s, b.mit, nr))); break; }
                 if (d.vorlage === 'waage') { aus = aus.concat(belaste(s, d, nr, itemsAus(s, b.mit, nr))); break; }
                 var items = itemsAus(s, b.mit, nr), versucht = false, erfolg = false, grund = null;
+                // eine Wandfackel an brennende Wandfackeln: zurueck in ihren Halter (an dunkle: anzuenden, unten). Frei ist nur
+                // ihr eigener; die anderen Halter tragen die festen Fackeln
+                if (d.vorlage === 'licht' && d.flammen && items.length === 1 && items[0].vorlage === 'wandfackel' && !s.f['licht_aus:' + d.raum]) {
+                    if (!items[0].halter || items[0].raum !== d.raum) { fass = m(KAT.LICHT.keinHalter); fass.n = 1; aus.push(fass); break; }
+                    hinlegen(s, items, nr, d);
+                    delete s.f['heraus:' + items[0].id];
+                    aus.push(zeigt(m(KAT.LICHT.stecken.replace('{akk}', akk(items[0])))));
+                    break;
+                }
                 l = aktionenAn(s, d.id, ['benutzen', 'schluessel']);
                 for (i = 0; i < l.length && !erfolg; i++) {
                     a = l[i];
-                    if (erledigt(s, a)) continue;
+                    if (erledigt(s, a) && !a.licht) continue;         // Fackeln anzuenden geht nach jedem Loeschen wieder
                     if (a.art === 'schluessel') {
                         if (!brauchtErfuellt(s, a)) continue;
                         var schl = false;
@@ -6935,7 +7059,7 @@ var Spiel = (function () {
             }
             if (d.raum !== raum) continue;
             if (d.typ === 'element' && weg[d.id]) continue;
-            if (d.typ === 'gegenstand' && !nehmbar[d.id]) continue;
+            if (d.typ === 'gegenstand' && !nehmbar[d.id] && !d.halter) continue;
             // freie Verstecke: von Anfang an da und durchsuchbar (suchen), erst nach Hinweis oder Suche als Fach erkannt
             var suchen = unentdeckt(s, d);      // Hinweis und falsche Faehrte zeigen die Stelle, erkennbar wird das Fach erst offen
             var offen = false;
@@ -6965,6 +7089,7 @@ var Spiel = (function () {
             if (!suchen && d.klopft && d.verborgen && !offen && s.f['klopft:' + d.id] &&
                 regelVonElement(s, d.id).some(function (rk) { return rk.art === 'klopfen' && !sieht(s, rk, nr); })) suchen = true;
             var eintrag = { id: d.id, name: d.name, typ: d.typ, offen: offen, code: code };
+            if (d.halter) eintrag.halter = d.fest ? 2 : 1;              // lose Wandfackel im Halter; 2 = ein Splint klemmt sie fest
             // offen heisst es anders: Eine offene Truhe ist keine verschlossene mehr
             if (offen && d.typ === 'versteck' && KAT.HINDERNISSE[d.vorlage] && KAT.HINDERNISSE[d.vorlage].offen) eintrag.name = KAT.HINDERNISSE[d.vorlage].offen;
             if (verdeckt(s, d.id)) eintrag.verdeckt = true;         // liegt unter etwas: da, aber nicht zu erreichen
@@ -7016,6 +7141,16 @@ var Spiel = (function () {
         // Der ganze Bereich steht (Oberflaeche, 2026-10-12): Steht die Zwischentuer oder das Gitter offen? Die Oberflaeche zeigt
         // das Ding auch von der anderen Seite, wo es nicht in der Sicht steht ("zu" je Raum sagt nur, ob dieser Spieler hinueber darf).
         if (s.partie.durchgang) ansicht.gangOffen = !!s.f['offen:' + s.partie.durchgang.nach];
+        // Licht wie Feuer (2026-10-12): welche Raeume hell sind (auch nebenan, fuer den Schein durch die Oeffnung) und wer
+        // eine brennende Leuchte traegt (Laterne, Fackel, Kerzen: alles mit Licht), je Spieler die Nummer des Dings
+        ansicht.hell = {};
+        for (i = 0; i < s.partie.raeume.length; i++) ansicht.hell[s.partie.raeume[i].id] = !s.f['licht_aus:' + s.partie.raeume[i].id];
+        for (i = 0; i < keys.length; i++) {
+            var lt = s.partie.dinge[keys[i]];
+            if (lt.typ !== 'gegenstand' || !lt.e || !(lt.e.licht > 0) || !s.f['hat:' + lt.id] || s.f['weg:' + lt.id] || typeof s.wer[lt.id] !== 'number') continue;
+            if (!ansicht.leuchten) ansicht.leuchten = {};
+            if (!ansicht.leuchten[s.wer[lt.id]]) ansicht.leuchten[s.wer[lt.id]] = lt.id;
+        }
         // Timer (Wunsch des Projektinhabers 2026-10-12): Laeuft eine echte Frist, zeigt die Oberflaeche, wie viel bleibt.
         // rest und gesamt in Sekunden; die naechste ungebannte Frist. zeit (oben) ist ebenfalls in Sekunden.
         for (i = 0; i < s.partie.bedrohungen.length; i++) {
@@ -7089,6 +7224,7 @@ var Spiel = (function () {
             if (d.vorlage === 'spiegelbank' || d.vorlage === 'spiegelbild') { aus[k].hebel = d.stellen; if (d.vorlage === 'spiegelbank') aus[k].bank = true; }   // R88
             if (d.vorlage === 'hebelreihe') { aus[k].hebel = d.stellen; aus[k].bank = true; aus[k].lampen = true; }   // R15: Hebel mit Lampen
             if (d.verborgen) aus[k].verborgen = true;
+            if (d.anzeichen) aus[k].anzeichen = true;                // das Anzeichen ist am Modell zu sehen (client/ui.js, anzeichenBaue)
             if (verb) aus[k].verb = verb;
             // Zaehlreihe: das Zeichen, das daran steht
             if (v === 'zaehl' || v === 'standpunkt') {       // auch das Zeichen neben den Fussspuren (R22)
