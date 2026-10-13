@@ -1307,6 +1307,7 @@ var Setting = (function () {
             'mit Gewalt aufdrehen': 'Du drehst {akk} mit Gewalt auf.',
             'Rost weg\u00e4tzen': 'Die S\u00e4ure frisst den Rost weg.'
         },
+        // grund (GRUNDSAETZE.md, Empfehlung 11, "Ask Why"): warum die Dinge hier so wirken; steht am Anfang nach dem intro
         // intro: immer; eile: nur, wenn eine Frist laeuft (Blindtest Runde 3: Glocke und Rauch versprachen Eile, die es nicht gab)
         stories: [
             // zellen: Start in Kerkerzellen (Raum 1 heisst dann so; intro allein und zu mehreren)
@@ -1314,6 +1315,7 @@ var Setting = (function () {
                 zellen: { raum: 'Kerkergang', ohne: ['Zelle'], intro: ['Die Wache hat dich ins Verlies geworfen und in eine Zelle gesperrt. Drau\u00dfen im Kerkergang ist es still, und die Kerkert\u00fcr ist verriegelt.',
                     'Die Wache hat euch ins Verlies geworfen, jeden in eine eigene Zelle. Drau\u00dfen im Kerkergang ist es still, und die Kerkert\u00fcr ist verriegelt.'] },      // unten: unter der Erde (Lichtschacht statt Fenster)          // Steingew\u00f6lbe: nicht im Fachwerkhaus
                 intro: 'Die Wache hat dich ins Verlies geworfen. Du bist {in}, und die Kerkert\u00fcr ist verriegelt.',
+                grund: 'Der Kerkermeister war ein T\u00fcftler. Was sich hier regt oder \u00f6ffnet, hat er so eingerichtet, und jede seiner Fallen folgt einer Regel.',
                 eile: 'Zur n\u00e4chsten Glocke holen sie dich.',
                 ende: 'Du bist drau\u00dfen, bevor die Wache kommt.',
                 ausgang: { name: 'Kerkert\u00fcr', nom: 'die Kerkert\u00fcr', akk: 'die Kerkert\u00fcr', verb: 'T\u00fcr \u00f6ffnen', auf: 'Die Kerkert\u00fcr schwingt auf.' },
@@ -1321,6 +1323,7 @@ var Setting = (function () {
                 raeume: [{ name: 'Zelle', in: 'in der Zelle', nach: 'in die Zelle' }, { name: 'Wachstube', in: 'in der Wachstube', nach: 'in die Wachstube' },
                     { name: 'Kerkergang', in: 'im Kerkergang', nach: 'in den Kerkergang' }, { name: 'Vorratskammer', in: 'in der Vorratskammer', nach: 'in die Vorratskammer' }] },
             { id: 'schatzkammer', titel: 'Die Schatzkammer',
+                grund: 'Der Burgherr traut niemandem. Seine Sch\u00e4tze sch\u00fctzen alte Kunstgriffe, die nur durchschaut, wer genau hinsieht.',
                 intro: 'Du bist in die Schatzkammer des Burgherrn eingestiegen. Hinter dir ist die Kammert\u00fcr ins Schloss gefallen. Du bist {in}.',
                 eile: 'Bis zum Morgen musst du hier raus sein.',
                 ende: 'Du bist drau\u00dfen, und niemand hat dich gesehen.',
@@ -1330,6 +1333,7 @@ var Setting = (function () {
                 raeume: [{ name: 'Schatzkammer', in: 'in der Schatzkammer', nach: 'in die Schatzkammer' }, { name: 'Vorkammer', in: 'in der Vorkammer', nach: 'in die Vorkammer' },
                     { name: 'R\u00fcstkammer', in: 'in der R\u00fcstkammer', nach: 'in die R\u00fcstkammer' }, { name: 'Schreibstube', in: 'in der Schreibstube', nach: 'in die Schreibstube' }] },
             { id: 'labor', titel: 'Das Labor des Alchemisten',
+                grund: 'Seine Versuche wirken noch nach: Manches hier gehorcht seinen Mixturen und Kunstgriffen, wenn man das Richtige tut.',
                 intro: 'Der Alchemist ist seit Tagen verschwunden. Du wolltest nur nachsehen, da schlug die T\u00fcr zu. Du bist {in}, und irgendwo brodelt noch sein letzter Versuch.',
                 eile: 'Lange geht das nicht mehr gut.',
                 ende: 'Du bist drau\u00dfen. Hinter dir zischt es noch.',
@@ -1338,6 +1342,7 @@ var Setting = (function () {
                 raeume: [{ name: 'Labor', in: 'im Labor', nach: 'ins Labor' }, { name: 'Kr\u00e4uterkammer', in: 'in der Kr\u00e4uterkammer', nach: 'in die Kr\u00e4uterkammer' },
                     { name: 'Studierstube', in: 'in der Studierstube', nach: 'in die Studierstube' }, { name: 'Destillierkeller', in: 'im Destillierkeller', nach: 'in den Destillierkeller', unten: true }] },
             { id: 'gruft', titel: 'Die Gruft', unten: true,      // seit 2026-10-12 auch im Quaternius-Stil (Vorschlag PC 2: Steinsarg, Urnenregal, Scherben)
+                grund: 'Die Erbauer haben die Gruft gegen Grabr\u00e4uber gesichert, mit Bannen, die bis heute wirken.',
                 intro: 'Du solltest nur eine Urkunde aus der Gruft unter der Kapelle holen. Dann fiel hinter dir die Gruftt\u00fcr zu. Du bist {in}.',
                 eile: 'Hier unten bleibt dir nicht viel Zeit.',
                 ende: 'Du bist drau\u00dfen, oben in der Kapelle, und atmest durch.',
@@ -1347,6 +1352,7 @@ var Setting = (function () {
                 raeume: [{ name: 'Gruft', in: 'in der Gruft', nach: 'in die Gruft' }, { name: 'Beinhaus', in: 'im Beinhaus', nach: 'ins Beinhaus' },
                     { name: 'Vorraum', in: 'im Vorraum', nach: 'in den Vorraum' }, { name: 'Sakristeikeller', in: 'im Sakristeikeller', nach: 'in den Sakristeikeller' }] },
             { id: 'weinkeller', titel: 'Der Weinkeller', unten: true, draussen: 'feuer',      // oben brennt es: durch den Lichtschacht Feuerschein
+                grund: 'Der Kellermeister hat seine besten Vorr\u00e4te mit allerlei Kniffen vor den Knechten versteckt.',
                 intro: 'Die Burg wird belagert, oben brennt es. Du hast dich in den Keller gerettet, aber die Kellert\u00fcr hat sich hinter dir verkeilt. Du bist {in}.',
                 eile: 'Der Rauch kommt n\u00e4her.',
                 ende: 'Du bist drau\u00dfen, im Burggraben, an der frischen Luft.',
@@ -1872,6 +1878,7 @@ var Katalog = (function () {
         alternativen(KAEFIG.alt, S.kaefig.alt, 'kaefig');
         if (!S.zellen || !S.zellen.tuer) fehlt('zellen');
         else { uebernimm(ZELLEN, S.zellen, ['b', 'drin', 'zu', 'offen', 'frei'], 'zellen'); ZELLEN.tuer = S.zellen.tuer; alternativen(ZELLEN.alt, S.zellen.alt, 'zellen'); }
+        for (var zg = 0; zg < S.stories.length; zg++) if (typeof S.stories[zg].grund !== 'string') fehlt('stories[' + zg + '].grund (warum die Dinge hier so wirken)');
         for (var zs = 0; zs < S.stories.length; zs++) if (S.stories[zs].zellen && !(S.stories[zs].zellen.intro && S.stories[zs].zellen.intro.length === 2 && S.stories[zs].zellen.raum)) fehlt('stories[' + zs + '].zellen (raum, intro allein und zu mehreren)');
     }
     if (!S.spiegel || !S.spiegel.bank || !S.spiegel.bild || !S.spiegel.pfeil || S.spiegel.pfeil.length !== 2) fehlt('spiegel');
@@ -4671,7 +4678,7 @@ var Generator = (function () {
         var zellen = !!story.zellen && !this.aus.zellen && Zufall.strom(String(p.seed), 'zellen:' + p.spieler + ':' + p.stufe + ':' + p.versuch).chance(ZELLEN_ANTEIL);
         if (zellen) namen = namen.filter(function (x) { return x.name === story.zellen.raum; }).concat(namen.filter(function (x) { return x.name !== story.zellen.raum && (story.zellen.ohne || []).indexOf(x.name) < 0; }));
         p.setting = this.K.SETTING;
-        p.story = { id: story.id, titel: story.titel, intro: zellen ? story.zellen.intro[this.spieler > 1 ? 1 : 0] : story.intro, eile: story.eile || null, ende: story.ende, auf: story.ausgang.auf, verb: story.ausgang.verb };
+        p.story = { id: story.id, titel: story.titel, intro: (zellen ? story.zellen.intro[this.spieler > 1 ? 1 : 0] : story.intro) + ' ' + story.grund, eile: story.eile || null, ende: story.ende, auf: story.ausgang.auf, verb: story.ausgang.verb };
         // Ausstattung der Story (Schatzkammer: Truhen und Gold, Weinkeller: Faesser): nur, was es in diesem Stil als Modell gibt
         var deko = this.K.RAUM.deko || [], nurDa = function (l) { return (l || []).filter(function (m0) { return deko.indexOf(m0) >= 0; }); };
         if (story.ausstattung) p.story.ausstattung = { wand: nurDa(story.ausstattung.wand), tisch: nurDa(story.ausstattung.tisch),
@@ -7474,6 +7481,14 @@ var Spiel = (function () {
             if (!ansicht.frist || rest < ansicht.frist.rest) ansicht.frist = { rest: rest, gesamt: Math.round(bf.frist * SEK) };
         }
         if (s.ausserWertung) ansicht.ausserWertung = true;           // Stufe 1: Frist abgelaufen, es geht weiter ohne Wertung
+        // Finale und Ausklang (GRUNDSAETZE.md, Empfehlung 9): endspurt = an der Ausgangstuer ist nur noch ein Schloss zu
+        // (bei mindestens zwei), die Oberflaeche kuendigt den Hoehepunkt mit Licht oder Ton an; ausklang = was die Partie
+        // gebracht hat, fuer ein Schlussbild statt eines Textes
+        var tsl = (s.partie.tuer && s.partie.tuer.schloesser) || [], tzu = 0;
+        for (i = 0; i < tsl.length; i++) if (!s.f['schloss:' + tsl[i].id]) tzu++;
+        if (s.status === 'laeuft' && tsl.length >= 2 && tzu === 1) ansicht.endspurt = true;
+        if (s.status === 'gewonnen') ansicht.ausklang = { zeit: sekunden(s), schloesser: tsl.length, raeume: s.partie.raeume.length, tipps: s.tippLoesungen || 0, ausserWertung: !!s.ausserWertung,
+            gebannt: s.partie.bedrohungen.filter(function (b) { return s.f['gebannt:' + b.id]; }).length };
         // Weggestossenes in diesem Raum: wo es jetzt steht
         if (s.koerper) {
             var planS = planVon(s), gk;
