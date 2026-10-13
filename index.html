@@ -468,7 +468,7 @@ var Setting = (function () {
             wecker: { name: 'Kettenb\u00fcndel', nom: 'das Kettenb\u00fcndel', akk: 'das Kettenb\u00fcndel', b: 'Ein B\u00fcndel Eisenketten. Es rasselt bei jeder Bewegung.',
                 zweit: { name: 'lose Kette', nom: 'die lose Kette', akk: 'die lose Kette', b: 'Eine einzelne lange Eisenkette.', verb: 'Entwirren',
                     satz: 'Du entwirrst das B\u00fcndel. \u00dcbrig bleibt eine lange Kette, die nicht mehr rasselt.' } },
-            hantel: { name: 'Steingewicht', nom: 'das Steingewicht', akk: 'das Steingewicht', b: 'Ein behauener Steinquader mit eisernem Tragb\u00fcgel, sehr schwer.' },
+            hantel: { name: 'Steingewicht', nom: 'das Steingewicht', akk: 'das Steingewicht', b: 'Ein behauener Gewichtsstein mit eisernem Tragring, sehr schwer.' },
             topf: { name: 'Holzkrug', nom: 'der Holzkrug', akk: 'den Holzkrug', b: 'Ein leichter Krug aus Holz, mit Eisenreifen beschlagen.' },
             pfanne: { name: 'Gusseisenpfanne', nom: 'die Gusseisenpfanne', akk: 'die Gusseisenpfanne', b: 'Eine schwere Pfanne aus Gusseisen.' }
         },
@@ -1093,6 +1093,8 @@ var Setting = (function () {
                         wer: 'Das Gitter h\u00e4lt nur, solange jemand den Hebel unten h\u00e4lt. Einer muss bleiben. Wer, entscheidet ihr; wer sich nicht einigt, zieht Lose.',
                         los: 'Ihr zieht H\u00f6lzchen. Das kurze hat {wer}. Bleiben muss trotzdem nur, wer selbst an den Hebel geht.',
                         alt: [{ h: 2, opfer: true, text: 'einer h\u00e4lt den Hebel, die anderen gehen durch' }, { b: { reissfest: 1 }, legt: true, text: 'den Hebel mit einem Seil unten festbinden' }] },
+                    // der Kessel der Traenke ist hier der Topf des Herstellers: ohne Fuesse, dunkles Eisen, zwei Griffe (Blindtest: "Kochtopf")
+                    TRAENKE: { kessel: { b: 'Ein gro\u00dfer Kessel aus ru\u00dfschwarzem Eisen mit zwei Griffen, breit wie ein Wagenrad.' } },
                     // Ausstattung der Stories: was das Modell des Herstellers wirklich zeigt
                     AUSSTATTUNG: { weinregal: 'Weinfass', waffenstaender: 'Waffenpfeiler', moerser: 'Schale', kolben: 'Kolben', buecherbord: 'Kommode mit B\u00fcchern',
                         grabplatte: 'Grabstein', knochen: 'Gebeine', kette: 'Eisenkugel mit Kette' }
