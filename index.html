@@ -2678,7 +2678,7 @@ var Generator = (function () {
     // Raetsel, fuer die die Oberflaeche noch kein Bild hat: der Server laesst sie aus (Tests nehmen sie mit)
     // wachposten (R212, 2026-10-13): Die Oberflaeche dreht ihn noch nicht nach dem Muster und meldet kein Erwischen; bis
     // das steht, gibt es ihn in Partien mit Bild nicht (PC-Sitzung, ARBEITSTEILUNG).
-    var NOCH_OHNE_BILD = { wachposten: 1 };
+    var NOCH_OHNE_BILD = {};
     function Bau(seed, spieler, stufe, versuch, stil, bild) {
         this.aus = bild ? NOCH_OHNE_BILD : {};
         this.r = Zufall.strom(String(seed), 'partie:' + spieler + ':' + stufe + ':' + versuch);
