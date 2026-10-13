@@ -1146,7 +1146,8 @@ var Setting = (function () {
                 // ganze Textbloecke, die in diesem Stil anders lauten (werden ueber den Block des Settings gelegt)
                 block: {
                     AUSSTATTUNG: { kisten: 'Kiste', weinregal: 'Fassgestell', moerser: 'Tiegel', kolben: 'Trank', pritsche: 'Bett', saeule: 'St\u00fctzbalken',
-                        gold: 'Goldkiste', sarg: 'Steinsarg', grabplatte: 'Urnenregal', knochen: 'Scherben' },
+                        gold: 'Goldkiste', sarg: 'Steinsarg', grabplatte: 'Urnenregal', knochen: 'Scherben',
+                        barrenstapel: 'beschlagene Kisten', ruestung: 'Schild mit Axt', grabmal: 'Grabkreuz', sarg_offen: 'offener Steinsarg' },
                     // Das Paket hat weder Zahnrad noch Hebel: Am Ger\u00e4t des Schlosses (R80) sind M\u00fcnzen eingelassen, und ein Schl\u00fcssel
                     // steckt oben oder unten (client/ui.js schlossGeraet)
                     HANDBUCH: { bed: { mehr: 'mehr als {n} M\u00fcnzen eingelassen sind', weniger: 'weniger als {n} M\u00fcnzen eingelassen sind', hebel: 'der Schl\u00fcssel {stand} steckt' },
@@ -1191,7 +1192,9 @@ var Setting = (function () {
                 raum: {
                     deko: ['regal', 'fass', 'kisten', 'banner', 'stuhl', 'klangflasche',
                         'kette', 'pritsche', 'eimer', 'waffenstaender', 'muenzen', 'kelch', 'kolben', 'moerser', 'buecher', 'buecherbord', 'weinregal', 'fassstapel', 'fassturm', 'saeule',
-                        'schatztruhe', 'gold', 'sarg', 'grabplatte', 'knochen'],
+                        'schatztruhe', 'gold', 'sarg', 'grabplatte', 'knochen',
+                        // Raumfuellung je Story (2026-10-13, werkzeug/modelle/bau.js): die Stuecke des Gewoelbes, die hier fehlten
+                        'lagerfass', 'holzstoss', 'bretterstapel', 'barrenstapel', 'ruestung', 'grabmal', 'sarg_offen'],
                     geschoss: 2.5,
                     fenster: 'wand',                                     // Fenster auf Augenhoehe, wo an der Wand nichts steht (kern/raumplan.js, fenster)
                     stand: { radio: 'boden' },
@@ -1199,7 +1202,8 @@ var Setting = (function () {
                     grund: { becken: [0.875, 0.48], radio: [0.22, 0.22], holzkiste: [0.49, 0.3], wasser: [0.55, 0.31], schaukelstuhl: [0.28, 0.27], v_fass: [0.36, 0.36],
                         v_urne: [0.23, 0.23], v_schemel: [0.19, 0.19], fass: [0.36, 0.36], kisten: [0.38, 0.4], stuhl: [0.19, 0.19], tisch: [0.61, 0.25],
                         kette: [0.25, 0.21], pritsche: [0.8, 0.63], eimer: [0.22, 0.2], waffenstaender: [0.55, 0.39], buecher: [0.17, 0.14], buecherbord: [0.52, 0.15], weinregal: [0.7, 0.38], fassstapel: [0.7, 0.46], fassturm: [1.05, 0.46], saeule: [0.17, 0.19],
-                        schatztruhe: [0.5, 0.43], sarg: [1.0, 0.35], grabplatte: [0.63, 0.19], knochen: [0.32, 0.17] }
+                        schatztruhe: [0.5, 0.43], sarg: [1.0, 0.35], grabplatte: [0.63, 0.19], knochen: [0.32, 0.17],
+                        lagerfass: [0.63, 0.57], holzstoss: [0.65, 0.46], bretterstapel: [0.75, 0.25], barrenstapel: [0.55, 0.31], ruestung: [0.54, 0.23], grabmal: [0.32, 0.19], sarg_offen: [1.16, 0.58] }
                 }
             }
         },
