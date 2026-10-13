@@ -265,7 +265,8 @@ var Setting = (function () {
     var gewoelbe = {
         id: 'gewoelbe',
         name: 'Burggew\u00f6lbe',
-        hell: 'Fackeln brennen', dunkel: 'Fackeln aus',
+        // Kopfzeile: als Zustand zu lesen ("Fackeln aus" las der Blindtest auch als Aufforderung, 2026-10-13)
+        hell: 'Im Fackelschein', dunkel: 'Im Dunkeln',
         ausloeser: {
             hinsehen: 'Als du eine Weile hinsiehst:',
             wegsehen: 'Du drehst dich kurz weg. Als du wieder hinsiehst:',
@@ -283,7 +284,8 @@ var Setting = (function () {
             anzahl: 'Als ihr zu zweit davorsteht:',
             licht_nebenan: 'Nebenan wird es dunkel. Hier:',
             laerm_nebenan: 'Von nebenan dringt L\u00e4rm herein. Dabei:',
-            abwesenheit: 'Als du zur\u00fcckkommst, ist etwas anders:'
+            abwesenheit: 'Als du zur\u00fcckkommst, ist etwas anders:',
+            bekommt: 'Als du ihm etwas hinh\u00e4ltst:'
         },
         // Spur als Beobachtung (ab Stufe 2): woran man sieht, wann es geschieht; dazu je Rolle eines Elements, was davon
         // schon zu sehen ist (dritter Wert in f). Auf Stufe 1 steht die Regel w\u00f6rtlich (spur, Ausl\u00f6ser, Vorf\u00fchrung).
@@ -302,7 +304,8 @@ var Setting = (function () {
             anzahl: 'Davor sind zwei Paar Fu\u00dfabdr\u00fccke nebeneinander in den Staub gedr\u00fcckt.',
             licht_nebenan: 'Von der Mauer zum Nebenraum ziehen sich Ru\u00dfspuren her\u00fcber.',
             laerm_nebenan: 'Die Mauer zum Nebenraum hat feine Risse, als dr\u00f6hne es oft von dr\u00fcben.',
-            abwesenheit: 'Die Spuren sind frisch, doch kein Fu\u00dfabdruck f\u00fchrt hin, als sei es geschehen, w\u00e4hrend niemand da war.'
+            abwesenheit: 'Die Spuren sind frisch, doch kein Fu\u00dfabdruck f\u00fchrt hin, als sei es geschehen, w\u00e4hrend niemand da war.',
+            bekommt: 'Die Gitterst\u00e4be sind in der Mitte blank gegriffen: Durch sie ist schon manches hin und her gereicht worden.'
         },
         elemente: {
             puppe: { name: '\u00dcbungspuppe', nom: 'die \u00dcbungspuppe', akk: 'die \u00dcbungspuppe', verb: 'Ansto\u00dfen',
@@ -337,6 +340,8 @@ var Setting = (function () {
                 gegen: { zeit: ['den Abfluss freistochern', 'das Rohr zuschlagen'] },
                 bannBeob: 'Unten am Kessel gurgelt ein verstopfter Abfluss, oben rinnt das Wasser aus einem Rohr nach.',
                 bann: 'Unten am Kessel gurgelt ein verstopfter Abfluss, oben rinnt das Wasser aus einem Rohr nach. Mit etwas Langem lie\u00dfe sich der Abfluss freistochern, mit etwas Schwerem das Rohr zuschlagen.',
+                // Schoepfen (Blindtest 2026-10-12: zwoelf von zwoelf erwarten, dass man Wasser aus dem Kessel in den Schacht fuellt)
+                schoepfen: { text: 'Wasser aus dem Kessel in den Schacht sch\u00f6pfen', satz: 'Du sch\u00f6pfst Wasser aus dem Kessel in den Schacht, bis das Holzk\u00e4stchen oben am Rand treibt. Darin liegt {ziel}.' },
                 sinken: { text: 'etwas Schweres in den Schacht werfen', satz: 'Es versinkt im Schacht. Das Wasser steigt, und das Holzk\u00e4stchen treibt nach oben. Darin: {ziel}. Du nimmst es heraus.' }, f: [
                 ['bedrohung', 'Das Wasser l\u00e4uft \u00fcber den Rand und flutet den Boden.', 'Am Kessel kleben Kalkr\u00e4nder weit \u00fcber dem Rand: Er ist schon \u00f6fter \u00fcbergelaufen.'],
                 ['traeger', 'Das Wasser steigt im Schacht und hebt das schwimmende Holzk\u00e4stchen nach oben. Darin: {ziel}.', 'Im Schacht ziehen sich alte Wasserr\u00e4nder bis dicht unter den Rand.', 'Das Wasser im Schacht hebt sich ein wenig, das Holzk\u00e4stchen schaukelt und sinkt wieder.'],
@@ -450,7 +455,21 @@ var Setting = (function () {
                 ['richtung', 'Die bleiche Gestalt hebt den Arm und zeigt auf eine Stelle: {ziel}.', 'Vom Reif am Boden zieht sich eine feine Spur fort, als sei jemand immer wieder zur selben Stelle hingeschwebt.'],
                 ['zahl', 'Die bleiche Gestalt schreibt mit dem Finger Ziffern in die Luft. Sie leuchten nach.', 'Im Reif am Boden sind Ziffern zu ahnen, wie mit dem Finger gezogen und halb verwischt.'],
                 ['teil', 'Die bleiche Gestalt schreibt mit dem Finger etwas in die Luft. {teil}', 'Im Reif am Boden ist ein Zeichen zu ahnen, wie mit dem Finger gezogen.'],
-                ['keine', 'Die bleiche Gestalt ringt die H\u00e4nde und blickt ins Leere.']] }
+                ['keine', 'Die bleiche Gestalt ringt die H\u00e4nde und blickt ins Leere.']] },
+            // R215: Was er will, sagt er selbst (will); sein Satz, wenn er hilft, ist der einzige Text (Vertrag Abschnitt 6)
+            gefangener: { name: 'Gefangener', nom: 'der Gefangene', akk: 'den Gefangenen', verb: 'Hinhalten',
+                b: 'Hinter einem rostigen Gitter in der Mauer kauert ein abgemagerter Mann in Lumpen.',
+                will: {
+                    essen: { text: 'ihm etwas zu essen geben', sagt: 'Er kr\u00e4chzt: \u201eHunger. Bring mir was zu bei\u00dfen, dann sag ich dir, was ich wei\u00df.\u201c' },
+                    decke: { text: 'ihm etwas zum Zudecken geben', sagt: 'Er zittert: \u201eMir ist so kalt. Gib mir was zum Zudecken, und ich helf dir.\u201c' },
+                    klinge: { text: 'ihm eine Klinge geben', sagt: 'Er fl\u00fcstert: \u201eGib mir eine Klinge. Ich frag nicht, wozu du sie brauchst. Frag du mich auch nicht.\u201c' }
+                },
+                nimmt: 'Der Gefangene greift durchs Gitter und nimmt es.',
+                nein: 'Der Gefangene sch\u00fcttelt den Kopf.', f: [
+                ['teil', 'Er beugt sich ans Gitter und fl\u00fcstert: {teil}', 'Er murmelt vor sich hin, Ziffern und Zeichen, als kenne er ein Geheimnis dieses Raums.'],
+                ['richtung', 'Er deutet durchs Gitter auf eine Stelle: {ziel}.', 'Sein Blick wandert immer wieder zur selben Stelle im Raum.'],
+                ['zahl', 'Er z\u00e4hlt dir an den Fingern Ziffern vor.', 'An der Wand seiner Zelle sind Ziffern eingeritzt, halb verdeckt von seinem R\u00fccken.'],
+                ['traeger', 'Er schiebt dir daf\u00fcr etwas durchs Gitter: {ziel}.', 'In seiner Zelle blinkt etwas, das er hinter dem R\u00fccken versteckt.', 'Er greift hinter seinen R\u00fccken, z\u00f6gert und beh\u00e4lt es doch.']] }
         },
         gegenstaende: {
             hammer: { name: 'Schmiedehammer', nom: 'der Schmiedehammer', akk: 'den Schmiedehammer', b: 'Ein Schmiedehammer mit schwerem Eisenkopf.' },
@@ -1503,7 +1522,9 @@ var Katalog = (function () {
         licht_nebenan: { text: 'sobald es nebenan dunkel ist', bedarf: 'licht_nebenan' },
         laerm_nebenan: { text: 'bei L\u00e4rm nebenan', bedarf: 'laerm_nebenan' },
         // Wenn keiner im Raum ist (R56): alle gehen hinaus, wer zurueckkommt, sieht es; nur mit zwei Raeumen
-        abwesenheit: { text: 'wenn niemand im Raum ist', bedarf: 'abwesenheit' }
+        abwesenheit: { text: 'wenn niemand im Raum ist', bedarf: 'abwesenheit' },
+        // R215: wenn er bekommt, was er will (man reicht es ihm, er behaelt es); nur am Gefangenen
+        bekommt: { text: 'wenn er bekommt, was er will', bedarf: 'bekommt' }
     };
     // nebenan: Was im anderen Raum geschieht, wirkt hier (RAETSEL.md R82); nur in Partien mit zwei Raeumen
     // anzahl braucht zwei Spieler im Raum; der Generator nimmt den Ausloeser nur ab drei Spielern (der Pruefer belegt
@@ -1619,6 +1640,16 @@ var Katalog = (function () {
             { art: 'zahl', aus: ['licht_aus'] },
             { art: 'teil', aus: ['licht_aus'] },
             { art: 'keine', aus: ['licht_aus'] }
+        ] },
+        // R215 Der Gefangene nebenan: sitzt hinter einem Gitter in der Mauer und tauscht Wissen gegen Dinge. Was er will,
+        // sagt er selbst (will: je Wunsch die Bedingung); bekommt er es, behaelt er es und hilft. Durchs Gitter passt nur
+        // Kleines (gitter: auch als Traeger nur Kleines). Keine falsche Faehrte: Wer ihm etwas gibt, soll etwas bekommen.
+        gefangener: { figur: true, selten: 0.35, nurKlein: true, gitter: true,
+            will: { essen: { b: { lockend: 1 } }, decke: { b: { deckend: 2 } }, klinge: { b: { scharf: 1 } } }, f: [
+            { art: 'teil', aus: ['bekommt'] },
+            { art: 'richtung', aus: ['bekommt'] },
+            { art: 'zahl', aus: ['bekommt'] },
+            { art: 'traeger', aus: ['bekommt'] }
         ] }
     };
     // Werkzeug nur, was man tragen kann (Schild, Kerzen): Uebungspuppe und Kronleuchter wanderten sonst in die Tasche
@@ -1658,7 +1689,8 @@ var Katalog = (function () {
         schnur:       { e: { reissfest: 2 } },
         wecker:       { e: { laut: 2 }, zweit: { e: { reissfest: 2 } } },
         hantel:       { e: { schwer: 3, stumpf: 2, laut: 1 } },
-        topf:         { e: { laut: 1, stumpf: 1 } },
+        // schoepfend (Blindtest 2026-10-12): Der Holzkrug fasst Wasser, man schoepft damit aus dem Kessel in den Schacht
+        topf:         { e: { laut: 1, stumpf: 1, schoepfend: 1 } },
         pfanne:       { e: { schwer: 3, stumpf: 2, laut: 1 } }
     };
 
@@ -1680,7 +1712,7 @@ var Katalog = (function () {
     var EIGENSCHAFT_TEXT = {
         schwer: 'schwer', stumpf: 'stumpf', laut: 'laut', lang: 'lang', scharf: 'scharf', saeurehaltig: '\u00e4tzend',
         entzuendend: 'entz\u00fcndend', licht: 'Licht', deckend: 'deckend', saugfaehig: 'saugf\u00e4hig', spiegelnd: 'spiegelnd',
-        haken: 'Haken', reissfest: 'rei\u00dffest', schluessel: 'Schl\u00fcssel', steif: 'steif', lockend: 'lockend'
+        haken: 'Haken', reissfest: 'rei\u00dffest', schluessel: 'Schl\u00fcssel', steif: 'steif', lockend: 'lockend', schoepfend: 'sch\u00f6pfend'
     };
 
     // Verstecke. Jede Alternative ist ein Loesungsweg: b = Bedingung (Eigenschaft: Mindeststaerke), h = Haende,
@@ -1771,6 +1803,11 @@ var Katalog = (function () {
             if (!se.hell || typeof se.hell.name !== 'string' || typeof se.hell.b !== 'string') fehlt('elemente.' + k + '.hell (Name und Beschreibung im Hellen)');
             ELEMENTE[k].hell = se.hell;
         }
+        // R215: je Wunsch, was er sagt und wie man es nennt; was er sagt, wenn er etwas nimmt oder ablehnt
+        if (ELEMENTE[k].will) {
+            for (var wk in ELEMENTE[k].will) if (ELEMENTE[k].will.hasOwnProperty(wk)) uebernimm(ELEMENTE[k].will[wk], se.will && se.will[wk], ['text', 'sagt'], 'elemente.' + k + '.will.' + wk);
+            uebernimm(ELEMENTE[k], se, ['nimmt', 'nein'], 'elemente.' + k);
+        }
         if (se.bZeit) ELEMENTE[k].bZeit = se.bZeit;            // Beschreibung als Zeitgeber
         if (se.ruhig) ELEMENTE[k].ruhig = se.ruhig;            // als Zeitgeber, wenn die Frist aufgehalten ist
         if (se.flutSpurGebannt) ELEMENTE[k].flutSpurGebannt = se.flutSpurGebannt;
@@ -1795,6 +1832,7 @@ var Katalog = (function () {
         }
         if (se.flut) { if (!se.flutSpur || !se.flutGebannt) fehlt('elemente.' + k + '.flutSpur/flutGebannt'); ELEMENTE[k].flut = se.flut; ELEMENTE[k].flutSpur = se.flutSpur; ELEMENTE[k].flutGebannt = se.flutGebannt; }   // was das steigende Wasser hebt (R51)
         if (se.sinken) { if (!se.sinken.text || !se.sinken.satz) fehlt('elemente.' + k + '.sinken'); ELEMENTE[k].sinken = se.sinken; }
+        if (se.schoepfen) { if (!se.schoepfen.text || !se.schoepfen.satz) fehlt('elemente.' + k + '.schoepfen'); ELEMENTE[k].schoepfen = se.schoepfen; }   // Wasser in den Schacht schoepfen
         if (!se.f || se.f.length !== ELEMENTE[k].f.length) fehlt('elemente.' + k + '.f');
         for (i = 0; i < se.f.length; i++) {
             if (se.f[i][0] !== ELEMENTE[k].f[i].art) fehlt('elemente.' + k + '.f[' + i + '] (Art ' + ELEMENTE[k].f[i].art + ')');
@@ -2418,7 +2456,7 @@ var Pruefer = (function () {
         for (i = 0; i < (a.nimmt || []).length; i++) delete z.f[a.nimmt[i]];
         if (k.alt && k.alt.laerm) z.f['laerm:' + a.raum] = true;
         for (i = 0; i < (k.verbr || []).length; i++) z.f['weg:' + k.verbr[i]] = true;
-        if (a.verbrauchtMittel) for (i = 0; i < (k.mittel || []).length; i++) z.f['weg:' + k.mittel[i]] = true;   // verwandelt
+        if (a.verbrauchtMittel || a.gegeben) for (i = 0; i < (k.mittel || []).length; i++) z.f['weg:' + k.mittel[i]] = true;   // verwandelt oder weggegeben (R215)
         z.schritte += a.kosten || 1;
         // Steigendes Wasser (R51): erst ab der halben Frist der Flut (vorher wartet man); ohne Frist (erster Lauf) sofort
         if (a.flut && partie) {
@@ -2756,6 +2794,10 @@ var Generator = (function () {
             // Runde 3, 1320); ab Stufe 2 verraet es sich nur durch eine Spur
             this.p.start.push('kennt:' + rg.id);
             rg.enthuellung = { art: 'spur' };
+        } else if (rg.ausloeser === 'bekommt') {
+            // R215: Was er will und dass er dafuer hilft, sagt er selbst; vorfuehren laesst es sich nicht
+            this.p.start.push('kennt:' + rg.id);
+            rg.enthuellung = { art: 'spur' };
         } else if (el.vorlage === 'kerze' && rg.ausloeser === 'waerme') {
             // Kerzen, die erst die Waerme weckt, fuehren nichts vor (eine Flamme, die es noch nicht gibt); Russ und Wachs verraten es
             this.p.start.push('kennt:' + rg.id);
@@ -2832,6 +2874,19 @@ var Generator = (function () {
                     this.fixtur['stille:' + el.raum] = true;
                 }
                 return ['stille:' + el.raum];
+            case 'bekommt':
+                // R215: ein Wunsch je Gefangenem (er sagt ihn beim Ansehen); man reicht es ihm, er behaelt es (Verzweigung im Pruefer,
+                // weil das Ding danach fehlt)
+                var WL = this.K.ELEMENTE[el.vorlage].will;
+                // nichts wollen, was er selbst durchs Gitter reicht (eine Decke wollen und ein Tuch geben)
+                var gabe = this.p.regeln.filter(function (rr) { return rr.element === el.id && rr.ziel; }).map(function (rr) { return this.p.dinge[rr.ziel]; }, this)[0];
+                var wahl = sortiert(WL).filter(function (wk) { return !gabe || !gabe.e || !Object.keys(WL[wk].b).some(function (ek) { return (gabe.e[ek] || 0) >= WL[wk].b[ek]; }); });
+                if (!el.will) el.will = this.r.waehle(wahl.length ? wahl : sortiert(WL));
+                var Wn = WL[el.will], mw = this.anforderung(Wn.text, [{ text: Wn.text, b: Wn.b }]);
+                this.liefere(Wn.b, tiefe, opt);
+                var ag = this.aktion({ text: el.name + ': ' + Wn.text, art: 'benutzen', raum: el.raum, ding: el.id, mittel: mw, gibt: ['bekommt:' + el.id], schalter: true });
+                ag.gegeben = true;
+                return ['bekommt:' + el.id];
             case 'zeit':
                 this.aktion({ text: 'bei ' + el.name + ' abwarten', art: 'warten', raum: el.raum, ding: el.id, kosten: 3, gibt: ['zeit:' + el.id], sicher: true });
                 return ['zeit:' + el.id];
@@ -3227,10 +3282,11 @@ var Generator = (function () {
     // Was in ein Ding passt (Blindtest Runde 3: eine lange Spitzhacke steckte in einer Kerze und zwischen Buchseiten)
     Bau.prototype.passtHinein = function (g) {
         var K = this.K, klein = g.vorlage === 'notiz' || g.vorlage === 'plaettchen' || K.KLEIN.indexOf(g.vorlage) >= 0;
-        return function (f, key) { return f.art !== 'behaelter' || klein || !K.ELEMENTE[key].nurKlein; };
+        // durchs Gitter (R215) reicht man nur Kleines: Dort gilt es auch fuer den Traeger
+        return function (f, key) { return (f.art !== 'behaelter' && !(f.art === 'traeger' && K.ELEMENTE[key].gitter)) || klein || !K.ELEMENTE[key].nurKlein; };
     };
     Bau.prototype.lege_elementregel = function (art, g, tiefe, opt) {
-        var el = this.nimmElement(art, art === 'behaelter' ? this.passtHinein(g) : null);
+        var el = this.nimmElement(art, art === 'behaelter' || art === 'traeger' ? this.passtHinein(g) : null);
         if (!el) return false;
         var d = this.elementDing(el.key, g.raum, opt), aus = this.ausWahl(el.f);
         var rg = this.regel(d, el.f, aus, g);
@@ -3250,7 +3306,20 @@ var Generator = (function () {
             as.satz = SK.satz.replace('{ziel}', g.name);
             as.sinken = true;
         }
+        if (art === 'traeger' && aus === 'wasser') this.schoepfWeg(d, g, tiefe, opt);
         return true;
+    };
+    // Schoepfen (Blindtest der PC-Sitzung 2026-10-12): Zwoelf von zwoelf Gutachtern erwarten bei Kessel und Schacht, dass man
+    // Wasser umfuellt, damit das Kaestchen aufschwimmt ("groesster Logikbruch", wenn das nicht geht). Ein Weg mehr zum selben
+    // Ziel, mit etwas, das Wasser fasst; das Gefaess bleibt. Bannt die Flut nicht (schoepfend ist nicht stumpf genug).
+    Bau.prototype.schoepfWeg = function (d, g, tiefe, opt) {
+        var SC = this.K.ELEMENTE[d.vorlage] && this.K.ELEMENTE[d.vorlage].schoepfen;
+        if (!SC || this.aus.schoepfen || !this.r.chance(0.8)) return;
+        var ms = this.anforderung(SC.text, [{ text: SC.text, b: { schoepfend: 1 } }]);
+        if (this.zweiterWeg()) this.liefere({ schoepfend: 1 }, tiefe - 1, opt);
+        var a = this.aktion({ text: SC.text + ' (' + d.name + ')', art: 'benutzen', raum: d.raum, ding: d.id, mittel: ms, gibt: ['hat:' + g.id], schalter: true });
+        a.satz = SC.satz.replace('{ziel}', g.name);
+        a.schoepfen = true;
     };
     // Steigendes Wasser hebt (R51): Ein Kessel, der mit einer Frist ueberlaeuft (Bedrohung mit Ausloeser Zeit), hebt auf
     // halbem Weg ein Holzkaestchen im Schacht daneben in Reichweite. Wer zu frueh kommt, erreicht es nicht; wer zu lange
@@ -3274,7 +3343,9 @@ var Generator = (function () {
         var a = this.aktion({ text: g.name + ' aus dem gestiegenen Schacht nehmen', art: 'ereignis', ausloeser: 'zeit', raum: d.raum, ding: d.id, braucht: bedarf,
             kennt: [rg.id], gibt: ['hat:' + g.id], sicher: true });
         a.flut = b.id;
-        // kein Wurf in den Schacht (R68) bei der Flut: jedes schwere Ding bannt sie auch, "benutzen" am Kessel waere doppeldeutig
+        // kein Wurf in den Schacht (R68) bei der Flut: jedes schwere Ding bannt sie auch, "benutzen" am Kessel waere doppeldeutig;
+        // Schoepfen geht: Der Krug ist nicht stumpf genug, um den Abfluss freizuschlagen
+        this.schoepfWeg(d, g, tiefe, opt);
         return true;
     };
 
@@ -4708,6 +4779,10 @@ var Generator = (function () {
         var stil = this.p.stil, stories = this.K.STORIES.filter(function (x) { return !x.stile || x.stile.indexOf(stil) >= 0; });
         if (!stories.length) throw new Error('Generator: keine Story fuer den Stil ' + stil);
         var story = this.r.waehle(stories), namen = this.r.mischen(story.raeume.slice());
+        // Heisst ein Raum wie die Story ("Der Weinkeller" und "Weinkeller"), kommt er zuletzt: Beide nebeneinander im Titel
+        // "wirkt klar wie ein Fehler" (Blindtest der PC-Sitzung 2026-10-13, drei von drei). Ohne weiteren Zufall.
+        var kurz = story.titel.replace(/^(Der|Die|Das) /, '');
+        namen = namen.filter(function (x) { return x.name !== kurz; }).concat(namen.filter(function (x) { return x.name === kurz; }));
         // Kerkerzellen: eigener Zufallsstrom fuer das Ob; Raum 1 ist dann der Kerkergang, keine zweite "Zelle" als Raum
         var zellen = !!story.zellen && !this.aus.zellen && Zufall.strom(String(p.seed), 'zellen:' + p.spieler + ':' + p.stufe + ':' + p.versuch).chance(ZELLEN_ANTEIL);
         if (zellen) namen = namen.filter(function (x) { return x.name === story.zellen.raum; }).concat(namen.filter(function (x) { return x.name !== story.zellen.raum && (story.zellen.ohne || []).indexOf(x.name) < 0; }));
@@ -6293,6 +6368,7 @@ var Spiel = (function () {
             if (a.gibt[i].indexOf('offen:') === 0) t.push(tuerText(s).auf + ' Der Weg ' + raumNach(s, a.gibt[i].slice(6)) + ' ist frei.');
             if (a.gibt[i].indexOf('wasser:') === 0) t.push('Wasser l' + '\u00e4' + 'uft.');
             if (a.gibt[i].indexOf('waerme:') === 0) t.push(gross(nom(s.partie.dinge[a.ding])) + ' wird warm.');
+            if (a.gibt[i].indexOf('bekommt:') === 0) t.push(KAT.ELEMENTE[s.partie.dinge[a.ding].vorlage].nimmt);      // R215
         }
         if (g.length) t.push('Du findest: ' + g.join(', ') + '.');
         if (alt && alt.laerm) t.push('Das war laut.');
@@ -6661,6 +6737,7 @@ var Spiel = (function () {
             var rs = regelVonElement(s, d.id), EL = KAT.ELEMENTE[d.vorlage];
             t = s.f['waerme:' + d.id] && EL.bWarm ? EL.bWarm : EL.bZeit && rs.some(function (r0) { return r0.zeitgeber; }) ? EL.bZeit : EL.b;
             if (EL.hell && !figurDa(s, d, nr)) t = EL.hell.b;      // R219: wer die Gestalt nicht sieht, sieht die kalte Stelle (die Spur gilt ihr)
+            if (EL.will && d.will && !s.f['bekommt:' + d.id]) t += ' ' + EL.will[d.will].sagt;      // R215: was er will, sagt er selbst
             for (i = 0; i < rs.length; i++) {
                 // Schacht (R68): solange das Kaestchen unten treibt, sieht man es
                 if (rs[i].art === 'traeger' && KAT.ELEMENTE[d.vorlage].tief && !(rs[i].ziel && s.f['hat:' + rs[i].ziel])) t += ' ' + KAT.ELEMENTE[d.vorlage].tief;
@@ -7135,7 +7212,8 @@ var Spiel = (function () {
             case 'benutzen':
                 if (d.vorlage === 'durchreiche') { aus = aus.concat(durchreichen(s, d, b.mit, nr)); break; }
                 if (d.vorlage === 'mischkessel') { aus = aus.concat(mischen(s, d, itemsAus(s, b.mit, nr))); break; }   // R62: vor den Kruegen, Wasser gehoert nicht hinein
-                if (itemsAus(s, b.mit, nr).some(function (x) { return x.vorlage === 'krug'; })) { aus = aus.concat(kruege(s, d, itemsAus(s, b.mit, nr), nr)); break; }
+                // dem Gefangenen reicht man auch einen Krug nur hin (R215)
+                if (d.vorlage !== 'gefangener' && itemsAus(s, b.mit, nr).some(function (x) { return x.vorlage === 'krug'; })) { aus = aus.concat(kruege(s, d, itemsAus(s, b.mit, nr), nr)); break; }
                 if (d.vorlage === 'hebelpaar') { aus = aus.concat(kette(s, d, nr, itemsAus(s, b.mit, nr))); break; }
                 if (d.vorlage === 'hausordnung') { aus = aus.concat(einsetzen(s, d, nr, itemsAus(s, b.mit, nr))); break; }
                 if (d.vorlage === 'waage') { aus = aus.concat(belaste(s, d, nr, itemsAus(s, b.mit, nr))); break; }
@@ -7179,6 +7257,11 @@ var Spiel = (function () {
                     if (w.alt.legt) hinlegen(s, items, nr, d);
                     if (a.tinte) aus.push(gelesen(m(gross(nom(d)) + ': ' + d.tinte), d.tinte));    // R43: die Schrift ist zu lesen
                     // verwandelt am Element: was hineinkam, ist weg; was entsteht, traegt der Handelnde
+                    // R215: was man dem Gefangenen reicht, behaelt er (nur, was dazu beitraegt)
+                    if (a.gegeben) {
+                        var gab = items.filter(function (x) { return Object.keys(w.alt.b || {}).some(function (ek) { return (x.e[ek] || 0) > 0; }); });
+                        for (var gb = 0; gb < (gab.length ? gab : items).length; gb++) s.f['weg:' + (gab.length ? gab : items)[gb].id] = true;
+                    }
                     if (a.verbrauchtMittel) {
                         // nur, was dazu beitraegt (Sackgassen-Suchlauf 2026-10-12, Partie 904/1/2: Spitzhacke und Wurfhaken zusammen
                         // in den Schacht geworfen, beide waren weg; versinken muss nur das Schwere)
@@ -7188,6 +7271,8 @@ var Spiel = (function () {
                         s.wer[a.gibt[0].slice(4)] = nr;
                         aus[ergIdx] = a.sinken ? zeigt(m(a.satz)) : m(a.satz);        // R68: Man sieht es versinken und das Kaestchen steigen
                     }
+                    // Schoepfen: das Kaestchen treibt hoch, was darin liegt, liegt dort (man nimmt es mit F); der Krug bleibt
+                    if (a.schoepfen) aus[ergIdx] = zeigt(m(a.satz));
                     // Aufgebrauchtes (Phiole): danach leer
                     for (var vb = 0; vb < items.length; vb++) {
                         if (!items[vb].verbrauch || !w.alt.b) continue;
@@ -7199,6 +7284,8 @@ var Spiel = (function () {
                 }
                 // ein Schluessel am falschen Schloss (Tausch, R93: Eisen und Bronze)
                 if (!erfolg && items.some(function (x) { return x.vorlage === 'schluessel'; }) && l.some(function (x) { return x.art === 'schluessel'; })) { aus.push(m(KAT.SCHLUESSEL.passtNicht)); erfolg = true; }
+                // R215: Das Falsche lehnt der Gefangene ab; man sieht ihn den Kopf schuetteln (abgelehnt zaehlt fuer die Oberflaeche)
+                if (!erfolg && d.vorlage === 'gefangener' && items.length) { s.abgelehnt = s.abgelehnt || {}; s.abgelehnt[d.id] = (s.abgelehnt[d.id] || 0) + 1; aus.push(nein(m(KAT.ELEMENTE.gefangener.nein))); erfolg = true; }
                 if (!erfolg) aus.push(grund ? m(grund) : nein(m('Damit l\u00e4sst sich hier nichts anfangen.')));
                 break;
 
@@ -7419,112 +7506,124 @@ var Spiel = (function () {
         var weg = {};
         for (k in s.partie.dinge) if (s.partie.dinge.hasOwnProperty(k) && s.partie.dinge[k].werkzeugVon && s.f['hat:' + k]) weg[s.partie.dinge[k].werkzeugVon] = true;
         var keys = Object.keys(s.partie.dinge).sort(function (a, b) { return parseInt(a.slice(1), 10) - parseInt(b.slice(1), 10); });
-        for (i = 0; i < keys.length; i++) {
-            var d = s.partie.dinge[keys[i]];
-            // ohne Eigenschaften und Stufen: Spieler sollen ueberlegen, was ein Ding kann, nicht Zahlen vergleichen
-            if (d.typ === 'gegenstand' && s.f['weg:' + d.id]) continue;      // verwandelt oder aufgebraucht
-            if (d.typ === 'gegenstand' && s.f['hat:' + d.id]) {
-                // gefunden: in der eigenen Tasche, bei einem anderen (dann nur der Name, zum Absprechen) oder am Boden
-                var w0 = s.wer[d.id];
-                if (w0 === nr) {
-                    var eintragG = { id: d.id, name: gName(s, d), b: beschreibung(d, s, nr), code: !!(d.e && d.e.schluessel) };
-                    for (k = 0; k < s.partie.aktionen.length; k++) if (s.partie.aktionen[k].art === 'verwandeln' && s.partie.aktionen[k].ding === d.id) eintragG.verwandeln = s.partie.aktionen[k].verb;
-                    if (d.fetzen) eintragG.fetzen = fetzenBild(s, d, nr);                                       // als Bild: Zeichen, Ziffern (oder fremde Schrift)
-                    if (d.vorlage === 'krug') eintragG.krug = [(s.krug && s.krug[d.id]) || 0, d.fasst];       // R18: Fuellstand und Fassung in Mass
-                    inventar.push(eintragG);
+        // Die Dinge eines Raums, wie dieser Spieler sie sieht; ohne Tasche (inventar null) fuer den Raum nebenan
+        function liste(raum, inventar, tragen) {
+            var dinge = [], i, k;
+            for (i = 0; i < keys.length; i++) {
+                var d = s.partie.dinge[keys[i]];
+                // ohne Eigenschaften und Stufen: Spieler sollen ueberlegen, was ein Ding kann, nicht Zahlen vergleichen
+                if (d.typ === 'gegenstand' && s.f['weg:' + d.id]) continue;      // verwandelt oder aufgebraucht
+                if (d.typ === 'gegenstand' && s.f['hat:' + d.id]) {
+                    // gefunden: in der eigenen Tasche, bei einem anderen (dann nur der Name, zum Absprechen) oder am Boden
+                    var w0 = s.wer[d.id];
+                    if (!inventar && typeof w0 === 'number') continue;
+                    if (w0 === nr) {
+                        var eintragG = { id: d.id, name: gName(s, d), b: beschreibung(d, s, nr), code: !!(d.e && d.e.schluessel) };
+                        for (k = 0; k < s.partie.aktionen.length; k++) if (s.partie.aktionen[k].art === 'verwandeln' && s.partie.aktionen[k].ding === d.id) eintragG.verwandeln = s.partie.aktionen[k].verb;
+                        if (d.fetzen) eintragG.fetzen = fetzenBild(s, d, nr);                                       // als Bild: Zeichen, Ziffern (oder fremde Schrift)
+                        if (d.vorlage === 'krug') eintragG.krug = [(s.krug && s.krug[d.id]) || 0, d.fasst];       // R18: Fuellstand und Fassung in Mass
+                        inventar.push(eintragG);
+                    }
+                    else if (typeof w0 === 'number') { if (!tragen[w0]) tragen[w0] = []; tragen[w0].push(gName(s, d)); }
+                    else if (w0 && w0.raum === raum) {
+                        var lg = { id: d.id, name: gName(s, d), typ: d.typ, offen: false, code: false, liegt: { x: w0.x, z: w0.z } };
+                        if (w0.an) lg.liegt.an = w0.an;                  // durchgereicht: liegt vor dieser Oeffnung
+                        if (w0.legt) lg.liegt.legt = 1;                  // an das Ding gestellt, gebunden, darueber gehaengt
+                        if (w0.y) lg.liegt.y = w0.y;                     // liegt so hoch auf etwas
+                        if (d.vorlage === 'krug') lg.krug = [(s.krug && s.krug[d.id]) || 0, d.fasst];
+                        if (w0.auf) lg.liegt.auf = w0.auf;              // liegt auf einer Trittplatte (R85)
+                        dinge.push(lg);
+                    }
+                    continue;
                 }
-                else if (typeof w0 === 'number') { if (!tragen[w0]) tragen[w0] = []; tragen[w0].push(gName(s, d)); }
-                else if (w0 && w0.raum === raum) {
-                    var lg = { id: d.id, name: gName(s, d), typ: d.typ, offen: false, code: false, liegt: { x: w0.x, z: w0.z } };
-                    if (w0.an) lg.liegt.an = w0.an;                  // durchgereicht: liegt vor dieser Oeffnung
-                    if (w0.legt) lg.liegt.legt = 1;                  // an das Ding gestellt, gebunden, darueber gehaengt
-                    if (w0.y) lg.liegt.y = w0.y;                     // liegt so hoch auf etwas
-                    if (d.vorlage === 'krug') lg.krug = [(s.krug && s.krug[d.id]) || 0, d.fasst];
-                    if (w0.auf) lg.liegt.auf = w0.auf;              // liegt auf einer Trittplatte (R85)
-                    dinge.push(lg);
+                if (d.raum !== raum) continue;
+                if (d.typ === 'element' && weg[d.id]) continue;
+                if (d.typ === 'gegenstand' && !nehmbar[d.id] && !d.halter) continue;
+                // freie Verstecke: von Anfang an da und durchsuchbar (suchen), erst nach Hinweis oder Suche als Fach erkannt
+                var suchen = unentdeckt(s, d);      // Hinweis und falsche Faehrte zeigen die Stelle, erkennbar wird das Fach erst offen
+                var offen = false;
+                if (d.typ === 'schloss') offen = !!s.f['schloss:' + d.id];
+                if (d.typ === 'versteck') {
+                    for (k = 0; k < s.partie.aktionen.length; k++) {
+                        var ak = s.partie.aktionen[k];
+                        if (ak.ding === d.id && ak.art !== 'ereignis' && (ak.art !== 'durchsuchen' || d.leer) && erledigt(s, ak)) offen = true;   // Ereignis am Versteck (R24: es ist gewandert) oeffnet es nicht
+                        if (ak.art === 'mechanismus' && ak.fach === d.id && s.f['geoeffnet:' + d.id]) offen = true;     // ein Mechanismus hat es geoeffnet (vielleicht nur kurz)
+                    }
                 }
-                continue;
-            }
-            if (d.raum !== raum) continue;
-            if (d.typ === 'element' && weg[d.id]) continue;
-            if (d.typ === 'gegenstand' && !nehmbar[d.id] && !d.halter) continue;
-            // freie Verstecke: von Anfang an da und durchsuchbar (suchen), erst nach Hinweis oder Suche als Fach erkannt
-            var suchen = unentdeckt(s, d);      // Hinweis und falsche Faehrte zeigen die Stelle, erkennbar wird das Fach erst offen
-            var offen = false;
-            if (d.typ === 'schloss') offen = !!s.f['schloss:' + d.id];
-            if (d.typ === 'versteck') {
-                for (k = 0; k < s.partie.aktionen.length; k++) {
-                    var ak = s.partie.aktionen[k];
-                    if (ak.ding === d.id && ak.art !== 'ereignis' && (ak.art !== 'durchsuchen' || d.leer) && erledigt(s, ak)) offen = true;   // Ereignis am Versteck (R24: es ist gewandert) oeffnet es nicht
-                    if (ak.art === 'mechanismus' && ak.fach === d.id && s.f['geoeffnet:' + d.id]) offen = true;     // ein Mechanismus hat es geoeffnet (vielleicht nur kurz)
+                if (d.vorlage === 'zwischentuer') offen = !!s.f['offen:' + s.partie.durchgang.nach];
+                if (d.vorlage === 'kristall') offen = erledigt(s, strahlAktion(s));
+                if (d.vorlage === 'waage') offen = waageOffen(s, d);
+                if (d.vorlage === 'kaefig') offen = !!s.f.befreit;
+                if (d.vorlage === 'zellentuer') offen = !!s.f['frei:' + d.zelle];
+                if (d.vorlage === 'notschacht') offen = !!s.f['schacht:' + d.id];
+                if (d.vorlage === 'winde') offen = !!s.f.zurueck;
+                if (d.vorlage === 'spiegelbild') offen = aktionenAn(s, d.id, ['spiegeln']).some(function (a) { return erledigt(s, a); });
+                if (d.vorlage === 'waechter') offen = aktionenAn(s, d.id, ['losung']).some(function (a) { return erledigt(s, a); });   // hat seine Losung gehoert: die Ansicht zeigt ihn offen
+                var code = false, alleS = schloesserAlle(s.partie);
+                for (k = 0; k < alleS.length; k++) if (alleS[k].id === d.id && alleS[k].code) code = true;
+                if (d.vorlage === 'buecherregal') code = true;                     // R12: Buch, Seite, Zeile eingeben
+                if (d.vorlage === 'balkenwaage') code = true;                      // R4: Kugeln links und rechts eingeben
+                if (d.vorlage === 'orakel') code = true;                           // R106: Nummer der Frage
+                // R86: Wer das Klopfen nicht hoert, erkennt das Fach daran auch nicht. Fuer ihn bleibt es, was man sieht (und
+                // heisst auch so), bis es offen ist; sonst verriete der Name am Fadenkreuz, was nur das feine Ohr findet.
+                if (!suchen && d.klopft && d.verborgen && !offen && s.f['klopft:' + d.id] &&
+                    regelVonElement(s, d.id).some(function (rk) { return rk.art === 'klopfen' && !sieht(s, rk, nr); })) suchen = true;
+                var eintrag = { id: d.id, name: d.name, typ: d.typ, offen: offen, code: code };
+                if (d.halter) eintrag.halter = d.fest ? 2 : 1;              // lose Wandfackel im Halter; 2 = ein Splint klemmt sie fest
+                // offen heisst es anders: Eine offene Truhe ist keine verschlossene mehr
+                if (offen && d.typ === 'versteck' && KAT.HINDERNISSE[d.vorlage] && KAT.HINDERNISSE[d.vorlage].offen) eintrag.name = KAT.HINDERNISSE[d.vorlage].offen;
+                if (verdeckt(s, d.id)) eintrag.verdeckt = true;         // liegt unter etwas: da, aber nicht zu erreichen
+                if (hochStelle(s, d.id)) eintrag.hoch = !oben(s, d.id) ? 1 : 2;      // R71: oben auf dem Wandbord; 1 = von unten nicht zu erreichen, 2 = es steht etwas darunter
+                if (d.vorlage === 'krug') eintrag.krug = [(s.krug && s.krug[d.id]) || 0, d.fasst];
+                // Schoepfen: Wasser aus dem Kessel in den Schacht gefuellt; die Oberflaeche laesst den Kesselspiegel sinken
+                if (d.vorlage === 'becken' && aktionenAn(s, d.id, ['benutzen']).some(function (ab) { return ab.schoepfen && erledigt(s, ab); })) eintrag.geschoepft = true;
+                if (d.vorlage === 'drehspiegel') eintrag.dreh = (s.spiegel && s.spiegel[d.id]) || 0;      // R20: Vierteldrehungen seit Beginn
+                if (suchen) {
+                    eintrag.suchen = true;
+                    // solange das Fach nicht entdeckt ist, heisst es schlicht nach dem, was man sieht (ein Fass ist ein Fass)
+                    var schlicht = d.modell && KAT.SCHLICHT ? KAT.SCHLICHT[d.modell.replace(/^v_/, '')] : null;
+                    if (schlicht) eintrag.name = schlicht;
                 }
-            }
-            if (d.vorlage === 'zwischentuer') offen = !!s.f['offen:' + s.partie.durchgang.nach];
-            if (d.vorlage === 'kristall') offen = erledigt(s, strahlAktion(s));
-            if (d.vorlage === 'waage') offen = waageOffen(s, d);
-            if (d.vorlage === 'kaefig') offen = !!s.f.befreit;
-            if (d.vorlage === 'zellentuer') offen = !!s.f['frei:' + d.zelle];
-            if (d.vorlage === 'notschacht') offen = !!s.f['schacht:' + d.id];
-            if (d.vorlage === 'winde') offen = !!s.f.zurueck;
-            if (d.vorlage === 'spiegelbild') offen = aktionenAn(s, d.id, ['spiegeln']).some(function (a) { return erledigt(s, a); });
-            if (d.vorlage === 'waechter') offen = aktionenAn(s, d.id, ['losung']).some(function (a) { return erledigt(s, a); });   // hat seine Losung gehoert: die Ansicht zeigt ihn offen
-            var code = false, alleS = schloesserAlle(s.partie);
-            for (k = 0; k < alleS.length; k++) if (alleS[k].id === d.id && alleS[k].code) code = true;
-            if (d.vorlage === 'buecherregal') code = true;                     // R12: Buch, Seite, Zeile eingeben
-            if (d.vorlage === 'balkenwaage') code = true;                      // R4: Kugeln links und rechts eingeben
-            if (d.vorlage === 'orakel') code = true;                           // R106: Nummer der Frage
-            // R86: Wer das Klopfen nicht hoert, erkennt das Fach daran auch nicht. Fuer ihn bleibt es, was man sieht (und
-            // heisst auch so), bis es offen ist; sonst verriete der Name am Fadenkreuz, was nur das feine Ohr findet.
-            if (!suchen && d.klopft && d.verborgen && !offen && s.f['klopft:' + d.id] &&
-                regelVonElement(s, d.id).some(function (rk) { return rk.art === 'klopfen' && !sieht(s, rk, nr); })) suchen = true;
-            var eintrag = { id: d.id, name: d.name, typ: d.typ, offen: offen, code: code };
-            if (d.halter) eintrag.halter = d.fest ? 2 : 1;              // lose Wandfackel im Halter; 2 = ein Splint klemmt sie fest
-            // offen heisst es anders: Eine offene Truhe ist keine verschlossene mehr
-            if (offen && d.typ === 'versteck' && KAT.HINDERNISSE[d.vorlage] && KAT.HINDERNISSE[d.vorlage].offen) eintrag.name = KAT.HINDERNISSE[d.vorlage].offen;
-            if (verdeckt(s, d.id)) eintrag.verdeckt = true;         // liegt unter etwas: da, aber nicht zu erreichen
-            if (hochStelle(s, d.id)) eintrag.hoch = !oben(s, d.id) ? 1 : 2;      // R71: oben auf dem Wandbord; 1 = von unten nicht zu erreichen, 2 = es steht etwas darunter
-            if (d.vorlage === 'krug') eintrag.krug = [(s.krug && s.krug[d.id]) || 0, d.fasst];
-            if (d.vorlage === 'drehspiegel') eintrag.dreh = (s.spiegel && s.spiegel[d.id]) || 0;      // R20: Vierteldrehungen seit Beginn
-            if (suchen) {
-                eintrag.suchen = true;
-                // solange das Fach nicht entdeckt ist, heisst es schlicht nach dem, was man sieht (ein Fass ist ein Fass)
-                var schlicht = d.modell && KAT.SCHLICHT ? KAT.SCHLICHT[d.modell.replace(/^v_/, '')] : null;
-                if (schlicht) eintrag.name = schlicht;
-            }
-            if (d.verrueckt || d.klopft) eintrag.w = wirkungen(s, d, nr);       // R24: art verrueckt, an = steht am zweiten Platz; R26: art klopfen, an = es klopft
-            if (d.typ === 'element') { eintrag.w = wirkungen(s, d, nr); if (s.f['waerme:' + d.id]) eintrag.warm = true; }
-            // Figuren im Raum (Vertrag ARBEITSTEILUNG Abschnitt 6): Haltung und Sichtbarkeit; der Geist (R219) erscheint nur
-            // im Dunkeln und zeigt, sobald er sein Zeichen gegeben hat; im Hellen heisst die Stelle anders
-            if (d.typ === 'element' && KAT.ELEMENTE[d.vorlage] && KAT.ELEMENTE[d.vorlage].figur) {
-                var fda = figurDa(s, d, nr), fzeigt = fda && eintrag.w.some(function (wf) { return wf.an && wf.art !== 'keine'; });
-                eintrag.w.push({ art: 'figur', haltung: fzeigt ? 'zeigt' : 'idle', an: fda });
-                if (!fda && KAT.ELEMENTE[d.vorlage].hell) eintrag.name = KAT.ELEMENTE[d.vorlage].hell.name;
-            }
-            // Hausordnung: die drei Plaettchen, wie sie gerade auf der Tafel stehen
-            if (d.vorlage === 'hausordnung') eintrag.tafel = ordnungZeile(s, d).split(' \u00b7 ');
-            // Trittplatte (R85): wie tief sie sinkt; ich = du stehst darauf (die Oberflaeche stellt dich hin)
-            if (d.vorlage === 'waage') { eintrag.last = waageLast(s, d); if (s.steht[nr] === d.id) eintrag.ich = true; }
-            // Spiegelraeume (R88): wie die Hebel stehen (drueben gespiegelt), dort auch die Tafel
-            if (d.vorlage === 'notschacht' && s.f['eingestuerzt:' + d.id]) eintrag.eingestuerzt = true;   // R157
-            if (d.vorlage === 'spiegelbank') eintrag.hebel = hebelStand(s, d);
-            if (d.vorlage === 'pakt' && aktionenAn(s, d.id, ['pakt'])[0] && !s.f['hat:' + d.gibt]) eintrag.haelt = d.gibt;   // R152: was in der Steinhand liegt (PC-Sitzung: die Oberflaeche zeigt es dort)
-            if (d.vorlage === 'hebelreihe') eintrag.hebel = reiheStand(s, d);     // R15: '1' = unten, die Lampe ist aus
-            if (d.vorlage === 'mischkessel' && s.kessel && s.kessel[d.id]) { eintrag.farbe = s.kessel[d.id].farbe; eintrag.stoffe = s.kessel[d.id].stoffe.length; }   // R62: Farbe (Index) und Stoffe im Kessel
-            if (d.vorlage === 'balkenwaage' && s.wiegen && s.wiegen[d.id]) eintrag.wiegen = s.wiegen[d.id].letzt;   // R4: [links, rechts, -1 links sinkt / 0 / 1]
-            if (s.kreuz && s.kreuz[d.id]) eintrag.kreuz = s.kreuz[d.id].x !== null && s.kreuz[d.id].z !== null ? [s.kreuz[d.id].x, s.kreuz[d.id].z] : true;   // R41: alle sehen es, [x, z] = von dort gemalt
-            if (d.vorlage === 'spiegelbild') { eintrag.hebel = gespiegelt(hebelStand(s, s.partie.dinge[d.partner])); eintrag.ziel = d.ziel; }
-            // Inschrift: einmal lesbar gemacht, steht ihr Teil fuer alle sichtbar im Stein
-            if (d.vorlage === 'inschrift' || d.vorlage === 'gedenktafel' || d.vorlage === 'standpunkt') {
-                for (k = 0; k < s.partie.aktionen.length; k++) {
-                    var ain = s.partie.aktionen[k];
-                    if (ain.ding !== d.id || !ain.teil) continue;
-                    // die Gedenktafel ist von Anfang an lesbar (R44), die Kleckse des Standpunkts kleben von Anfang an im Raum (R22)
-                    eintrag.w = [{ art: 'teil', aus: '', gezeigt: false, an: d.vorlage !== 'inschrift' || erledigt(s, ain) }];
-                    if (eintrag.w[0].an) { eintrag.w[0].code = ain.teil.ziffern; if (ain.teil.zeichen !== null) eintrag.w[0].zeichen = KAT.ZEICHEN[ain.teil.zeichen][0]; }
+                if (d.verrueckt || d.klopft) eintrag.w = wirkungen(s, d, nr);       // R24: art verrueckt, an = steht am zweiten Platz; R26: art klopfen, an = es klopft
+                if (d.typ === 'element') { eintrag.w = wirkungen(s, d, nr); if (s.f['waerme:' + d.id]) eintrag.warm = true; }
+                // Figuren im Raum (Vertrag ARBEITSTEILUNG Abschnitt 6): Haltung und Sichtbarkeit; der Geist (R219) erscheint nur
+                // im Dunkeln und zeigt, sobald er sein Zeichen gegeben hat; im Hellen heisst die Stelle anders
+                if (d.typ === 'element' && KAT.ELEMENTE[d.vorlage] && KAT.ELEMENTE[d.vorlage].figur) {
+                    var fda = figurDa(s, d, nr), fzeigt = fda && eintrag.w.some(function (wf) { return wf.an && wf.art !== 'keine'; });
+                    // R215: Der Gefangene sitzt, bis er bekommt, was er will; dann nimmt er es (einmal) und steht am Gitter
+                    var fhalt = d.vorlage === 'gefangener' ? (s.f['bekommt:' + d.id] ? 'nimmt' : 'sitzt') : fzeigt ? 'zeigt' : 'idle';
+                    eintrag.w.push({ art: 'figur', haltung: fhalt, an: fda });
+                    if (s.abgelehnt && s.abgelehnt[d.id]) eintrag.abgelehnt = s.abgelehnt[d.id];      // jedes Mal einmal Kopfschuetteln
+                    if (!fda && KAT.ELEMENTE[d.vorlage].hell) eintrag.name = KAT.ELEMENTE[d.vorlage].hell.name;
                 }
+                // Hausordnung: die drei Plaettchen, wie sie gerade auf der Tafel stehen
+                if (d.vorlage === 'hausordnung') eintrag.tafel = ordnungZeile(s, d).split(' \u00b7 ');
+                // Trittplatte (R85): wie tief sie sinkt; ich = du stehst darauf (die Oberflaeche stellt dich hin)
+                if (d.vorlage === 'waage') { eintrag.last = waageLast(s, d); if (s.steht[nr] === d.id) eintrag.ich = true; }
+                // Spiegelraeume (R88): wie die Hebel stehen (drueben gespiegelt), dort auch die Tafel
+                if (d.vorlage === 'notschacht' && s.f['eingestuerzt:' + d.id]) eintrag.eingestuerzt = true;   // R157
+                if (d.vorlage === 'spiegelbank') eintrag.hebel = hebelStand(s, d);
+                if (d.vorlage === 'pakt' && aktionenAn(s, d.id, ['pakt'])[0] && !s.f['hat:' + d.gibt]) eintrag.haelt = d.gibt;   // R152: was in der Steinhand liegt (PC-Sitzung: die Oberflaeche zeigt es dort)
+                if (d.vorlage === 'hebelreihe') eintrag.hebel = reiheStand(s, d);     // R15: '1' = unten, die Lampe ist aus
+                if (d.vorlage === 'mischkessel' && s.kessel && s.kessel[d.id]) { eintrag.farbe = s.kessel[d.id].farbe; eintrag.stoffe = s.kessel[d.id].stoffe.length; }   // R62: Farbe (Index) und Stoffe im Kessel
+                if (d.vorlage === 'balkenwaage' && s.wiegen && s.wiegen[d.id]) eintrag.wiegen = s.wiegen[d.id].letzt;   // R4: [links, rechts, -1 links sinkt / 0 / 1]
+                if (s.kreuz && s.kreuz[d.id]) eintrag.kreuz = s.kreuz[d.id].x !== null && s.kreuz[d.id].z !== null ? [s.kreuz[d.id].x, s.kreuz[d.id].z] : true;   // R41: alle sehen es, [x, z] = von dort gemalt
+                if (d.vorlage === 'spiegelbild') { eintrag.hebel = gespiegelt(hebelStand(s, s.partie.dinge[d.partner])); eintrag.ziel = d.ziel; }
+                // Inschrift: einmal lesbar gemacht, steht ihr Teil fuer alle sichtbar im Stein
+                if (d.vorlage === 'inschrift' || d.vorlage === 'gedenktafel' || d.vorlage === 'standpunkt') {
+                    for (k = 0; k < s.partie.aktionen.length; k++) {
+                        var ain = s.partie.aktionen[k];
+                        if (ain.ding !== d.id || !ain.teil) continue;
+                        // die Gedenktafel ist von Anfang an lesbar (R44), die Kleckse des Standpunkts kleben von Anfang an im Raum (R22)
+                        eintrag.w = [{ art: 'teil', aus: '', gezeigt: false, an: d.vorlage !== 'inschrift' || erledigt(s, ain) }];
+                        if (eintrag.w[0].an) { eintrag.w[0].code = ain.teil.ziffern; if (ain.teil.zeichen !== null) eintrag.w[0].zeichen = KAT.ZEICHEN[ain.teil.zeichen][0]; }
+                    }
+                }
+                dinge.push(eintrag);
             }
-            dinge.push(eintrag);
+            return dinge;
         }
+        dinge = liste(raum, inventar, tragen);
         var raeume = [];
         for (i = 0; i < s.partie.raeume.length; i++) raeume.push({ id: s.partie.raeume[i].id, name: s.partie.raeume[i].name, hier: s.partie.raeume[i].id === raum, zu: zugangZu(s, s.partie.raeume[i].id, nr) });
         var ansicht = { raum: raum, raeume: raeume, dinge: dinge, inventar: inventar, zeit: sekunden(s), licht: !s.f['licht_aus:' + raum],
@@ -7543,6 +7642,11 @@ var Spiel = (function () {
         // Der ganze Bereich steht (Oberflaeche, 2026-10-12): Steht die Zwischentuer oder das Gitter offen? Die Oberflaeche zeigt
         // das Ding auch von der anderen Seite, wo es nicht in der Sicht steht ("zu" je Raum sagt nur, ob dieser Spieler hinueber darf).
         if (s.partie.durchgang) ansicht.gangOffen = !!s.f['offen:' + s.partie.durchgang.nach];
+        // Was drueben steht (Wunsch der Oberflaeche, 2026-10-13): die Dinge des Nebenraums mit denselben Feldern wie in dinge,
+        // solange man hinuebersieht (Tuer offen oder Fallgitter, durch dessen Staebe man immer sieht); so sieht man, was ein
+        // Mitspieler drueben veraendert, ohne hinueberzugehen
+        var dgn = s.partie.durchgang;
+        if (dgn && raum && (ansicht.gangOffen || dgn.opfer) && (raum === dgn.von || raum === dgn.nach)) ansicht.nebenan = liste(raum === dgn.von ? dgn.nach : dgn.von, null, null);
         // Licht wie Feuer (2026-10-12): welche Raeume hell sind (auch nebenan, fuer den Schein durch die Oeffnung) und wer
         // eine brennende Leuchte traegt (Laterne, Fackel, Kerzen: alles mit Licht), je Spieler die Nummer des Dings
         // Fenster oder Lichtschacht je Raum (nur Bild: Daemmerlicht zaehlt als dunkel) und was draussen leuchtet
