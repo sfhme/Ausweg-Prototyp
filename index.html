@@ -441,7 +441,16 @@ var Setting = (function () {
                 ['traeger', 'Der Kronleuchter ger\u00e4t ins Schwingen und fegt vom Sims, was oben lag: {ziel}.', 'Auf dem Sims unter dem Kronleuchter sind Schrammen, so weit schwingt er manchmal aus.', 'Der Kronleuchter schwingt bis dicht an den Sims; oben wackelt etwas, bleibt aber liegen.'],
                 ['richtung', 'Der schwingende Kronleuchter wirft einen Schatten, und der Schatten zeigt auf eine Stelle: {ziel}.', 'Unter dem Kronleuchter sind Kreidestriche am Boden, als h\u00e4tte jemand seinen Schatten nachgezogen.'],
                 ['bedrohung', 'Der Kronleuchter sackt tief und schwingt nach jedem, der darunter geht.', 'An den W\u00e4nden rund um den Kronleuchter sind tiefe Schrammen, so weit schwingt er.'],
-                ['keine', 'Der Kronleuchter knarrt und dreht sich.']] }
+                ['keine', 'Der Kronleuchter knarrt und dreht sich.']] },
+            // R219: Im Hellen ist nur die kalte Stelle da (hell), im Dunkeln steht dort die Gestalt
+            geist: { name: 'bleiche Gestalt', nom: 'die bleiche Gestalt', akk: 'die bleiche Gestalt', verb: 'Ansehen',
+                b: 'Eine bleiche Frau in einem langen Kleid, halb durchsichtig. Durch sie hindurch sieht man die Mauer.',
+                hell: { name: 'eiskalte Stelle', nom: 'die eiskalte Stelle', akk: 'die eiskalte Stelle',
+                    b: 'Hier ist es eiskalt, mitten im Raum. Auf dem Boden glitzert Reif, und der Atem steht als Wolke in der Luft.' }, f: [
+                ['richtung', 'Die bleiche Gestalt hebt den Arm und zeigt auf eine Stelle: {ziel}.', 'Vom Reif am Boden zieht sich eine feine Spur fort, als sei jemand immer wieder zur selben Stelle hingeschwebt.'],
+                ['zahl', 'Die bleiche Gestalt schreibt mit dem Finger Ziffern in die Luft. Sie leuchten nach.', 'Im Reif am Boden sind Ziffern zu ahnen, wie mit dem Finger gezogen und halb verwischt.'],
+                ['teil', 'Die bleiche Gestalt schreibt mit dem Finger etwas in die Luft. {teil}', 'Im Reif am Boden ist ein Zeichen zu ahnen, wie mit dem Finger gezogen.'],
+                ['keine', 'Die bleiche Gestalt ringt die H\u00e4nde und blickt ins Leere.']] }
         },
         gegenstaende: {
             hammer: { name: 'Schmiedehammer', nom: 'der Schmiedehammer', akk: 'den Schmiedehammer', b: 'Ein Schmiedehammer mit schwerem Eisenkopf.' },
@@ -1601,6 +1610,15 @@ var Katalog = (function () {
             { art: 'richtung', aus: ['beruehrung'] },
             { art: 'bedrohung', aus: ['naehe'] },
             { art: 'keine', aus: ['beruehrung'] }
+        ] },
+        // Figuren im Raum (RAETSEL Abschnitt M): figur = kein Modell, die Oberflaeche stellt die Figur hin
+        // (client/figuren_raum*.glb, Vertrag in ARBEITSTEILUNG Abschnitt 6); selten = nur in diesem Anteil der Partien im Angebot.
+        // R219 Der Geist: erscheint nur im Dunkeln. Was er zeigt, sieht im Mehrspiel nur, wer das Nachtauge hat (R86).
+        geist: { figur: true, selten: 0.35, f: [
+            { art: 'richtung', aus: ['licht_aus'] },
+            { art: 'zahl', aus: ['licht_aus'] },
+            { art: 'teil', aus: ['licht_aus'] },
+            { art: 'keine', aus: ['licht_aus'] }
         ] }
     };
     // Werkzeug nur, was man tragen kann (Schild, Kerzen): Uebungspuppe und Kronleuchter wanderten sonst in die Tasche
@@ -1748,6 +1766,11 @@ var Katalog = (function () {
         // bann je Ausloeser, oder ein Satz fuer alle. Eine Frist sagt dazu, wie die Partie endet (abgelaufen: verloren).
         if (se.ende) ELEMENTE[k].ende = se.ende;
         if (se.bWarm) ELEMENTE[k].bWarm = se.bWarm;            // Beschreibung, wenn es warm ist (angezuendet)
+        // Figur, die nur im Dunkeln erscheint (R219): wie die Stelle im Hellen heisst und aussieht
+        if (ELEMENTE[k].figur && ELEMENTE[k].f.every(function (f0) { return f0.aus.length === 1 && f0.aus[0] === 'licht_aus'; })) {
+            if (!se.hell || typeof se.hell.name !== 'string' || typeof se.hell.b !== 'string') fehlt('elemente.' + k + '.hell (Name und Beschreibung im Hellen)');
+            ELEMENTE[k].hell = se.hell;
+        }
         if (se.bZeit) ELEMENTE[k].bZeit = se.bZeit;            // Beschreibung als Zeitgeber
         if (se.ruhig) ELEMENTE[k].ruhig = se.ruhig;            // als Zeitgeber, wenn die Frist aufgehalten ist
         if (se.flutSpurGebannt) ELEMENTE[k].flutSpurGebannt = se.flutSpurGebannt;
@@ -2601,7 +2624,9 @@ var Generator = (function () {
             raeume: [], dinge: {}, regeln: [], bedrohungen: [], anforderungen: {}, aktionen: [], tuer: null, start: [],
             stil: stil, platz: this.K.RAUM
         };
-        this.elementeFrei = this.r.mischen(sortiert(this.K.ELEMENTE).filter(function (k) { return !bild || !NOCH_OHNE_BILD[k]; }));      // ohne Bild: vor dem Mischen weg
+        // ohne Bild: vor dem Mischen weg; Seltenes (Figuren im Raum) nur in seinem Anteil der Partien, aus eigenem Strom
+        var K0 = this.K, zs = Zufall.strom(String(seed), 'selten:' + spieler + ':' + stufe + ':' + versuch);
+        this.elementeFrei = this.r.mischen(sortiert(this.K.ELEMENTE).filter(function (k) { return (!bild || !NOCH_OHNE_BILD[k]) && (!K0.ELEMENTE[k].selten || zs.chance(K0.ELEMENTE[k].selten)); }));
         var aus0 = this.aus;
         this.gegenstaendeFrei = this.r.mischen(sortiert(this.K.GEGENSTAENDE).filter(function (k) { return !aus0[k]; }));     // ohne Bild: vor dem Mischen weg, damit der Rest gleich faellt
         this.fixtur = {};
@@ -3485,13 +3510,14 @@ var Generator = (function () {
     };
 
     Bau.prototype.lege_richtung = function (g, tiefe, opt) {
-        var el = this.nimmElement('richtung');
-        if (!el) return false;
-        var d = this.elementDing(el.key, g.raum, opt), aus = this.ausWahl(el.f);
+        // erst pruefen, ob noch ein Versteckname frei ist, dann das Element aufstellen (sonst stand es ohne Regel im Raum)
         var namen = [], i;
         var VERSTECKNAMEN = this.K.VERSTECKE;
         for (i = 0; i < VERSTECKNAMEN.length; i++) if (!this.fixtur['name:' + VERSTECKNAMEN[i][0]]) namen.push(VERSTECKNAMEN[i]);
         if (!namen.length) return false;
+        var el = this.nimmElement('richtung');
+        if (!el) return false;
+        var d = this.elementDing(el.key, g.raum, opt), aus = this.ausWahl(el.f);
         var vname = this.r.waehle(namen);
         this.fixtur['name:' + vname[0]] = true;
         var v = this.ding('versteck', vname[0], g.raum, { verborgen: true, nom: vname[1], akk: vname[2], modell: 'v_' + vname[3] });
@@ -5588,6 +5614,13 @@ var Spiel = (function () {
         return rg.privat ? erbe(s, rg.privat) : null;
     }
     function sieht(s, rg, nr) { var p = privatFuer(s, rg); return !p || p === nr; }
+    // Figur, die nur im Dunkeln erscheint (R219, KAT.ELEMENTE[..].hell): Spieler nr sieht sie, wenn es im Raum dunkel ist
+    // und ihr Hinweis ihm gilt (im Mehrspiel oft nur dem Nachtauge, R86). Sonst ist dort nur die kalte Stelle.
+    function figurDa(s, d, nr) {
+        if (!KAT.ELEMENTE[d.vorlage] || !KAT.ELEMENTE[d.vorlage].hell) return true;
+        if (!s.f['licht_aus:' + d.raum]) return false;
+        return regelVonElement(s, d.id).every(function (rg) { return sieht(s, rg, nr); });
+    }
     function meineGaben(s, nr) {
         var l = [], i;
         for (i = 0; i < KAT.GABEN_REIHE.length; i++) if (gabeVon(s, KAT.GABEN_REIHE[i]) === nr) l.push(KAT.GABEN_REIHE[i]);
@@ -6627,6 +6660,7 @@ var Spiel = (function () {
         if (d.typ === 'element') {
             var rs = regelVonElement(s, d.id), EL = KAT.ELEMENTE[d.vorlage];
             t = s.f['waerme:' + d.id] && EL.bWarm ? EL.bWarm : EL.bZeit && rs.some(function (r0) { return r0.zeitgeber; }) ? EL.bZeit : EL.b;
+            if (EL.hell && !figurDa(s, d, nr)) t = EL.hell.b;      // R219: wer die Gestalt nicht sieht, sieht die kalte Stelle (die Spur gilt ihr)
             for (i = 0; i < rs.length; i++) {
                 // Schacht (R68): solange das Kaestchen unten treibt, sieht man es
                 if (rs[i].art === 'traeger' && KAT.ELEMENTE[d.vorlage].tief && !(rs[i].ziel && s.f['hat:' + rs[i].ziel])) t += ' ' + KAT.ELEMENTE[d.vorlage].tief;
@@ -7459,6 +7493,13 @@ var Spiel = (function () {
             }
             if (d.verrueckt || d.klopft) eintrag.w = wirkungen(s, d, nr);       // R24: art verrueckt, an = steht am zweiten Platz; R26: art klopfen, an = es klopft
             if (d.typ === 'element') { eintrag.w = wirkungen(s, d, nr); if (s.f['waerme:' + d.id]) eintrag.warm = true; }
+            // Figuren im Raum (Vertrag ARBEITSTEILUNG Abschnitt 6): Haltung und Sichtbarkeit; der Geist (R219) erscheint nur
+            // im Dunkeln und zeigt, sobald er sein Zeichen gegeben hat; im Hellen heisst die Stelle anders
+            if (d.typ === 'element' && KAT.ELEMENTE[d.vorlage] && KAT.ELEMENTE[d.vorlage].figur) {
+                var fda = figurDa(s, d, nr), fzeigt = fda && eintrag.w.some(function (wf) { return wf.an && wf.art !== 'keine'; });
+                eintrag.w.push({ art: 'figur', haltung: fzeigt ? 'zeigt' : 'idle', an: fda });
+                if (!fda && KAT.ELEMENTE[d.vorlage].hell) eintrag.name = KAT.ELEMENTE[d.vorlage].hell.name;
+            }
             // Hausordnung: die drei Plaettchen, wie sie gerade auf der Tafel stehen
             if (d.vorlage === 'hausordnung') eintrag.tafel = ordnungZeile(s, d).split(' \u00b7 ');
             // Trittplatte (R85): wie tief sie sinkt; ich = du stehst darauf (die Oberflaeche stellt dich hin)
