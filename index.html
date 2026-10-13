@@ -337,6 +337,9 @@ var Setting = (function () {
                 flutSpur: 'An der Schachtwand ziehen sich Wasserr\u00e4nder bis zum Rand hinauf: Steigt der Kessel, steigt auch das Wasser im Schacht.',
                 // Frist (Bedrohung mit Zeit): woran man sieht, wie man sie aufhaelt (Gegenmittel lang oder stumpf); steht beim Ansehen und an der Sperre
                 ende: 'Das Wasser steht dir bis zur Brust und steigt weiter. Aus diesem Raum kommst du nicht mehr hinaus.',
+                // R72: die Folge, bevor es zu Ende ist
+                folgen: { text: 'Der Kessel l\u00e4uft \u00fcber. Kn\u00f6cheltief steht das Wasser im Raum, was am Boden lag, weicht auf, und die Bodenverstecke stehen unter Wasser. Noch kommst du hinaus, aber nicht mehr lange.',
+                    sperre: 'Das steht jetzt unter Wasser. Da kommst du nicht mehr heran.' },
                 gegen: { zeit: ['den Abfluss freistochern', 'das Rohr zuschlagen'] },
                 bannBeob: 'Unten am Kessel gurgelt ein verstopfter Abfluss, oben rinnt das Wasser aus einem Rohr nach.',
                 bann: 'Unten am Kessel gurgelt ein verstopfter Abfluss, oben rinnt das Wasser aus einem Rohr nach. Mit etwas Langem lie\u00dfe sich der Abfluss freistochern, mit etwas Schwerem das Rohr zuschlagen.',
@@ -361,6 +364,8 @@ var Setting = (function () {
             standuhr: { name: 'R\u00e4derwerk', nom: 'das R\u00e4derwerk', akk: 'das R\u00e4derwerk', verb: 'Anhalten',
                 b: 'Ein Haufen eiserner Zahnr\u00e4der am Boden, ineinander verhakt. Trotzdem greifen sie, drehen sich und ticken.',
                 ende: 'Die Decke ist so tief gesunken, dass du nur noch kriechen kannst. Aus diesem Raum kommst du nicht mehr hinaus.',
+                folgen: { text: 'Mit einem Ruck sinkt die Decke ein ganzes St\u00fcck. Was oben auf dem Bord stand, ist zerdr\u00fcckt. Noch kommst du hinaus, aber nicht mehr lange.',
+                    sperre: 'Da ist nichts mehr, die Decke hat es zerdr\u00fcckt.' },
                 gegen: { zeit: ['etwas Langes zwischen die R\u00e4der klemmen', 'die Achse mit einem schweren Schlag verklemmen'] },
                 bannBeob: 'Zwischen zwei gro\u00dfen Zahnr\u00e4dern klafft eine L\u00fccke, und die Achse in der Mitte wackelt bei jedem Schlag.',
                 bann: 'Zwischen zwei gro\u00dfen Zahnr\u00e4dern ist eine L\u00fccke, in die etwas Langes passen w\u00fcrde. Und die Achse in der Mitte sieht aus, als lie\u00dfe sie sich mit einem schweren Schlag verklemmen.', f: [
@@ -753,6 +758,10 @@ var Setting = (function () {
                 S: ['Sieglinde', 'Siegfried'], T: ['Theodor', 'Thea'], U: ['Ulrich', 'Ute'], W: ['Walther', 'Wilhelmine'], Z: ['Zacharias', 'Zita'] }
         },
         // Losung (R104): wer sie im Raum in den Chat schreibt, dem gibt das W\u00e4chterbild frei, was es verbirgt
+        // R212 Der Wachposten: steht mit dem Ruecken zum Raum neben dem, was er bewacht (Figur nur bei KayKit)
+        wachposten: { name: 'Wachposten', nom: 'der Wachposten', akk: 'den Wachposten',
+            b: 'Ein Skelettkrieger in rostiger R\u00fcstung steht mit dem R\u00fccken zum Raum und h\u00e4lt Wache. Immer wieder rasselt seine R\u00fcstung, dann dreht er sich um und sieht in den Raum.',
+            erwischt: 'Der Wachposten f\u00e4hrt herum und zeigt auf dich. Zur\u00fcck zum Eingang!' },
         wache: {
             bild: { name: 'leeres Bildnis des Burgvogts', nom: 'das leere Bildnis des Burgvogts', akk: 'das leere Bildnis des Burgvogts', schrift: 'Wer die Losung nennt, dem \u00f6ffne ich.',
                 b: 'Ein schwerer Rahmen, die Leinwand darin ist leer, als w\u00e4re der Burgvogt herausgestiegen. Trotzdem f\u00fchlst du dich gemustert. Unter dem Rahmen steht: Wer die Losung nennt, dem \u00f6ffne ich.',
@@ -1151,7 +1160,7 @@ var Setting = (function () {
             quaternius: {
                 name: 'Quaternius',
                 ohne: ['standuhr', 'spiegel', 'gemaelde', 'bodenschacht', 'schrank_oben', 'hammer', 'schere', 'feuerzeug',
-                    'besen', 'angel', 'v_balken', 'v_wappen'],
+                    'besen', 'angel', 'v_balken', 'v_wappen', 'wachposten'],
                 anders: {
                     radio: { b: 'Ein aufgeschlagenes Buch auf einem Lesepult. Die Seiten rascheln, als atme es, und manchmal fl\u00fcstert es.' },
                     messer: { name: 'Messer', nom: 'das Messer', akk: 'das Messer', b: 'Ein Messer mit frisch geschliffener Klinge.' },
@@ -1544,7 +1553,8 @@ var Katalog = (function () {
             { art: 'teil', aus: ['licht_aus', 'licht_an'] },
             { art: 'zeitgeber', aus: ['zeit'] }
         ] },
-        becken: { gegen: { zeit: { alt: [{ b: { lang: 2, steif: 1 } }, { b: { stumpf: 2 }, laerm: true }] } }, f: [
+        // folgen (R72): was geschieht, wenn seine Frist ablaeuft, bevor die Partie endet (wasser, decke)
+        becken: { folgen: 'wasser', gegen: { zeit: { alt: [{ b: { lang: 2, steif: 1 } }, { b: { stumpf: 2 }, laerm: true }] } }, f: [
             { art: 'bedrohung', aus: ['zeit'] },
             { art: 'traeger', aus: ['wasser'] },
             { art: 'zahl', aus: ['wasser'] },
@@ -1562,7 +1572,7 @@ var Katalog = (function () {
             { art: 'melodie', aus: ['beruehrung', 'zeit', 'stille'] }       // R27: spielt die Folge fuer die Klangstaebe am Schloss
         ] },
         // Frist: der lange Stab bleibt zwischen den Raedern stecken; am Kessel stochert man nur oder schlaegt zu
-        standuhr: { gegen: { zeit: { alt: [{ b: { lang: 2, steif: 1 }, legt: true }, { b: { stumpf: 2 }, laerm: true }] } }, f: [
+        standuhr: { folgen: 'decke', gegen: { zeit: { alt: [{ b: { lang: 2, steif: 1 }, legt: true }, { b: { stumpf: 2 }, laerm: true }] } }, f: [
             { art: 'zahl', aus: ['zeit', 'beruehrung', 'stille'], takt: true },
             { art: 'behaelter', aus: ['zeit'] },
             { art: 'richtung', aus: ['beruehrung'] },
@@ -1751,6 +1761,10 @@ var Katalog = (function () {
     var KAEFIG = { alt: [{ b: { lang: 2, steif: 1 } }, { b: { saeurehaltig: 1 } }, { b: { stumpf: 2 }, laerm: true }] };
     // Kerkerzellen (2026-10-12): wie eine Zellentuer aufgeht, von innen durch die Staebe oder von aussen
     var ZELLEN = { alt: [{ b: { scharf: 1 } }, { b: { lang: 2, steif: 1 } }, { b: { stumpf: 2 }, laerm: true }] };
+    // R212 Der Wachposten (Sekunden): Ruhe zwischen ruhe[0] und ruhe[1] (auf Stufe 1 vier mehr), dann rasselt er warnen lang
+    // und sieht schauen lang hin; zyklen solche Runden, dann von vorn. Laerm im Raum lenkt ihn ablenken lang ab. Erwischt:
+    // strafe Sekunden; jeder Handgriff am bewachten Versteck kostet im Pruefer kosten Einheiten mehr (man wartet ab).
+    var WACHPOSTEN_MASS = { ruhe: [7, 14], warnen: 1.5, schauen: 3, ablenken: 10, strafe: 10, kosten: 2, zyklen: 6, stufe1: 4 };
 
     // Gegenmittel je Ausloeser einer Bedrohung. beobachter = ein freier Spieler haelt sie in Schach (wegsehen).
     // null bei laerm: Laerm-Bedrohungen werden nicht gebannt, man muss leise Wege nehmen.
@@ -1808,6 +1822,8 @@ var Katalog = (function () {
             for (var wk in ELEMENTE[k].will) if (ELEMENTE[k].will.hasOwnProperty(wk)) uebernimm(ELEMENTE[k].will[wk], se.will && se.will[wk], ['text', 'sagt'], 'elemente.' + k + '.will.' + wk);
             uebernimm(ELEMENTE[k], se, ['nimmt', 'nein'], 'elemente.' + k);
         }
+        // R72: Satz zur Folge einer abgelaufenen Frist und, was man an einem gefluteten Ding hoert
+        if (ELEMENTE[k].folgen) { uebernimm(ELEMENTE[k], { folgenText: se.folgen && se.folgen.text, folgenSperre: se.folgen && se.folgen.sperre }, ['folgenText', 'folgenSperre'], 'elemente.' + k + '.folgen'); }
         if (se.bZeit) ELEMENTE[k].bZeit = se.bZeit;            // Beschreibung als Zeitgeber
         if (se.ruhig) ELEMENTE[k].ruhig = se.ruhig;            // als Zeitgeber, wenn die Frist aufgehalten ist
         if (se.flutSpurGebannt) ELEMENTE[k].flutSpurGebannt = se.flutSpurGebannt;
@@ -2037,7 +2053,7 @@ var Katalog = (function () {
         version: 3, SETTING: S.id, ARTEN: ARTEN, AUSLOESER: AUSLOESER, ELEMENTE: ELEMENTE, GEGENSTAENDE: GEGENSTAENDE,
         EIGENSCHAFT_TEXT: EIGENSCHAFT_TEXT, ZU_WENIG: S.zuWenig, HINDERNISSE: HINDERNISSE, SCHLOESSER: SCHLOESSER, GEGENMITTEL: GEGENMITTEL,
         VERSTECKE: S.verstecke, VERSTECK_ANZEICHEN: S.versteckAnzeichen || {}, MECHANISMEN: S.mechanismen || {}, MECHANIK: S.mechanik || null, SCHLICHT: S.schlicht, AUSSTATTUNG: S.ausstattung, LICHT: S.licht, DUNKEL_START: S.dunkelStart, WASSER: WASSER, SCHLUESSEL: S.schluessel, NOTIZ: S.notiz, STORIES: S.stories, TIPP: S.tipp, FRIST_WEICH: S.fristWeich, WEG_SATZ: S.wegSatz || {}, SEK_JE_EINHEIT: SEK_JE_EINHEIT,
-        VERWANDLUNGEN: S.verwandlungen, ZAEHL: S.zaehl, LOGIK: S.logik, LUEGNER: S.luegner, HANDBUCH: S.handbuch, REGAL: S.regal, ZIFFER_JE_KOPF: S.zifferJeKopf, KLEIN: KLEIN, BEWEGLICH: BEWEGLICH, VERRUECKT: S.verrueckt, KLANG: S.klang, KLOPF_AUS: KLOPF_AUS, STAEBE: STAEBE, DURCHREICHE: S.durchreiche, HAUSORDNUNG: S.hausordnung, GEDENKTAFEL: S.gedenktafel, STANDPUNKT: S.standpunkt, STRAHL: S.strahl, WORT: WORT, WACHE: S.wache, KRUEGE: S.kruege, KERBSTEIN: S.kerbstein, BALKENWAAGE: S.balkenwaage, KAEFIG: KAEFIG, ZELLEN: ZELLEN, PAKT: S.pakt, KREIDE: S.kreide, HOCH: S.hoch, NOTSCHACHT: NOTSCHACHT, SPIEGEL: S.spiegel, HEBELREIHE: S.hebelreihe, ORAKEL: S.orakel, NOTIZEN: S.notizen, TRAENKE: S.traenke, BAUEN: BAUEN, BAUEN_TEXT: S.bauen, GABEN: S.gaben, GABEN_REIHE: ['nachtauge', 'gehoer', 'schrift'], WAAGE: S.waage, WAAGE_SCHWER: WAAGE_SCHWER, FALLGITTER: FALLGITTER_K, ZEICHEN: S.zeichen, FETZEN: S.fetzen, TINTE: TINTE_K, UHR: S.uhr, ZWISCHENTUER: S.zwischentuer, TAFEL: S.tafel, INSCHRIFT: INSCHRIFT_K,
+        VERWANDLUNGEN: S.verwandlungen, ZAEHL: S.zaehl, LOGIK: S.logik, LUEGNER: S.luegner, HANDBUCH: S.handbuch, REGAL: S.regal, ZIFFER_JE_KOPF: S.zifferJeKopf, KLEIN: KLEIN, BEWEGLICH: BEWEGLICH, VERRUECKT: S.verrueckt, KLANG: S.klang, KLOPF_AUS: KLOPF_AUS, STAEBE: STAEBE, DURCHREICHE: S.durchreiche, HAUSORDNUNG: S.hausordnung, GEDENKTAFEL: S.gedenktafel, STANDPUNKT: S.standpunkt, STRAHL: S.strahl, WORT: WORT, WACHE: S.wache, WACHPOSTEN: S.wachposten || null, WACHPOSTEN_MASS: WACHPOSTEN_MASS, KRUEGE: S.kruege, KERBSTEIN: S.kerbstein, BALKENWAAGE: S.balkenwaage, KAEFIG: KAEFIG, ZELLEN: ZELLEN, PAKT: S.pakt, KREIDE: S.kreide, HOCH: S.hoch, NOTSCHACHT: NOTSCHACHT, SPIEGEL: S.spiegel, HEBELREIHE: S.hebelreihe, ORAKEL: S.orakel, NOTIZEN: S.notizen, TRAENKE: S.traenke, BAUEN: BAUEN, BAUEN_TEXT: S.bauen, GABEN: S.gaben, GABEN_REIHE: ['nachtauge', 'gehoer', 'schrift'], WAAGE: S.waage, WAAGE_SCHWER: WAAGE_SCHWER, FALLGITTER: FALLGITTER_K, ZEICHEN: S.zeichen, FETZEN: S.fetzen, TINTE: TINTE_K, UHR: S.uhr, ZWISCHENTUER: S.zwischentuer, TAFEL: S.tafel, INSCHRIFT: INSCHRIFT_K,
         SCHLOSSTEXT: S.schlosstext, VORBEI: S.vorbei, SPUR: S.spur, HAENDE: S.haende, ZWEITFACH: S.zweitfach, RUHIG: S.ruhig,
         FACH: { klemmt: S.fach.klemmt, hohl: S.fach.hohl, alt: [{ b: { lang: 2, schwer: 2 }, text: S.fach.alt[0] }, { b: { stumpf: 2 }, laerm: true, text: S.fach.alt[1] }, { b: { scharf: 2 }, text: S.fach.alt[2] }] },
         HELL: S.hell, DUNKEL: S.dunkel
@@ -2131,6 +2147,8 @@ var Katalog = (function () {
         }
         // Pakt der Hand (R152): Ein Stil ohne Hand-Modell bietet ihn nicht an (PC-Sitzung, 2026-10-11)
         if ((st.ohne || []).indexOf('pakt') >= 0) K.PAKT = null;
+        // Wachposten (R212): nur, wo es die Figur gibt
+        if ((st.ohne || []).indexOf('wachposten') >= 0) K.WACHPOSTEN = null;
         var bleiben = [];
         for (i = 0; i < K.VERSTECKE.length; i++) if ((st.ohne || []).indexOf('v_' + K.VERSTECKE[i][3]) < 0) bleiben.push(K.VERSTECKE[i]);
         K.VERSTECKE = bleiben;
@@ -2649,7 +2667,9 @@ var Generator = (function () {
     // opt.bild (Server, Spielseite, Probeseite) kommen sie in keiner Partie vor; ohne (Tests, zeige.js) in jeder. Die
     // PC-Sitzung streicht hier einen Eintrag, sobald das Raetsel Modelle und ein Bild hat (ARBEITSTEILUNG.md 3.1f).
     // Raetsel, fuer die die Oberflaeche noch kein Bild hat: der Server laesst sie aus (Tests nehmen sie mit)
-    var NOCH_OHNE_BILD = {};
+    // wachposten (R212, 2026-10-13): Die Oberflaeche dreht ihn noch nicht nach dem Muster und meldet kein Erwischen; bis
+    // das steht, gibt es ihn in Partien mit Bild nicht (PC-Sitzung, ARBEITSTEILUNG).
+    var NOCH_OHNE_BILD = { wachposten: 1 };
     function Bau(seed, spieler, stufe, versuch, stil, bild) {
         this.aus = bild ? NOCH_OHNE_BILD : {};
         this.r = Zufall.strom(String(seed), 'partie:' + spieler + ':' + stufe + ':' + versuch);
@@ -2880,8 +2900,10 @@ var Generator = (function () {
                 var WL = this.K.ELEMENTE[el.vorlage].will;
                 // nichts wollen, was er selbst durchs Gitter reicht (eine Decke wollen und ein Tuch geben)
                 var gabe = this.p.regeln.filter(function (rr) { return rr.element === el.id && rr.ziel; }).map(function (rr) { return this.p.dinge[rr.ziel]; }, this)[0];
-                var wahl = sortiert(WL).filter(function (wk) { return !gabe || !gabe.e || !Object.keys(WL[wk].b).some(function (ek) { return (gabe.e[ek] || 0) >= WL[wk].b[ek]; }); });
-                if (!el.will) el.will = this.r.waehle(wahl.length ? wahl : sortiert(WL));
+                // und nur, was es in diesem Stil gibt (KayKit hat keinen Fisch, also nichts zu essen)
+                var GG = this.K.GEGENSTAENDE, gibt = function (wk) { return Object.keys(GG).some(function (gk) { return Object.keys(WL[wk].b).every(function (ek) { return (GG[gk].e[ek] || 0) >= WL[wk].b[ek]; }); }); };
+                var wahl = sortiert(WL).filter(function (wk) { return gibt(wk) && (!gabe || !gabe.e || !Object.keys(WL[wk].b).some(function (ek) { return (gabe.e[ek] || 0) >= WL[wk].b[ek]; })); });
+                if (!el.will) el.will = this.r.waehle(wahl.length ? wahl : sortiert(WL).filter(gibt));
                 var Wn = WL[el.will], mw = this.anforderung(Wn.text, [{ text: Wn.text, b: Wn.b }]);
                 this.liefere(Wn.b, tiefe, opt);
                 var ag = this.aktion({ text: el.name + ': ' + Wn.text, art: 'benutzen', raum: el.raum, ding: el.id, mittel: mw, gibt: ['bekommt:' + el.id], schalter: true });
@@ -3089,7 +3111,7 @@ var Generator = (function () {
         g.raum = g.raum || this.raum();
         g.zone = this.zoneFuer(g.raum, opt);
         var arten = tiefe <= 0 ? ['frei'] : this.r.mischen(['frei', 'hindernis', 'hindernis', 'hindernis', 'behaelter', 'behaelter',
-            'traeger', 'richtung', 'richtung', 'zweitfach', 'luegner', 'hausordnung', 'verrueckt', 'klopfen', 'losung', 'kruege', 'strahl', 'flut', 'spiegel', 'hebelreihe', 'traenke', 'notizen', 'orakel', 'mechanismus']);
+            'traeger', 'richtung', 'richtung', 'zweitfach', 'luegner', 'hausordnung', 'verrueckt', 'klopfen', 'losung', 'kruege', 'strahl', 'flut', 'spiegel', 'hebelreihe', 'traenke', 'notizen', 'orakel', 'mechanismus', 'wache']);
         var i;
         if (tiefe > 0 && arten[0] === 'frei' && this.r.chance(0.6)) arten.push(arten.shift());
         for (i = 0; i < arten.length; i++) {
@@ -3202,6 +3224,27 @@ var Generator = (function () {
         g.lage = v.name;
         g.raum = v.raum;
         this.aktion({ text: v.name + ' \u00f6ffnen', art: 'benutzen', raum: v.raum, ding: v.id, mittel: m, gibt: ['hat:' + g.id] });
+        return true;
+    };
+
+    // R212 Der Wachposten: Der Gegenstand liegt in einem Versteck, neben dem ein Wachposten steht, mit dem Ruecken zum Raum.
+    // In wechselnden Abstaenden rasselt er kurz und dreht sich um; wer am Versteck hantiert, waehrend er hinsieht, muss
+    // zurueck zum Eingang. Laerm lenkt ihn ab (zu viert: einer macht Laerm, die anderen huschen). Nur, wo es die Figur gibt,
+    // einmal je Partie, nicht im Bereich einer Bedrohung. Der Pruefer rechnet das Abpassen als Zeitkosten.
+    Bau.prototype.lege_wache = function (g, tiefe, opt) {
+        var W = this.K.WACHPOSTEN, M = this.K.WACHPOSTEN_MASS, i, vor = this.p.aktionen.length, v = null;
+        if (!W || this.aus.wachposten || tiefe < 1 || this.fixtur.wache || g.zone || !this.r.chance(0.3)) return false;
+        if (!this.lege_hindernis(g, tiefe, opt)) return false;
+        for (i = vor; i < this.p.aktionen.length; i++) if (this.p.aktionen[i].gibt.indexOf('hat:' + g.id) >= 0) v = this.p.dinge[this.p.aktionen[i].ding];
+        if (!v) return true;
+        this.fixtur.wache = true;
+        var muster = [], mehr = this.p.stufe === 1 ? M.stufe1 : 0;
+        for (i = 0; i < M.zyklen; i++) muster.push([M.ruhe[0] + this.r.bis(M.ruhe[1] - M.ruhe[0] + 1) + mehr, M.warnen, M.schauen]);
+        var w = this.ding('fixtur', W.name, v.raum, { vorlage: 'wachposten', nom: W.nom, akk: W.akk, bewacht: v.id, muster: muster });
+        w.zone = false;
+        v.bewacht = w.id;
+        for (i = vor; i < this.p.aktionen.length; i++) if (this.p.aktionen[i].ding === v.id) { this.p.aktionen[i].kosten = (this.p.aktionen[i].kosten || 1) + M.kosten; this.p.aktionen[i].bewacht = w.id; }
+        g.lage += ', bewacht vom ' + W.name;
         return true;
     };
 
@@ -5036,6 +5079,36 @@ var Generator = (function () {
         return p;
     };
 
+    // R72 Folgen einer Frist (Entscheidung des Projektinhabers 2026-10-12: "B und A"): Laeuft eine Frist ab, kommt zuerst die
+    // Folge, die zur Geschichte passt, und erst nach (Einheiten) spaeter das Ende. Steigt das Wasser, fluten die Bodenverstecke
+    // des Raums, und Papier und Zunder, die dort offen liegen, weichen auf; sinkt die Decke, zerdrueckt sie, was oben auf dem
+    // Bord steht (R71). Treffen darf die Folge nur, ohne das die Partie loesbar bleibt (auch mit einem weniger): der Reihe nach
+    // geprueft, was zusammen noch geht, bleibt drin. Getroffen ist nur, was bis dahin niemand hatte oder geoeffnet hat.
+    var FOLGEN_NACH = 0.3, FOLGEN_MIN = 3, BODENVERSTECK = { diele: 1, bodenschacht: 1 };
+    function ohneDinge(p, spieler, ids) {
+        var q = JSON.parse(JSON.stringify(p)), weg = {}, i;
+        for (i = 0; i < ids.length; i++) weg[ids[i]] = true;
+        q.aktionen = q.aktionen.filter(function (x) { return !weg[x.ding] && !x.gibt.some(function (f) { return f.indexOf('hat:') === 0 && weg[f.slice(4)]; }); });
+        return Pruefer.pruefe(q, spieler).loesbar && (spieler < 2 || Pruefer.pruefe(q, spieler - 1).loesbar);
+    }
+    function legeFolgen(p, spieler, K) {
+        var i, j;
+        for (i = 0; i < p.bedrohungen.length; i++) {
+            var b = p.bedrohungen[i], el = p.dinge[b.element], art = el && K.ELEMENTE[el.vorlage] ? K.ELEMENTE[el.vorlage].folgen : null;
+            if (b.ausloeser !== 'zeit' || !b.frist || !art) continue;
+            var kand = sortiert(p.dinge).filter(function (k) {
+                var d = p.dinge[k];
+                if (d.raum !== b.raum) return false;
+                if (art === 'decke') return p.hoch === k;
+                return (d.typ === 'versteck' && BODENVERSTECK[d.vorlage]) ||
+                    (d.typ === 'gegenstand' && (d.vorlage === 'notiz' || d.vorlage === 'streichhoelzer' || d.fetzen) && p.aktionen.some(function (x) { return x.art === 'nehmen' && x.ding === k; }));
+            });
+            var treffen = [];
+            for (j = 0; j < kand.length; j++) if (ohneDinge(p, spieler, treffen.concat([kand[j]]))) treffen.push(kand[j]);
+            b.folgen = { art: art, dinge: treffen, nach: Math.max(FOLGEN_MIN, Math.ceil(b.frist * FOLGEN_NACH)) };
+        }
+    }
+
     function setzeFristen(p, schritte) {
         var i;
         for (i = 0; i < p.bedrohungen.length; i++) {
@@ -5090,7 +5163,7 @@ var Generator = (function () {
                 if (!loesbar(a.braucht.concat(a.gibt))) return true;
             } else if (a.art === 'verwandeln') {
                 if (!loesbar(a.braucht.concat(a.gibt))) return true;
-            } else if (a.mittel && !a.verbrauchtMittel && p.anforderungen[a.mittel]) {
+            } else if (a.mittel && !a.verbrauchtMittel && !a.gegeben && p.anforderungen[a.mittel]) {
                 // ein Verbrauchsstueck (Phiole) an der falschen Stelle aufgebraucht (Sackgassen-Suchlauf 2026-10-12, Partie 993/1/1:
                 // die einzige Saeure frass das Schloss der Truhe, danach blieb das Buendel zu): jede Stelle, an der es passt, pruefen
                 var altV = p.anforderungen[a.mittel].alt, idsV = sortiert(p.dinge);
@@ -5101,7 +5174,7 @@ var Generator = (function () {
                     if (!passtV) continue;
                     if (!loesbar((a.braucht || []).concat(a.gibt, ['hat:' + gv.id, 'weg:' + gv.id]))) return true;
                 }
-            } else if (a.verbrauchtMittel && a.mittel) {
+            } else if ((a.verbrauchtMittel || a.gegeben) && a.mittel) {      // auch, was man dem Gefangenen gibt (R215; Sackgassen-Suchlauf 2026-10-13, Partie 2008/1/2)
                 var alt = p.anforderungen[a.mittel].alt, ids = sortiert(p.dinge);
                 for (j = 0; j < ids.length; j++) {
                     var g = p.dinge[ids[j]], passt = false;
@@ -5190,7 +5263,8 @@ var Generator = (function () {
         var spieler = opt.spieler, stufe = opt.stufe, v, gruende = [];
         var bekannt = Object.prototype.toString.call(opt.bekannt) === '[object Array]' ? opt.bekannt : null, beste = null, ersteGute = -1;
         if (!(spieler >= 1 && spieler <= 4) || !STUFE[stufe]) throw new Error('Generator.erzeuge: spieler 1..4, stufe 1..3');
-        // Der Stil (Modellsatz) wird je Partie gewuerfelt, aus den zulaessigen. opt.stil legt ihn fest (Pruefwerkzeuge).
+        // Der Stil (Modellsatz) wird je Partie gewuerfelt, aus den zulaessigen. opt.stil legt ihn fest (Pruefwerkzeuge, und
+        // der Server, solange nur ein Stil gespielt wird: server/server.js STIL_FEST).
         var stil = opt.stil || Zufall.strom(String(seed), 'stil').waehle(Katalog.STILE);
         if (Katalog.ALLE_STILE.indexOf(stil) < 0) throw new Error('Generator.erzeuge: Stil ' + stil + ' gibt es nicht');
         for (v = 0; v < MAX_VERSUCHE; v++) {
@@ -5207,6 +5281,7 @@ var Generator = (function () {
                 setzeFristen(p, Math.max(a.schritte, b ? b.schritte : 0));
                 a = Pruefer.pruefe(p, spieler); b = spieler > 1 ? Pruefer.pruefe(p, spieler - 1) : null;
                 if (!a.loesbar || (b && !b.loesbar)) { gruende.push('Frist zu knapp'); continue; }
+                legeFolgen(p, spieler, Katalog.fuer(stil));
             }
             // Niemand bleibt zurueck (R155): auch der Weg, auf dem der Haltende geholt wird, muss gehen (mit Frist)
             if (p.winde) {
@@ -5658,8 +5733,49 @@ var Spiel = (function () {
         return null;
     }
 
+    // R212 Der Wachposten: was er zur Sekunde t tut (doest, bald = rasselt gleich, wacht, abgelenkt), aus seinem Muster;
+    // die Oberflaeche rechnet dasselbe aus wache.muster (Vertrag ARBEITSTEILUNG)
+    function wachPhase(s, w, t) {
+        if (typeof t !== 'number') t = s.zeit * SEK;
+        if (s.ablenk && s.ablenk[w.id] > t) return 'abgelenkt';
+        var L = 0, i, z;
+        for (i = 0; i < w.muster.length; i++) L += w.muster[i][0] + w.muster[i][1] + w.muster[i][2];
+        var r = ((t % L) + L) % L;
+        for (i = 0; i < w.muster.length; i++) {
+            z = w.muster[i];
+            if (r < z[0]) return 'doest';
+            r -= z[0];
+            if (r < z[1]) return 'bald';
+            r -= z[1];
+            if (r < z[2]) return 'wacht';
+            r -= z[2];
+        }
+        return 'doest';
+    }
+    // Wer sich am bewachten Versteck zu schaffen macht: der Wachposten dazu (sonst null). Was es freigibt, liegt danach
+    // dort und laesst sich nehmen (ein Griff, kein Hantieren).
+    function bewachtVon(s, b) {
+        if (!b.ding || !s.partie.dinge.hasOwnProperty(String(b.ding))) return null;
+        var d = s.partie.dinge[String(b.ding)];
+        return d.bewacht && d.vorlage !== 'wachposten' ? s.partie.dinge[d.bewacht] : null;
+    }
+    var HANDGRIFF = { benutzen: 1, anfassen: 1, eingeben: 1, schieben: 1 };
+    function erwischt(s, nr, w) {
+        if (!s.erwischt) s.erwischt = {};
+        s.erwischt[nr] = (s.erwischt[nr] || 0) + 1;                    // die Oberflaeche stellt ihn an den Eingang
+        kostet(s, KAT.WACHPOSTEN_MASS.strafe / SEK, false);
+        if (!s.zeigtAuf) s.zeigtAuf = {};
+        s.zeigtAuf[w.id] = s.zeit * SEK + 2;                            // zwei Sekunden lang zeigt er auf ihn
+        return [m(KAT.WACHPOSTEN.erwischt)];
+    }
+
     function laermFolgen(s, raum) {
-        var i, aus = [];
+        var i, aus = [], wk;
+        // R212: Laerm im Raum lenkt den Wachposten ab
+        for (wk in s.partie.dinge) if (s.partie.dinge.hasOwnProperty(wk) && s.partie.dinge[wk].vorlage === 'wachposten' && s.partie.dinge[wk].raum === raum) {
+            if (!s.ablenk) s.ablenk = {};
+            s.ablenk[wk] = s.zeit * SEK + KAT.WACHPOSTEN_MASS.ablenken;
+        }
         s.f['laerm:' + raum] = true;
         // wie oft es in diesem Raum laut war: Daran erkennt die Oberflaeche neuen Laerm und zeigt ihn allen im Raum
         if (!s.laut) s.laut = {};
@@ -5850,7 +5966,8 @@ var Spiel = (function () {
     }
     // Kreide (R41): nur die Kreide allein, auf ein Ding, das im Raum bleibt (kein Gegenstand)
     function kreideAn(s, d, items) {
-        return items.length === 1 && items[0].vorlage === 'kreide' && d.typ !== 'gegenstand' && d.vorlage !== 'durchreiche' && d.vorlage !== 'waage';
+        // keine Kreuze auf Figuren (R215, R212, R219): Wer sie ihnen hinhaelt, dem antworten sie wie auf alles andere
+        return items.length === 1 && items[0].vorlage === 'kreide' && d.typ !== 'gegenstand' && d.vorlage !== 'durchreiche' && d.vorlage !== 'waage' && !(KAT.ELEMENTE[d.vorlage] && KAT.ELEMENTE[d.vorlage].figur) && d.vorlage !== 'wachposten';
     }
     // gemalt wird auf die Seite, vor der man steht (b.x, b.z; ohne Angabe die Seite zur Raummitte)
     function kreuz(s, d, b) {
@@ -6904,6 +7021,20 @@ var Spiel = (function () {
             .replace('{stand}', T.staende[g.stand]);
     }
 
+    // R72: Die Folge einer abgelaufenen Frist tritt ein (einmal): Bodenverstecke fluten, Papier weicht auf, das Bord wird
+    // zerdrueckt; getroffen ist nur, was bis dahin keiner hatte oder geoeffnet hat
+    function folgenEintreten(s, b) {
+        var E = KAT.ELEMENTE[s.partie.dinge[b.element].vorlage], i, id, d;
+        s.f['folgen:' + b.id] = true;
+        for (i = 0; i < b.folgen.dinge.length; i++) {
+            id = b.folgen.dinge[i]; d = s.partie.dinge[id];
+            if (d.typ === 'gegenstand') { if (!s.f['hat:' + id]) s.f['weg:' + id] = true; }
+            else if (!aktionenAn(s, id, ['benutzen', 'oeffnen', 'durchsuchen', 'ereignis']).some(function (a) { return erledigt(s, a); })) s.f['geflutet:' + id] = true;
+        }
+        return [zeigt(m(E.folgenText, 'warnung'))];
+    }
+    function fristEnde(b) { return b.frist + (b.folgen ? b.folgen.nach : 0); }
+
     function zeitPruefen(s) {
         var aus = [], i, ende = null;
         for (i = 0; i < s.partie.bedrohungen.length; i++) {
@@ -6911,6 +7042,9 @@ var Spiel = (function () {
             if (b.ausloeser !== 'zeit' || b.frist === null || s.f['gebannt:' + b.id] || s.f['abgelaufen:' + b.id]) continue;
             var rg = regel(s, b.regel), rest = b.frist - s.zeit;
             if (rest <= 0) {
+                // R72: erst die Folge, das Ende spaeter
+                if (b.folgen && !s.f['folgen:' + b.id]) aus = aus.concat(folgenEintreten(s, b));
+                if (b.folgen && s.zeit < fristEnde(b)) continue;
                 if (!s.fristGemeldet[b.id]) { s.fristGemeldet[b.id] = true; aus.push(zeigt(m('Jetzt ist es so weit: ' + rg.text, 'warnung'))); }
                 if (!ende) ende = KAT.ELEMENTE[s.partie.dinge[b.element].vorlage].ende;
             } else if (rest <= 4 || (rest <= b.frist / 4 && !s.fristGemeldet[b.id + ':viertel'])) {
@@ -6923,7 +7057,7 @@ var Spiel = (function () {
         // Auf Stufe 1 ist die Frist weich (Entscheidung 2026-10-12 nach GRUNDSAETZE.md, Empfehlung 12): Man spielt weiter,
         // nur zaehlt die Partie nicht mehr fuer die Wertung (s.ausserWertung); die Frist ist vorbei (abgelaufen:).
         if (ende && s.status === 'laeuft' && s.partie.stufe === 1) {
-            for (i = 0; i < s.partie.bedrohungen.length; i++) { var bw = s.partie.bedrohungen[i]; if (bw.ausloeser === 'zeit' && bw.frist !== null && !s.f['gebannt:' + bw.id] && bw.frist <= s.zeit) s.f['abgelaufen:' + bw.id] = true; }
+            for (i = 0; i < s.partie.bedrohungen.length; i++) { var bw = s.partie.bedrohungen[i]; if (bw.ausloeser === 'zeit' && bw.frist !== null && !s.f['gebannt:' + bw.id] && fristEnde(bw) <= s.zeit) s.f['abgelaufen:' + bw.id] = true; }
             if (!s.ausserWertung) { s.ausserWertung = true; var fw = m(ende + ' ' + KAT.FRIST_WEICH, 'system'); fw.l = fw.text; aus.push(fw); }
         } else if (ende && s.status === 'laeuft') { s.status = 'verloren'; aus.push(m(ende, 'system')); }
         return aus;
@@ -7055,6 +7189,28 @@ var Spiel = (function () {
         var zuFenster = fensterZu(s);
         if (zuFenster.length) return zuFenster.concat(befehl(s, nr, b));      // erst klackt es zu, dann geschieht der Befehl
         if (b.art === 'tipp') return tipp(s, nr);
+        // R72: was die Folge einer Frist geflutet hat, erreicht man nicht mehr
+        if (b.ding && s.f['geflutet:' + b.ding] && b.art !== 'ansehen') {
+            var gb0 = null;
+            for (var gi = 0; gi < s.partie.bedrohungen.length; gi++) if (s.partie.bedrohungen[gi].folgen && s.partie.bedrohungen[gi].folgen.dinge.indexOf(String(b.ding)) >= 0) gb0 = s.partie.bedrohungen[gi];
+            return [nein(m(KAT.ELEMENTE[s.partie.dinge[gb0.element].vorlage].folgenSperre))];
+        }
+        // R212: Am bewachten Versteck hantieren, waehrend der Wachposten hinsieht: erwischt. Die Oberflaeche meldet dazu,
+        // wer sich bewegt hat, waehrend er hinsah (sie kennt die Orte); der Server prueft nur die Zeit (eine Sekunde Spiel)
+        if (HANDGRIFF[b.art]) { var wpo = bewachtVon(s, b); if (wpo && s.raum[nr] === wpo.raum && wachPhase(s, wpo) === 'wacht') return erwischt(s, nr, wpo); }
+        // Abpassen, bis er wegsieht: nur fuer Pruefwerkzeuge (der Server laesst es nicht durch; ein Spieler wartet einfach ab)
+        if (b.art === 'abpassen') {
+            var wpp = b.ding && s.partie.dinge.hasOwnProperty(String(b.ding)) ? s.partie.dinge[String(b.ding)] : null, wpn = 0;
+            if (!wpp || wpp.vorlage !== 'wachposten') return [];
+            while (wachPhase(s, wpp) !== 'doest' && wachPhase(s, wpp) !== 'abgelenkt' && wpn++ < 400) kostet(s, 1 / 12, false);
+            return [];
+        }
+        if (b.art === 'erwischt') {
+            var wpd = b.ding && s.partie.dinge.hasOwnProperty(String(b.ding)) ? s.partie.dinge[String(b.ding)] : null;
+            if (!wpd || wpd.vorlage !== 'wachposten' || s.raum[nr] !== wpd.raum) return [];
+            if (wachPhase(s, wpd) !== 'wacht' && wachPhase(s, wpd, s.zeit * SEK - 1) !== 'wacht') return [];
+            return erwischt(s, nr, wpd);
+        }
         // Tipp nach der Absicht: woran der Spieler zuletzt war (angesehen, angefasst, benutzt, genommen)
         if (b.ding && s.partie.dinge.hasOwnProperty(String(b.ding))) { if (!s.zuletzt) s.zuletzt = {}; s.zuletzt[nr] = String(b.ding); }
         if (b.art === 'lose') return lose(s, nr);
@@ -7577,6 +7733,13 @@ var Spiel = (function () {
                 if (d.vorlage === 'krug') eintrag.krug = [(s.krug && s.krug[d.id]) || 0, d.fasst];
                 // Schoepfen: Wasser aus dem Kessel in den Schacht gefuellt; die Oberflaeche laesst den Kesselspiegel sinken
                 if (d.vorlage === 'becken' && aktionenAn(s, d.id, ['benutzen']).some(function (ab) { return ab.schoepfen && erledigt(s, ab); })) eintrag.geschoepft = true;
+                // R212: was der Wachposten gerade tut; das Muster, damit die Oberflaeche ihn ohne neue Sicht weiterdreht
+                if (d.vorlage === 'wachposten') {
+                    var wph = wachPhase(s, d), wzeigt = s.zeigtAuf && s.zeigtAuf[d.id] > s.zeit * SEK;
+                    eintrag.w = [{ art: 'figur', haltung: wzeigt ? 'zeigt' : wph === 'wacht' ? 'wacht' : wph === 'abgelenkt' ? 'idle' : 'doest', an: true }];
+                    eintrag.wache = { muster: d.muster, phase: wph, jetzt: Math.round(s.zeit * SEK * 10) / 10, ablenkBis: (s.ablenk && s.ablenk[d.id]) || 0 };
+                }
+                if (s.f['geflutet:' + d.id]) eintrag.geflutet = true;          // R72: steht unter Wasser
                 if (d.vorlage === 'drehspiegel') eintrag.dreh = (s.spiegel && s.spiegel[d.id]) || 0;      // R20: Vierteldrehungen seit Beginn
                 if (suchen) {
                     eintrag.suchen = true;
@@ -7642,6 +7805,7 @@ var Spiel = (function () {
         // Der ganze Bereich steht (Oberflaeche, 2026-10-12): Steht die Zwischentuer oder das Gitter offen? Die Oberflaeche zeigt
         // das Ding auch von der anderen Seite, wo es nicht in der Sicht steht ("zu" je Raum sagt nur, ob dieser Spieler hinueber darf).
         if (s.partie.durchgang) ansicht.gangOffen = !!s.f['offen:' + s.partie.durchgang.nach];
+        if (s.erwischt && s.erwischt[nr]) ansicht.erwischt = s.erwischt[nr];      // R212: steigt, wenn der Wachposten ihn erwischt hat
         // Was drueben steht (Wunsch der Oberflaeche, 2026-10-13): die Dinge des Nebenraums mit denselben Feldern wie in dinge,
         // solange man hinuebersieht (Tuer offen oder Fallgitter, durch dessen Staebe man immer sieht); so sieht man, was ein
         // Mitspieler drueben veraendert, ohne hinueberzugehen
@@ -7665,8 +7829,10 @@ var Spiel = (function () {
         for (i = 0; i < s.partie.bedrohungen.length; i++) {
             var bf = s.partie.bedrohungen[i];
             if (bf.ausloeser !== 'zeit' || !bf.frist || s.f['gebannt:' + bf.id] || s.f['abgelaufen:' + bf.id]) continue;
-            var rest = Math.max(0, Math.ceil((bf.frist - s.zeit) * SEK - 1e-9));
-            if (!ansicht.frist || rest < ansicht.frist.rest) ansicht.frist = { rest: rest, gesamt: Math.round(bf.frist * SEK) };
+            // R72: nach der Folge zaehlt der Timer bis zum Ende (folgen: true)
+            var bfE = s.f['folgen:' + bf.id] ? fristEnde(bf) : bf.frist, rest = Math.max(0, Math.ceil((bfE - s.zeit) * SEK - 1e-9));
+            if (!ansicht.frist || rest < ansicht.frist.rest) ansicht.frist = { rest: rest, gesamt: Math.round(bfE * SEK) };
+            if (s.f['folgen:' + bf.id]) { ansicht.frist.folgen = true; if (!ansicht.folgen) ansicht.folgen = {}; ansicht.folgen[bf.raum] = bf.folgen.art; }
         }
         if (s.ausserWertung) ansicht.ausserWertung = true;           // Stufe 1: Frist abgelaufen, es geht weiter ohne Wertung
         // Finale und Ausklang (GRUNDSAETZE.md, Empfehlung 9): endspurt = an der Ausgangstuer ist nur noch ein Schloss zu
