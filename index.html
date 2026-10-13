@@ -369,8 +369,9 @@ var Setting = (function () {
                 ruhig: 'Die R\u00e4der laufen wieder gleichm\u00e4\u00dfig. Es eilt nicht mehr.' },
             spiegel: { name: 'blanker Schild', nom: 'der blanke Schild', akk: 'den blanken Schild', verb: 'Zur Seite klappen',
                 b: 'Ein blank polierter Schild an der Wand. Man sieht sich darin wie in einem Spiegel.',
-                bannBeob: 'Wer hineinsieht, kann sich nicht mehr r\u00fchren. Wo Staub den Rand tr\u00fcbt, spiegelt der Schild nichts.',
-                bann: 'Wer hineinsieht, kann sich nicht mehr r\u00fchren. Mit einem gro\u00dfen Tuch dar\u00fcber s\u00e4he niemand mehr hinein.', f: [
+                bannBeob: 'Wer hineinsieht, kann sich nicht mehr r\u00fchren. Wo Staub den Rand tr\u00fcbt, spiegelt der Schild nichts, und er h\u00e4ngt lose an einem einzigen Haken.',
+                bann: 'Wer hineinsieht, kann sich nicht mehr r\u00fchren. Mit einem gro\u00dfen Tuch dar\u00fcber s\u00e4he niemand mehr hinein, und mit etwas Langem lie\u00dfe er sich zur Wand drehen, ohne dass man hineinsieht.',
+                gegen: { hinsehen: ['abdecken', 'mit etwas Langem zur Wand drehen'] }, f: [
                 ['zahl', 'Der blanke Schild beschl\u00e4gt, und im Beschlag erscheinen Ziffern.', 'Auf dem blanken Schild sind feine Schlieren, als h\u00e4tte jemand mit dem Finger Ziffern hineingeschrieben.'],
                 ['richtung', 'Im Spiegelbild des Schildes ist eine Stelle markiert, im Raum selbst nicht: {ziel}.', 'Im Spiegelbild des Schildes wirkt der Raum nicht ganz wie der Raum selbst.'],
                 ['behaelter', 'Der Schild l\u00e4sst sich zur Seite klappen. Dahinter: {ziel}.', 'Am Rand des Schildes sitzen Scharniere, und die Wand dahinter ist dunkler.', 'Der Schild ruckt in seiner Halterung, als lie\u00dfe er sich zur Seite klappen.'],
@@ -394,8 +395,9 @@ var Setting = (function () {
                 ['verwandler', 'Die Kerzen brennen jetzt hell. Daran lie\u00dfe sich etwas anz\u00fcnden.', 'Die Dochte sind schwarz: Die Kerzen haben schon einmal gebrannt.']] },
             gemaelde: { name: 'dunkle Leinwand', nom: 'die dunkle Leinwand', akk: 'die dunkle Leinwand', verb: 'Abtasten',
                 b: 'Ein schwerer Rahmen an der Wand. Die Leinwand darin ist dunkel und ohne Bild, und doch f\u00fchlt man sich von ihr angesehen.',
-                bannBeob: 'Wer in die Augen sieht, kann sich nicht mehr r\u00fchren. Wo ein Fetzen Stoff \u00fcber dem Rahmen h\u00e4ngt, sind keine Augen zu sehen.',
-                bann: 'Wer in die Augen sieht, kann sich nicht mehr r\u00fchren. Ein gro\u00dfes Tuch \u00fcber dem Rahmen, und sie s\u00e4hen niemanden mehr.', f: [
+                bannBeob: 'Wer in die Augen sieht, kann sich nicht mehr r\u00fchren. Wo ein Fetzen Stoff \u00fcber dem Rahmen h\u00e4ngt, sind keine Augen zu sehen. Die Leinwand ist d\u00fcnn und an einer Ecke schon eingerissen.',
+                bann: 'Wer in die Augen sieht, kann sich nicht mehr r\u00fchren. Ein gro\u00dfes Tuch \u00fcber dem Rahmen, und sie s\u00e4hen niemanden mehr. Auch eine Klinge k\u00e4me durch die d\u00fcnne Leinwand.',
+                gegen: { hinsehen: ['abdecken', 'die Leinwand zerschneiden'] }, f: [
                 ['richtung', 'Auf der dunklen Leinwand erscheinen zwei Augen. Sie wandern zu einer Stelle: {ziel}.', 'Auf der dunklen Leinwand sind zwei blasse Kreise zu ahnen, wie Augen, die zur Seite blicken.'],
                 ['zahl', 'Auf der dunklen Leinwand leuchten Ziffern.', 'Auf der dunklen Leinwand sind blasse Umrisse von Ziffern zu ahnen.'],
                 ['behaelter', 'Hinter dem Rahmen klemmt etwas: {ziel}.', 'Der Rahmen steht unten ein St\u00fcck von der Wand ab.', 'Der Rahmen klappert gegen die Wand, als stecke etwas dahinter.'],
@@ -1010,6 +1012,8 @@ var Setting = (function () {
             naehe: ['mit L\u00e4rm verscheuchen', 'mit etwas Langem auf Abstand halten'],
             zeit: ['aufhalten (Abfluss freistochern, R\u00e4der blockieren)', 'mit Gewalt stoppen']
         },
+        // Stufe 1: Frist abgelaufen, aber es geht weiter (nach dem Satz "ende" des Elements)
+        fristWeich: 'Auf dieser Stufe geht es trotzdem weiter. Nur z\u00e4hlt die Partie nicht mehr f\u00fcr die Wertung.',
         // Dunkler Start (2026-10-12): warum es am Anfang dunkel ist; passt zu jeder Story (eine wird gewuerfelt)
         dunkelStart: { gruende: ['Die Fackeln sind heruntergebrannt. Es ist stockdunkel.', 'Ein kalter Luftzug hat die Fackeln gel\u00f6scht. Es ist stockdunkel.',
             'Jemand hat die Fackeln gel\u00f6scht, bevor die T\u00fcr zufiel. Es ist stockdunkel.'] },
@@ -1289,6 +1293,8 @@ var Setting = (function () {
             'einen Hebel mit etwas Schwerem beschweren und dann den anderen ziehen': 'Du beschwerst den einen Hebel und ziehst den anderen.',
             'etwas Spiegelndes davor aufstellen': 'Du stellst etwas Spiegelndes vor {akk}.',
             'abdecken': 'Du deckst {akk} ab.',
+            'mit etwas Langem zur Wand drehen': 'Ohne hineinzusehen, drehst du {akk} mit etwas Langem zur Wand.',
+            'die Leinwand zerschneiden': 'Du schneidest die Leinwand mitten durch die Augen. Sie sehen niemanden mehr an.',
             'ein Licht darauf richten': 'Du richtest ein Licht auf {akk}.',
             'mit L\u00e4rm verscheuchen': 'Du verscheuchst {akk} mit L\u00e4rm.',
             'mit Fisch bestechen': 'Du legst {akk} den Fisch hin. Sie frisst und l\u00e4sst dich vorbei.',
@@ -1522,7 +1528,9 @@ var Katalog = (function () {
             { art: 'teil', aus: ['zeit', 'beruehrung'], form: 'uhr' },
             { art: 'zeitgeber', aus: ['zeit'] }
         ] },
-        spiegel: { f: [
+        // Zweiter Weg gegen den Blickbann (GRUNDSAETZE.md, Empfehlung 6: wo er physikalisch naheliegt): den Schild mit etwas
+        // Langem zur Wand drehen, ohne hineinzusehen; die Leinwand mit einer Klinge zerschneiden
+        spiegel: { gegen: { hinsehen: { alt: [{ b: { deckend: 2 }, legt: true }, { b: { lang: 2, steif: 1 } }] } }, f: [
             { art: 'zahl', aus: ['waerme', 'wasser'] },
             { art: 'richtung', aus: ['hinsehen', 'licht_aus', 'licht_an'] },
             { art: 'behaelter', aus: ['beruehrung'] },
@@ -1541,7 +1549,7 @@ var Katalog = (function () {
             { art: 'zeitgeber', aus: ['zeit'] },
             { art: 'verwandler', aus: ['waerme'], rezept: { b: { lang: 2, steif: 1 }, e: { licht: 1, entzuendend: 1, lang: 2, steif: 1 }, zu: 'fackel' } }
         ] },
-        gemaelde: { nurKlein: true, f: [
+        gemaelde: { nurKlein: true, gegen: { hinsehen: { alt: [{ b: { deckend: 2 }, legt: true }, { b: { scharf: 2 } }] } }, f: [
             { art: 'richtung', aus: ['naehe', 'hinsehen', 'anzahl', 'abwesenheit'] },
             { art: 'zahl', aus: ['licht_aus'] },
             { art: 'behaelter', aus: ['beruehrung'] },
@@ -1953,7 +1961,7 @@ var Katalog = (function () {
     var BASIS = {
         version: 3, SETTING: S.id, ARTEN: ARTEN, AUSLOESER: AUSLOESER, ELEMENTE: ELEMENTE, GEGENSTAENDE: GEGENSTAENDE,
         EIGENSCHAFT_TEXT: EIGENSCHAFT_TEXT, ZU_WENIG: S.zuWenig, HINDERNISSE: HINDERNISSE, SCHLOESSER: SCHLOESSER, GEGENMITTEL: GEGENMITTEL,
-        VERSTECKE: S.verstecke, VERSTECK_ANZEICHEN: S.versteckAnzeichen || {}, MECHANISMEN: S.mechanismen || {}, MECHANIK: S.mechanik || null, SCHLICHT: S.schlicht, AUSSTATTUNG: S.ausstattung, LICHT: S.licht, DUNKEL_START: S.dunkelStart, WASSER: WASSER, SCHLUESSEL: S.schluessel, NOTIZ: S.notiz, STORIES: S.stories, TIPP: S.tipp, WEG_SATZ: S.wegSatz || {}, SEK_JE_EINHEIT: SEK_JE_EINHEIT,
+        VERSTECKE: S.verstecke, VERSTECK_ANZEICHEN: S.versteckAnzeichen || {}, MECHANISMEN: S.mechanismen || {}, MECHANIK: S.mechanik || null, SCHLICHT: S.schlicht, AUSSTATTUNG: S.ausstattung, LICHT: S.licht, DUNKEL_START: S.dunkelStart, WASSER: WASSER, SCHLUESSEL: S.schluessel, NOTIZ: S.notiz, STORIES: S.stories, TIPP: S.tipp, FRIST_WEICH: S.fristWeich, WEG_SATZ: S.wegSatz || {}, SEK_JE_EINHEIT: SEK_JE_EINHEIT,
         VERWANDLUNGEN: S.verwandlungen, ZAEHL: S.zaehl, LOGIK: S.logik, LUEGNER: S.luegner, HANDBUCH: S.handbuch, REGAL: S.regal, ZIFFER_JE_KOPF: S.zifferJeKopf, KLEIN: KLEIN, BEWEGLICH: BEWEGLICH, VERRUECKT: S.verrueckt, KLANG: S.klang, KLOPF_AUS: KLOPF_AUS, STAEBE: STAEBE, DURCHREICHE: S.durchreiche, HAUSORDNUNG: S.hausordnung, GEDENKTAFEL: S.gedenktafel, STANDPUNKT: S.standpunkt, STRAHL: S.strahl, WORT: WORT, WACHE: S.wache, KRUEGE: S.kruege, KERBSTEIN: S.kerbstein, BALKENWAAGE: S.balkenwaage, KAEFIG: KAEFIG, ZELLEN: ZELLEN, PAKT: S.pakt, KREIDE: S.kreide, HOCH: S.hoch, NOTSCHACHT: NOTSCHACHT, SPIEGEL: S.spiegel, HEBELREIHE: S.hebelreihe, ORAKEL: S.orakel, NOTIZEN: S.notizen, TRAENKE: S.traenke, BAUEN: BAUEN, BAUEN_TEXT: S.bauen, GABEN: S.gaben, GABEN_REIHE: ['nachtauge', 'gehoer', 'schrift'], WAAGE: S.waage, WAAGE_SCHWER: WAAGE_SCHWER, FALLGITTER: FALLGITTER_K, ZEICHEN: S.zeichen, FETZEN: S.fetzen, TINTE: TINTE_K, UHR: S.uhr, ZWISCHENTUER: S.zwischentuer, TAFEL: S.tafel, INSCHRIFT: INSCHRIFT_K,
         SCHLOSSTEXT: S.schlosstext, VORBEI: S.vorbei, SPUR: S.spur, HAENDE: S.haende, ZWEITFACH: S.zweitfach, RUHIG: S.ruhig,
         FACH: { klemmt: S.fach.klemmt, hohl: S.fach.hohl, alt: [{ b: { lang: 2, schwer: 2 }, text: S.fach.alt[0] }, { b: { stumpf: 2 }, laerm: true, text: S.fach.alt[1] }, { b: { scharf: 2 }, text: S.fach.alt[2] }] },
@@ -2215,7 +2223,7 @@ var Pruefer = (function () {
         var i, b, n = 0, letzte = 0, nachId = {}, noetig = null;
         for (i = 0; i < partie.bedrohungen.length; i++) {
             b = partie.bedrohungen[i];
-            if (b.ausloeser !== 'zeit' || b.frist === null || b.frist === undefined || z.f['gebannt:' + b.id]) continue;
+            if (b.ausloeser !== 'zeit' || b.frist === null || b.frist === undefined || z.f['gebannt:' + b.id] || z.f['abgelaufen:' + b.id]) continue;      // abgelaufen: Stufe 1, weich
             if (!noetig) {
                 noetig = noetigerWeg(partie, z.weg);
                 for (var j = 0; j < partie.aktionen.length; j++) nachId[partie.aktionen[j].id] = partie.aktionen[j];
@@ -5012,6 +5020,29 @@ var Generator = (function () {
         return false;
     }
 
+    // Breite (GRUNDSAETZE.md, Empfehlung 5: gegen Leerlauf zu dritt und zu viert): noetige Schritte geteilt durch die
+    // laengste Kette darin (ein Schritt haengt an einem frueheren, wenn der etwas gibt, das er braucht). Allein und zu zweit
+    // gilt keine Untergrenze; ab drei Spielern auf Stufe 1 mindestens 1,5, auf Stufe 2 und 3 mindestens 2 (gemessen
+    // 2026-10-12 vorher: Median 1,8 / 2,2 / 2,4; hoeher ginge nur mit noch mehr Schloessern, also laengeren Partien).
+    var BREITE_MIN = { 1: 1.5, 2: 2, 3: 2 };
+    function breite(p, noetig) {
+        var nach = {}, tiefe = [], i, j, lang = 1;
+        for (i = 0; i < p.aktionen.length; i++) nach[p.aktionen[i].id] = p.aktionen[i];
+        for (j = 0; j < noetig.length; j++) {
+            var a = nach[noetig[j].aktion], braucht = (noetig[j].abh || []).concat(a.braucht || []), d = 1;
+            for (i = 0; i < (a.kennt || []).length; i++) braucht.push('kennt:' + a.kennt[i]);
+            for (i = 0; i < j; i++) if ((nach[noetig[i].aktion].gibt || []).some(function (f) { return braucht.indexOf(f) >= 0; })) d = Math.max(d, tiefe[i] + 1);
+            tiefe.push(d);
+            if (d > lang) lang = d;
+        }
+        return noetig.length / lang;
+    }
+    // Zwei Raeume hintereinander (linear, auch das Fallgitter R150) sind von Natur aus schmaler: dort gilt 1,5, sonst kaemen
+    // sie zu dritt und zu viert kaum noch vor (gemessen: linear 148 statt 86 von 1440, Opfer 14 statt ueber 20)
+    // Das Fallgitter (R150) ist ein gewollter Engpass vor dem Schluss: dort nur keine reine Kette (1,2)
+    function breiteMin(p, stufe) { return p.opfer ? 1.2 : p.aufbau === 'linear' ? 1.5 : BREITE_MIN[stufe]; }
+    function zuSchmal(p, noetig, spieler, stufe) { return spieler >= 3 && breite(p, noetig) < breiteMin(p, stufe); }
+
     function erzeuge(seed, opt) {
         var spieler = opt.spieler, stufe = opt.stufe, v, gruende = [];
         if (!(spieler >= 1 && spieler <= 4) || !STUFE[stufe]) throw new Error('Generator.erzeuge: spieler 1..4, stufe 1..3');
@@ -5025,6 +5056,7 @@ var Generator = (function () {
             var a = Pruefer.pruefe(p, spieler), b = spieler > 1 ? Pruefer.pruefe(p, spieler - 1) : null;
             if (!a.loesbar || (b && !b.loesbar)) { gruende.push(!a.loesbar ? 'unloesbar' : 'unloesbar mit einem weniger'); continue; }
             if (a.schritteNoetig < STUFE[stufe].mindest) { gruende.push('zu kurz'); continue; }
+            if (zuSchmal(p, a.noetig, spieler, stufe)) { gruende.push('zu schmal'); continue; }
             var hatFrist = false, i;
             for (i = 0; i < p.bedrohungen.length; i++) if (p.bedrohungen[i].ausloeser === 'zeit') hatFrist = true;
             if (hatFrist) {
@@ -6715,7 +6747,7 @@ var Spiel = (function () {
         var aus = [], i, ende = null;
         for (i = 0; i < s.partie.bedrohungen.length; i++) {
             var b = s.partie.bedrohungen[i];
-            if (b.ausloeser !== 'zeit' || b.frist === null || s.f['gebannt:' + b.id]) continue;
+            if (b.ausloeser !== 'zeit' || b.frist === null || s.f['gebannt:' + b.id] || s.f['abgelaufen:' + b.id]) continue;
             var rg = regel(s, b.regel), rest = b.frist - s.zeit;
             if (rest <= 0) {
                 if (!s.fristGemeldet[b.id]) { s.fristGemeldet[b.id] = true; aus.push(zeigt(m('Jetzt ist es so weit: ' + rg.text, 'warnung'))); }
@@ -6727,7 +6759,12 @@ var Spiel = (function () {
         }
         // Frist abgelaufen und nicht aufgehalten: verloren (Vorgabe 2026-10-12, wie im echten Escape Room). Spaeter koennen
         // davor Folgen kommen (Luke unter Wasser, nasses Papier) und das Ende etwas spaeter liegen (RAETSEL R72).
-        if (ende && s.status === 'laeuft') { s.status = 'verloren'; aus.push(m(ende, 'system')); }
+        // Auf Stufe 1 ist die Frist weich (Entscheidung 2026-10-12 nach GRUNDSAETZE.md, Empfehlung 12): Man spielt weiter,
+        // nur zaehlt die Partie nicht mehr fuer die Wertung (s.ausserWertung); die Frist ist vorbei (abgelaufen:).
+        if (ende && s.status === 'laeuft' && s.partie.stufe === 1) {
+            for (i = 0; i < s.partie.bedrohungen.length; i++) { var bw = s.partie.bedrohungen[i]; if (bw.ausloeser === 'zeit' && bw.frist !== null && !s.f['gebannt:' + bw.id] && bw.frist <= s.zeit) s.f['abgelaufen:' + bw.id] = true; }
+            if (!s.ausserWertung) { s.ausserWertung = true; var fw = m(ende + ' ' + KAT.FRIST_WEICH, 'system'); fw.l = fw.text; aus.push(fw); }
+        } else if (ende && s.status === 'laeuft') { s.status = 'verloren'; aus.push(m(ende, 'system')); }
         return aus;
     }
 
@@ -6774,15 +6811,36 @@ var Spiel = (function () {
         }
         return aus;
     }
+    // Tipp nach der Absicht (GRUNDSAETZE.md, Empfehlung 8; Gilbert: "reward intent"): Unter den noetigen Schritten, die
+    // jetzt gehen, der zu dem Ding, an dem der Fragende zuletzt war (das Ding des Schritts oder ein Mittel dafuer); sonst
+    // der erste noetige. Ein Schritt geht jetzt, wenn alles, wovon er abhaengt, schon gilt (nie ein Raetsel, vor dem erst
+    // ein anderes zu loesen ist; Frage des Projektinhabers 2026-10-12).
+    function absicht(s, nr, noetig) {
+        var z = s.zuletzt && s.zuletzt[nr], i, j, a;
+        if (!z) return null;
+        for (i = 0; i < noetig.length; i++) {
+            a = null;
+            for (j = 0; j < s.partie.aktionen.length; j++) if (s.partie.aktionen[j].id === noetig[i].aktion) a = s.partie.aktionen[j];
+            if (!a || (a.ding !== z && (noetig[i].mittel || []).indexOf(z) < 0)) continue;
+            // was der Pruefer fuer diesen Schritt voraussetzt (abh: Werkzeug in der Hand, Licht, gebannt, Tuer offen; "!x" heisst:
+            // x gilt nicht), dazu, was die Aktion braucht und kennen muss: alles muss jetzt schon gelten
+            var geht = (noetig[i].abh || []).concat(a.braucht || [], (a.kennt || []).map(function (k) { return 'kennt:' + k; })).every(function (f) {
+                if (f.charAt(0) === '!') return !s.f[f.slice(1)];
+                return s.f[f] || (f.indexOf('hat:') === 0 && typeof s.wer[f.slice(4)] === 'number');
+            });
+            if (geht) return noetig[i];
+        }
+        return null;
+    }
     function tipp(s, nr) {
         var T = KAT.TIPP, r = Pruefer.pruefe(s.partie, aktive(s), { f: s.f, schritte: s.zeit }), i, text;
         var sag = function (t) { var x = m(t, 'tipp'); x.l = t; return [x]; };
         if (!r.loesbar || !r.noetig.length) return sag(T.keiner);
-        var w = r.noetig[0], a = null;
+        var w = absicht(s, nr, r.noetig) || r.noetig[0], a = null;
         for (i = 0; i < s.partie.aktionen.length; i++) if (s.partie.aktionen[i].id === w.aktion) a = s.partie.aktionen[i];
         if (!s.tipps) s.tipps = {};
-        var stufe = s.tipps[a.id] = Math.min(3, (s.tipps[a.id] || 0) + 1);
-        if (stufe === 3) s.tippLoesungen = (s.tippLoesungen || 0) + 1;
+        var vorher = s.tipps[a.id] || 0, stufe = s.tipps[a.id] = Math.min(3, vorher + 1);
+        if (stufe === 3 && vorher < 3) s.tippLoesungen = (s.tippLoesungen || 0) + 1;     // eine Loesung zaehlt einmal
         var d = a.ding ? s.partie.dinge[a.ding] : null;
         // ein Fach, das noch keiner entdeckt hat, heisst im Tipp, wie man es sieht (ein Fass ist ein Fass)
         var unbekannt = unentdeckt(s, d);
@@ -6836,6 +6894,8 @@ var Spiel = (function () {
         var zuFenster = fensterZu(s);
         if (zuFenster.length) return zuFenster.concat(befehl(s, nr, b));      // erst klackt es zu, dann geschieht der Befehl
         if (b.art === 'tipp') return tipp(s, nr);
+        // Tipp nach der Absicht: woran der Spieler zuletzt war (angesehen, angefasst, benutzt, genommen)
+        if (b.ding && s.partie.dinge.hasOwnProperty(String(b.ding))) { if (!s.zuletzt) s.zuletzt = {}; s.zuletzt[nr] = String(b.ding); }
         if (b.art === 'lose') return lose(s, nr);
         // Festhalten und Bewegen (bedien 'halten'): Abdeckung zur Seite, Buch gezogen, Halter gedreht. Das Ding bleibt stehen;
         // fuer die Engine ist es ein Anfassen, das nur so wirkt (F allein verraet nichts)
@@ -7409,10 +7469,11 @@ var Spiel = (function () {
         // rest und gesamt in Sekunden; die naechste ungebannte Frist. zeit (oben) ist ebenfalls in Sekunden.
         for (i = 0; i < s.partie.bedrohungen.length; i++) {
             var bf = s.partie.bedrohungen[i];
-            if (bf.ausloeser !== 'zeit' || !bf.frist || s.f['gebannt:' + bf.id]) continue;
+            if (bf.ausloeser !== 'zeit' || !bf.frist || s.f['gebannt:' + bf.id] || s.f['abgelaufen:' + bf.id]) continue;
             var rest = Math.max(0, Math.ceil((bf.frist - s.zeit) * SEK - 1e-9));
             if (!ansicht.frist || rest < ansicht.frist.rest) ansicht.frist = { rest: rest, gesamt: Math.round(bf.frist * SEK) };
         }
+        if (s.ausserWertung) ansicht.ausserWertung = true;           // Stufe 1: Frist abgelaufen, es geht weiter ohne Wertung
         // Weggestossenes in diesem Raum: wo es jetzt steht
         if (s.koerper) {
             var planS = planVon(s), gk;
