@@ -1196,6 +1196,7 @@ var Setting = (function () {
                         // Raumfuellung je Story (2026-10-13, werkzeug/modelle/bau.js): die Stuecke des Gewoelbes, die hier fehlten
                         'lagerfass', 'holzstoss', 'bretterstapel', 'barrenstapel', 'ruestung', 'grabmal', 'sarg_offen'],
                     geschoss: 2.5,
+                    schlossSeite: 0.95,                                  // Schloesser so weit neben der Tuermitte: neben dem Steinrahmen (er reicht bis 0,64 m), nicht auf seinem Rand
                     fenster: 'wand',                                     // Fenster auf Augenhoehe, wo an der Wand nichts steht (kern/raumplan.js, fenster)
                     stand: { radio: 'boden' },
                     wandhoehe: { licht: 1.5 },
@@ -2088,7 +2089,8 @@ var Katalog = (function () {
         K.STIL = id; K.STILNAME = st.name || id;
         K.RAUM = { stand: (st.raum && st.raum.stand) || {}, wandhoehe: (st.raum && st.raum.wandhoehe) || {}, grund: (st.raum && st.raum.grund) || {},
             geschoss: (st.raum && st.raum.geschoss) || 0, deko: (st.raum && st.raum.deko) || ['regal', 'fass', 'kisten', 'banner', 'stuhl'],
-            pfeiler: (st.raum && st.raum.pfeiler) || null, fenster: (st.raum && st.raum.fenster) || null };
+            pfeiler: (st.raum && st.raum.pfeiler) || null, fenster: (st.raum && st.raum.fenster) || null,
+            schlossSeite: (st.raum && st.raum.schlossSeite) || 0 };
         K.maengel = maengelVon(K, st);
         // jeder Weg hat einen ganzen Satz fuer sein Gelingen (setting.wegSatz), auch nach den Ersetzungen dieses Stils
         (function satzFehlt(o, tiefe) {
